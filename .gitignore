@@ -1,2 +1,6 @@
 # build directory
 build/
+# linux output console
+nohup.out
+# bash scripts
+*.sh

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -9,9 +11,10 @@ class window
     ~window();
 
     bool should_close();
-    void window_end_frame();
+    void end_frame();
 
   private:
     GLFWwindow* handle;
+    int width, height;
 };
 }
