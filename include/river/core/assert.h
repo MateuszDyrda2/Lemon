@@ -4,6 +4,7 @@
 #    if defined(RIVER_WINDOWS)
 #        define RIVER_DB() __debugbreak()
 #    elif defined(RIVER_LINUX)
+#        include <signal.h>
 #        define RIVER_DB() raise(SIGTRAP)
 #    else
 #        error "No debug break for the platform"

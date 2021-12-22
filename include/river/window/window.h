@@ -15,6 +15,7 @@ class window
 
   private:
     GLFWwindow* handle;
-    int width, height;
+    std::string _name;
+    int _width, _height;
 };
 }

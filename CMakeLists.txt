@@ -31,11 +31,12 @@ set(river_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 set(river_SRC
 	${river_SRC_DIR}engine.cpp
 	${river_SRC_DIR}window/window.cpp
+	${river_SRC_DIR}core/logger.cpp
 )
 
 add_library(river ${river_SRC})
 
-target_link_libraries(river PRIVATE glfw)
+target_link_libraries(river PRIVATE glfw glm)
 
 target_include_directories(river PUBLIC include)
 
