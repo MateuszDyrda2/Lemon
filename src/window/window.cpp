@@ -8,36 +8,41 @@ window::window(std::string const& name, int width, int height):
 {
     if(!glfwInit())
     {
+        LOG_FATAL("GLFW initialization failure");
         // initialization failure
     }
-    if(!(handle = glfwCreateWindow(width, height, name.c_str(), NULL, NULL)))
+    if(!(_handle = glfwCreateWindow(width, height, name.c_str(), NULL, NULL)))
     {
+        LOG_FATAL("Window or OpenGL context creation failed");
         // window or OpenGL context creation failed
     }
-    glfwMakeContextCurrent(handle);
+    glfwMakeContextCurrent(_handle);
     glfwSwapInterval(1);
 
-    glfwSetWindowUserPointer(handle, (void*)this);
-    glfwSetWindowSizeCallback(handle, [](GLFWwindow* handle, int width, int height) {
+    glfwSetWindowUserPointer(_handle, (void*)this);
+    glfwSetWindowSizeCallback(_handle, [](GLFWwindow* handle, int w, int h) {
         auto wnd     = (window*)glfwGetWindowUserPointer(handle);
-        wnd->_width  = width;
-        wnd->_height = height;
+        wnd->_width  = w;
+        wnd->_height = h;
+    });
+    glfwSetErrorCallback([](int /* error */, char const* description) {
+        LOG_ERROR("GLFWError: %s", description);
     });
     LOG_MESSAGE("Window created %dx%d", width, height);
 }
 window::~window()
 {
-    glfwDestroyWindow(handle);
+    glfwDestroyWindow(_handle);
     glfwTerminate();
     LOG_MESSAGE("Window destroyed");
 }
 bool window::should_close()
 {
-    return !!glfwWindowShouldClose(handle);
+    return !!glfwWindowShouldClose(_handle);
 }
 void window::end_frame()
 {
-    glfwSwapBuffers(handle);
+    glfwSwapBuffers(_handle);
     glfwPollEvents();
 }
 }

@@ -32,6 +32,11 @@ set(river_SRC
 	${river_SRC_DIR}engine.cpp
 	${river_SRC_DIR}window/window.cpp
 	${river_SRC_DIR}core/logger.cpp
+	${river_SRC_DIR}core/string_id.cpp
+	${river_SRC_DIR}game/object.cpp
+	${river_SRC_DIR}game/component.cpp
+	${river_SRC_DIR}game/entity.cpp
+	${river_SRC_DIR}game/scene.cpp
 )
 
 add_library(river ${river_SRC})

@@ -14,7 +14,7 @@ class window
     void end_frame();
 
   private:
-    GLFWwindow* handle;
+    GLFWwindow* _handle;
     std::string _name;
     int _width, _height;
 };
