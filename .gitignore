@@ -4,3 +4,5 @@ build/
 nohup.out
 # bash scripts
 *.sh
+# vscode dir
+.vscode/
