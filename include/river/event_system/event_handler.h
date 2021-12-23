@@ -1,5 +1,6 @@
 #pragma once
 
+#include <river/core/assert.h>
 #include <river/core/basic_types.h>
 #include <river/core/string_id.h>
 #include <river/game/object.h>
@@ -42,7 +43,7 @@ class event_handler : public object
     class event_base : public object
     {
       public:
-        event_base(std::string const& name);
+        event_base(const std::string& name);
     };
     template<class... Args>
     class event : public event_base
@@ -51,12 +52,12 @@ class event_handler : public object
         using container_type = std::list<listener_type<Args...>>;
 
       public:
-        event(std::string const& name);
+        event(const std::string& name);
         void dispatch(Args&&... args)
         {
-            std::for_each(listeners.begin(), listeners.end(), [](listener_type<Args...> const& l) { l(); });
+            std::for_each(listeners.begin(), listeners.end(), [](const listener_type<Args...>& l) { l(); });
         }
-        unsubscriber<Args...> subscribe(listener_type<Args...> const& listener)
+        unsubscriber<Args...> subscribe(const listener_type<Args...>& listener)
         {
             return unsubscriber(&listeners, listeners.insert(listeners.end(), listener));
         }
@@ -71,23 +72,26 @@ class event_handler : public object
   public:
     event_handler();
     template<class... Args>
-    void register(std::string eventName)
+    void register(const std::string& eventName)
     {
-        auto e = std::make_unique<event<Args...>>(eventName);
-        events.insert(std::make_pair(e->get_id(), e));
+        auto e   = std::make_unique<event<Args...>>(eventName);
+        auto res = events.insert(std::make_pair(e->get_id(), std::static_pointer_cast<event_base>(e)));
+        RIVER_ASSERT(res->second);
     }
     template<class... Args>
-    void dispatch(std::string eventName, Args&&... args)
+    void dispatch(const std::string& eventName, Args&&... args)
     {
-        auto& e = events.at(string_id(eventName));
-        auto& c = std::static_pointer_cast<event<Args...>>(e);
+        auto& e = events.find(string_id(eventName));
+        RIVER_ASSERT(e != events.end());
+        auto c = std::static_pointer_cast<event<Args...>>(e->second);
         c->dispatch(std::forward<Args>(args)...);
     }
     template<class... Args>
-    unsubscriber<Args...> subscribe(std::string eventName, listener_type<Args...> const& listener)
+    unsubscriber<Args...> subscribe(const std::string& eventName, const listener_type<Args...>& listener)
     {
-        auto& e = events.at(string_id(eventName));
-        auto& c = std::static_pointer_cast<event<Args...>>(e);
+        auto& e = events.find(string_id(eventName));
+        RIVER_ASSERT(e != events.end());
+        auto c = std::static_pointer_cast<event<Args...>>(e->second);
         return c->subscribe(listener);
     }
 

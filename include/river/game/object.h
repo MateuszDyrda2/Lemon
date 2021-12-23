@@ -7,10 +7,10 @@ class object
 {
   public:
     object(string_id id);
-    object(std::string const& name);
-    std::string const& get_name() const { id.get_string(); }
-    string_id const& get_id() const { return id; }
-    bool operator==(object const& other);
+    object(const std::string& name);
+    const std::string& get_name() const { return id.get_string(); }
+    const string_id& get_id() const { return id; }
+    bool operator==(const object& other);
     static void destroy(object* obj);
     static object* clone(object* obj);
     virtual ~object();

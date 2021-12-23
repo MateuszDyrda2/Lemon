@@ -6,18 +6,20 @@ namespace river {
 class scene : public object
 {
   public:
-    scene(std::string const& name);
+    scene(const std::string& name);
     ~scene();
+    void initialize();
+    void update();
+    void begin();
 
-    void update(float deltaTime);
-    void fixed_update(float fixedDelta);
-    void late_update(float deltaTime);
-
-    std::shared_ptr<entity> const& add_entity(std::shared_ptr<entity> const& ent);
-    std::shared_ptr<entity> const& add_entity(std::string const& name);
+    entity& add_entity(const std::string& name);
 
   private:
-    std::vector<std::shared_ptr<entity>> entities;
-    std::vector<std::shared_ptr<entity>> toDestroy;
+    std::vector<std::unique_ptr<entity>> entities;
+    std::vector<size_type> toDestroy;
+
+  private:
+    friend class entity;
+    void destroy_entity(entity* ent);
 };
 } // namespace river

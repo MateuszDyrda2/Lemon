@@ -4,10 +4,10 @@ namespace river {
 object::object(string_id id):
     id(id)
 { }
-object::object(std::string const& name):
+object::object(const std::string& name):
     id(name)
 { }
-bool object::operator==(object const& other)
+bool object::operator==(const object& other)
 {
     return id == other.id;
 }

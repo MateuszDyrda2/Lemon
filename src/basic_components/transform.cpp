@@ -3,37 +3,37 @@
 #include <river/basic_components/transform.h>
 
 namespace river {
-transform::transform(std::string const& name):
+transform::transform(const std::string& name):
     component(name)
 {
 }
-std::shared_ptr<transform> transform::get_child(size_type index)
+transform* transform::get_child(size_type index)
 {
     return children.at(index);
 }
-std::shared_ptr<transform> transform::get_child(std::string const& name)
+transform* transform::get_child(const std::string& name)
 {
     string_id id(name);
     auto res = std::find_if(children.begin(), children.end(),
-                            [&](std::shared_ptr<transform> const& ch) {
+                            [&](const std::shared_ptr<transform>& ch) {
                                 return ch->get_id() == id;
                             });
-    return res == children.end() ? std::shared_ptr<transform>() : *res;
+    return res == children.end() ? nullptr : *res;
 }
-std::shared_ptr<transform> transform::get_parent()
+transform* transform::get_parent()
 {
     return parent;
 }
-void transform::set_parent(std::shared_ptr<transform> const& parent)
+void transform::set_parent(transform* parent)
 {
     this->parent = parent;
     parent->children.emplace_back(this);
 }
-void transform::rotate(glm::vec2 const& axis, float angle)
+void transform::rotate(const glm::vec2& axis, float angle)
 {
     rotation += angle * axis;
 }
-void transform::rotate(glm::vec2 const& euler)
+void transform::rotate(const glm::vec2& euler)
 {
     rotation += euler;
 }
@@ -41,7 +41,7 @@ void transform::rotate(float x, float y)
 {
     rotation += glm::vec2(x, y);
 }
-void transform::translate(glm::vec2 const& translation)
+void transform::translate(const glm::vec2& translation)
 {
     position += translation;
 }

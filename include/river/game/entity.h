@@ -2,46 +2,61 @@
 
 #include "component.h"
 #include "object.h"
+#include <river/basic_components/transform.h>
 
 #include <memory>
 #include <vector>
 
 namespace river {
+class scene;
 class entity : public object
 {
   public:
-    entity(std::string const& name);
-    entity(string_id id);
+    entity(const std::string& name, scene* this_scene);
+    entity(string_id id, scene* this_scene);
     ~entity();
 
-    void on_enable();
-    void update(float deltaTime);
-    void fixed_update(float fixedDelta);
-    void late_update(float deltaTime);
-    void on_disable();
+    void awake_components();
+    void start();
+
+    void destroy_pending();
 
     template<class T>
-    std::shared_ptr<component>& add_component()
+    T& add_component()
     {
         size_type index = components.size();
-        auto& ret       = components.emplace_back(new T(id));
+        auto idx        = get_type_idx<T>();
+        auto& ret       = components.emplace_back(new T(get_id(), idx));
         componentIndexes.push_back(index);
-        get_type_idx<T>();
-        return auto;
+        return *std::static_pointer_cast<T>(ret);
     }
     template<class T>
-    std::shared_ptr<T>& get_component()
+    T& get_component()
     {
-        return static_pointer_cast<T>((components.at(componentIndexes.at(get_type_idx<T>()))));
+        return *((components.at(componentIndexes.at(get_type_idx<T>()))).get());
     }
 
+    bool is_active() const { return !!active; }
+    bool is_enabled() const { return !!enabled; }
+
+    void enable();
+    void disable();
+
+    void on_enable();
+    void on_disable();
+
     void set_active(bool value);
+    transform& get_transform() { return *_transform; };
+    const transform& get_transform() const { return *_transform; }
 
   private:
-    std::vector<std::shared_ptr<component>> components;
-    std::vector<std::shared_ptr<component>> toDestroy;
+    std::vector<std::unique_ptr<component>> components;
+    std::vector<size_type> toDestroy;
     std::vector<size_type> componentIndexes;
-    bool isActive;
+    std::unique_ptr<transform> _transform;
+    u8 active : 1;
+    u8 enabled : 1;
+    scene* _scene;
 
   private:
     void destroy_this() override;
@@ -57,5 +72,7 @@ class entity : public object
         static size_type typeIdx = get_index();
         return typeIdx;
     }
+    friend class component;
+    void destroy_component(size_type index);
 };
 } // namespace river

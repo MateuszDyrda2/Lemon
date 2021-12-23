@@ -7,7 +7,7 @@ namespace river {
 class window
 {
   public:
-    window(std::string const& name, int width, int height);
+    window(const std::string& name, int width, int height);
     ~window();
 
     bool should_close();

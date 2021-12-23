@@ -24,7 +24,7 @@ endif(WIN32)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DRIVER_DEBUG")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(river_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
@@ -46,7 +46,7 @@ target_link_libraries(river PRIVATE glfw glm)
 target_include_directories(river PUBLIC include)
 
 target_compile_options(river PRIVATE 
-	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused>"
+	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wformat=2;-Wunused>"
 	"$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:DEBUG>>:-W3>"
 )
 add_subdirectory(example)

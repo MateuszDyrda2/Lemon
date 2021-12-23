@@ -3,7 +3,7 @@
 #include <river/core/logger.h>
 
 namespace river {
-window::window(std::string const& name, int width, int height):
+window::window(const std::string& name, int width, int height):
     _name(name), _width(width), _height(height)
 {
     if(!glfwInit())
@@ -25,7 +25,7 @@ window::window(std::string const& name, int width, int height):
         wnd->_width  = w;
         wnd->_height = h;
     });
-    glfwSetErrorCallback([](int /* error */, char const* description) {
+    glfwSetErrorCallback([](int /* error */, const char* description) {
         LOG_ERROR("GLFWError: %s", description);
     });
     LOG_MESSAGE("Window created %dx%d", width, height);
