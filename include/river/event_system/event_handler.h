@@ -19,17 +19,18 @@ class unsubscriber
     using iterator_type  = container_type::iterator;
 
   public:
-    unsubscriber(container_type& l, iterator_type& iter):
+    unsubscriber() = default;
+    unsubscriber(container_type* l, iterator_type& iter):
         list(l), iterator(iter)
     { }
     void dispose()
     {
-        list.erase(iterator);
+        list->erase(iterator);
     }
 
   private:
     iterator_type iterator;
-    container_type& list;
+    container_type* list;
 };
 class event_handler : public object
 {
@@ -57,7 +58,7 @@ class event_handler : public object
         }
         unsubscriber<Args...> subscribe(listener_type<Args...> const& listener)
         {
-            return unsubscriber(listeners, listeners.insert(listeners.end(), listener));
+            return unsubscriber(&listeners, listeners.insert(listeners.end(), listener));
         }
 
       private:
@@ -93,5 +94,4 @@ class event_handler : public object
   private:
     map_type events;
 };
-
 } // namespace river
