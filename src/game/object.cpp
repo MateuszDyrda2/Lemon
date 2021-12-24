@@ -11,12 +11,4 @@ bool object::operator==(const object& other)
 {
     return id == other.id;
 }
-void object::destroy(object* obj)
-{
-    obj->destroy_this();
-}
-object* object::clone(object* obj)
-{
-    return obj->clone_this();
-}
 } // namespace river

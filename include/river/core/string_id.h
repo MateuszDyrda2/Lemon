@@ -19,8 +19,8 @@ class string_id
     using string_map = std::unordered_map<hash_t, std::string>;
 
   public:
-    DEBUG_CONSTEXPR string_id(const char* _str);
-    DEBUG_CONSTEXPR string_id(const std::string& _str);
+     DEBUG_CONSTEXPR explicit string_id(const char* _str);
+    DEBUG_CONSTEXPR explicit string_id(const std::string& _str);
     const std::string& get_string() const;
     hash_t get_id() const { return id; }
     bool operator==(const string_id& other) const;
@@ -34,3 +34,14 @@ class string_id
     hash_t id;
 };
 } // namespace river
+namespace std {
+using namespace river;
+template<>
+struct hash<string_id>
+{
+    std::size_t operator()(const string_id& k) const
+    {
+        return k.get_id();
+    }
+};
+} // namespace std

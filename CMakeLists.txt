@@ -37,11 +37,13 @@ set(river_SRC
 	${river_SRC_DIR}game/component.cpp
 	${river_SRC_DIR}game/entity.cpp
 	${river_SRC_DIR}game/scene.cpp
+	${river_SRC_DIR}event_system/event_handler.cpp
+	${river_SRC_DIR}renderer/renderer.cpp
 )
 
 add_library(river ${river_SRC})
 
-target_link_libraries(river PRIVATE glfw glm)
+target_link_libraries(river PUBLIC glad glfw glm)
 
 target_include_directories(river PUBLIC include)
 

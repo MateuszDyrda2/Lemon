@@ -59,8 +59,8 @@ class entity : public object
     scene* _scene;
 
   private:
-    void destroy_this() override;
-    object* clone_this() override;
+    void destroy_this();
+    object* clone_this();
     size_type get_index()
     {
         static size_type idx = 0;

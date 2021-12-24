@@ -32,7 +32,7 @@ class component : public object
     friend entity;
 
   private:
-    void destroy_this() override;
-    object* clone_this() override;
+    void destroy_this();
+    object* clone_this();
 };
 } // namespace river

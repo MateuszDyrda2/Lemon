@@ -1,6 +1,8 @@
 #pragma once
 
+#include "renderer/renderer.h"
 #include "window/window.h"
+#include <memory>
 
 namespace river {
 class engine
@@ -11,6 +13,7 @@ class engine
     void run();
 
   private:
-    window* _window;
+    std::unique_ptr<window> _window;
+    std::unique_ptr<renderer> _renderer;
 };
 }

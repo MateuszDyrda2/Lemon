@@ -5,18 +5,22 @@
 namespace river {
 engine::engine(int argc, char** argv)
 {
-    _window = new window("river", 1080, 720);
     LOG_MESSAGE("Engine created");
+    _window   = std::make_unique<window>("river", 1080, 720);
+    _renderer = std::make_unique<renderer>(_window.get());
+    (void)argc;
+    (void)argv;
 }
 engine::~engine()
 {
-    delete _window;
     LOG_MESSAGE("Engine destroyed");
 }
 void engine::run()
 {
     while(!_window->should_close())
     {
+        _renderer->render();
+
         _window->end_frame();
     }
 }
