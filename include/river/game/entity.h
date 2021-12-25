@@ -18,23 +18,12 @@ class entity : public object
 
     void awake_components();
     void start();
-
     void destroy_pending();
 
     template<class T>
-    T& add_component()
-    {
-        size_type index = components.size();
-        auto idx        = get_type_idx<T>();
-        auto& ret       = components.emplace_back(new T(get_id(), idx));
-        componentIndexes.push_back(index);
-        return *std::static_pointer_cast<T>(ret);
-    }
+    T& add_component(bool active = true);
     template<class T>
-    T& get_component()
-    {
-        return *((components.at(componentIndexes.at(get_type_idx<T>()))).get());
-    }
+    T& get_component();
 
     bool is_active() const { return !!active; }
     bool is_enabled() const { return !!enabled; }
@@ -61,18 +50,30 @@ class entity : public object
   private:
     void destroy_this();
     object* clone_this();
-    size_type get_index()
-    {
-        static size_type idx = 0;
-        return idx++;
-    }
+    size_type get_index();
     template<class T>
-    size_type get_type_idx()
-    {
-        static size_type typeIdx = get_index();
-        return typeIdx;
-    }
+    size_type get_type_idx();
     friend class component;
     void destroy_component(size_type index);
 };
+template<class T>
+T& entity::add_component(bool active)
+{
+    size_type index = components.size();
+    auto idx        = get_type_idx<T>();
+    auto& ret       = components.emplace_back(new T(this, idx, true));
+    componentIndexes.push_back(index);
+    return *std::static_pointer_cast<T>(ret);
+}
+template<class T>
+T& entity::get_component()
+{
+    return *((components.at(componentIndexes.at(get_type_idx<T>()))).get());
+}
+template<class T>
+size_type entity::get_type_idx()
+{
+    static size_type typeIdx = get_index();
+    return typeIdx;
+}
 } // namespace river

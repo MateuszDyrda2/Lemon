@@ -99,4 +99,9 @@ void entity::destroy_component(size_type index)
 {
     toDestroy.push_back(index);
 }
+size_type entity::get_index()
+{
+    static size_type idx = 0;
+    return idx++;
+}
 } // namespace river

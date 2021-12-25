@@ -3,14 +3,9 @@
 #include <river/game/entity.h>
 
 namespace river {
-component::component(const std::string& name, size_type idx, bool enabled):
-    object(name), _entityIndex(idx), enabled(enabled)
-{
-}
-component::component(string_id id, size_type idx, bool enabled):
-    object(id), _entityIndex(idx), enabled(enabled)
-{
-}
+component::component(entity* _ent, size_type idx, bool enabled):
+    object(_ent->get_id()), _entity(_ent), _entityIndex(idx), enabled(enabled)
+{ }
 bool component::is_enabled() const
 {
     return !!(enabled);

@@ -39,11 +39,14 @@ set(river_SRC
 	${river_SRC_DIR}game/scene.cpp
 	${river_SRC_DIR}event_system/event_handler.cpp
 	${river_SRC_DIR}renderer/renderer.cpp
+	${river_SRC_DIR}renderer/shader.cpp
+	${river_SRC_DIR}renderer/camera.cpp
+	${river_SRC_DIR}renderer/ortho_camera.cpp
 )
 
 add_library(river ${river_SRC})
 
-target_link_libraries(river PUBLIC glad glfw glm)
+target_link_libraries(river PUBLIC glad glfw glm stb)
 
 target_include_directories(river PUBLIC include)
 

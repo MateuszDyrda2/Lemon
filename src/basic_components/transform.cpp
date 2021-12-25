@@ -29,11 +29,11 @@ void transform::set_parent(transform* parent)
     this->parent = parent;
     parent->children.emplace_back(this);
 }
-void transform::rotate(const glm::vec2& axis, float angle)
+void transform::rotate(const glm::vec3& axis, float angle)
 {
     rotation += angle * axis;
 }
-void transform::rotate(const glm::vec2& euler)
+void transform::rotate(const glm::vec3& euler)
 {
     rotation += euler;
 }
@@ -41,21 +41,20 @@ void transform::rotate(float x, float y)
 {
     rotation += glm::vec2(x, y);
 }
-void transform::translate(const glm::vec2& translation)
+void transform::translate(const glm::vec3& translation)
 {
     position += translation;
 }
-glm::vec2 transform::get_world_position() const
+glm::vec3 transform::get_world_position() const
 {
     return parent ? parent->get_world_position() + position : position;
 }
-glm::vec2 transform::get_world_rotation() const
+glm::vec3 transform::get_world_rotation() const
 {
     return parent ? parent->get_world_rotation() + rotation : rotation;
 }
-glm::vec2 transform::get_world_scale() const
+glm::vec3 transform::get_world_scale() const
 {
     return parent ? parent->get_world_scale() + scale : scale;
 }
-
 } // namespace river

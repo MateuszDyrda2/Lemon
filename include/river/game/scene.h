@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.h"
+#include <river/renderer/camera.h>
 
 namespace river {
 class scene : public object
@@ -17,6 +18,7 @@ class scene : public object
   private:
     std::vector<std::unique_ptr<entity>> entities;
     std::vector<size_type> toDestroy;
+    std::unique_ptr<camera> _camera;
 
   private:
     friend class entity;

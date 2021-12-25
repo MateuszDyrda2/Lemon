@@ -2,12 +2,21 @@
 #include "object.h"
 
 namespace river {
+#define COMPONENT_BODY(COMPONENT_NAME)                                 \
+  public:                                                              \
+    COMPONENT_NAME(entity* _ent__, size_type _idx__, bool _enabled__); \
+                                                                       \
+  private:
+
+#define CONSTRUCTOR_BODY(COMPONENT_NAME)                                               \
+    COMPONENT_NAME::COMPONENT_NAME(entity* _ent__, size_type _idx__, bool _enabled__): \
+        component(_ent__, _idx__, _enabled)
+
 class entity;
 class component : public object
 {
   public:
-    component(const std::string& name, size_type idx, bool enabled = true);
-    component(string_id id, size_type idx, bool enabled = true);
+    component(entity* _ent, size_type idx, bool enabled);
     virtual ~component() = default;
 
     virtual void awake() { }
