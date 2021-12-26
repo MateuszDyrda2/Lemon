@@ -3,6 +3,7 @@
 #include <river/core/assert.h>
 #include <river/core/logger.h>
 
+#include <glm/gtx/transform.hpp>
 #include <river/window/window.h>
 
 namespace river {
@@ -29,6 +30,23 @@ void renderer::render()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+}
+void renderer::draw_sprite(texture& tex, transform& trans)
+{
+    textureShader->use();
+    glm::mat4 model = glm::mat4(1.0f);
+    model           = glm::translate(model, trans.get_position());
+    model           = glm::translate(model, glm::vec3(0.5f * trans.get_scale().x,
+                                                      0.5f * trans.get_scale().y, 0.0f));
+    model           = glm::rotate(model,
+                                  glm::radians(trans.get_rotation().z),
+                                  glm::vec3(0.0f, 0.0f, 1.0f));
+    model           = glm::translate(model, glm::vec3(-0.5f * trans.get_scale().x,
+                                                      -0.5f * trans.get_scale().y, 0.0f));
+
+    model = glm::scale(model, trans.get_scale());
+
+    textureShader->set_uniform("model", model);
 }
 void renderer::init_renderer_data()
 {

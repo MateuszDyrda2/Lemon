@@ -1,6 +1,8 @@
 #pragma once
 
 #include "shader.h"
+#include "texture.h"
+#include <river/basic_components/transform.h>
 #include <river/core/basic_types.h>
 #include <river/event_system/event_handler.h>
 
@@ -16,7 +18,7 @@ class renderer
     ~renderer();
 
     void render();
-    void draw_sprite();
+    void draw_sprite(texture& tex, transform& trans);
 
   private:
     window* _window;
