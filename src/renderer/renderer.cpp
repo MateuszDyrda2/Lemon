@@ -4,11 +4,11 @@
 #include <river/core/logger.h>
 
 #include <glm/gtx/transform.hpp>
+#include <river/game/scene.h>
 #include <river/window/window.h>
 
 namespace river {
-renderer::renderer(window* w):
-    _window(w)
+renderer::renderer(window* w)
 {
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -20,13 +20,13 @@ renderer::renderer(window* w):
         LOG_MESSAGE("Framebuffer resize: %dx%d", width, height);
         glViewport(0, 0, width, height);
     });
-    glViewport(0, 0, _window->get_width(), _window->get_height());
+    glViewport(0, 0, w->get_width(), w->get_height());
 }
 renderer::~renderer()
 {
     framebufferSize.dispose();
 }
-void renderer::render()
+void renderer::render(ptr<scene> currentScene)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

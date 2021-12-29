@@ -46,6 +46,8 @@ class event_handler : public object
     static void register_event(const std::string& eventName);
     template<class... Args>
     static void dispatch(const std::string& eventName, Args&&... args);
+    template<class... Args>
+    static void dispatch(string_id eventId, Args&&... args);
     template<class... Args, class F>
     static unsubscriber<Args...>
     subscribe(const std::string& eventName, F&& callable)
@@ -106,8 +108,13 @@ void event_handler::register_event(const std::string& eventName)
 template<class... Args>
 void event_handler::dispatch(const std::string& eventName, Args&&... args)
 {
+    dispatch(string_id(eventName), std::forward<Args>(args)...);
+}
+template<class... Args>
+void event_handler::dispatch(string_id eventId, Args&&... args)
+{
     auto& handler = get();
-    auto e        = handler.events.find(string_id(eventName));
+    auto e        = handler.events.find(eventId);
     RIVER_ASSERT(e != handler.events.end());
     auto& c = static_cast<event<Args...>&>(*(e->second));
     c.dispatch(std::forward<Args>(args)...);

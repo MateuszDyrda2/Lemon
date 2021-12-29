@@ -1,6 +1,8 @@
 #pragma once
 
+#include "game/scene_manager.h"
 #include "renderer/renderer.h"
+#include "time/clock.h"
 #include "window/window.h"
 #include <memory>
 
@@ -9,11 +11,13 @@ class engine
 {
   public:
     engine(int argc, char** argv);
-    virtual ~engine();
+    ~engine();
     void run();
 
   private:
-    std::unique_ptr<window> _window;
-    std::unique_ptr<renderer> _renderer;
+    owned<window> _window;
+    owned<renderer> _renderer;
+    owned<clock> _clock;
+    owned<scene_manager> _sceneManager;
 };
 }

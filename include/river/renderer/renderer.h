@@ -11,17 +11,17 @@
 
 namespace river {
 class window;
+class scene;
 class renderer
 {
   public:
-    renderer(window* w);
+    renderer(ptr<window> w);
     ~renderer();
 
-    void render();
+    void render(ptr<scene> currentScene);
     void draw_sprite(texture& tex, transform& trans);
 
   private:
-    window* _window;
     unsubscriber<size_type, size_type> framebufferSize;
 
   private:
