@@ -38,10 +38,4 @@ owned<T> create_owned(Args&&... args)
 {
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
-void asd()
-{
-    ref<int> asd;
-    owned<int> asda;
-    ptr<int> qwe;
-}
 }

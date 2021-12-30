@@ -1,79 +1,69 @@
 #pragma once
 
-#include "component.h"
-#include "object.h"
-#include <river/basic_components/transform.h>
-
-#include <memory>
-#include <vector>
+#include <entt/entity/registry.hpp>
+#include <river/core/basic_types.h>
+#include <river/core/string_id.h>
 
 namespace river {
-class scene;
-class entity : public object
+using entity_registry = entt::basic_registry<string_id>;
+class entity
 {
   public:
-    entity(const std::string& name, scene* this_scene);
-    entity(string_id id, scene* this_scene);
-    ~entity();
-
-    void awake_components();
-    void start();
-    void destroy_pending();
-
+    entity(ptr<entity_registry> registry, string_id name);
+    template<class T, class... Args>
+    void add_component(Args&&... args);
+    template<class... Args>
+    auto& get_component();
+    template<class... Args>
+    const auto& get_component() const;
     template<class T>
-    T& add_component(bool active = true);
+    bool has_component() const;
+    template<class... Args>
+    bool has_all_of() const;
+    template<class... Args>
+    bool has_any_of() const;
     template<class T>
-    T& get_component();
+    void remove_component();
 
-    bool is_active() const { return !!active; }
-    bool is_enabled() const { return !!enabled; }
-
-    void enable();
-    void disable();
-
-    void on_enable();
-    void on_disable();
-
-    void set_active(bool value);
-    transform& get_transform() { return *_transform; };
-    const transform& get_transform() const { return *_transform; }
+    string_id get_handle() const { return handle; }
 
   private:
-    std::vector<std::unique_ptr<component>> components;
-    std::vector<size_type> toDestroy;
-    std::vector<size_type> componentIndexes;
-    std::unique_ptr<transform> _transform;
-    u8 active : 1;
-    u8 enabled : 1;
-    scene* _scene;
-
-  private:
-    void destroy_this();
-    object* clone_this();
-    size_type get_index();
-    template<class T>
-    size_type get_type_idx();
-    friend class component;
-    void destroy_component(size_type index);
+    string_id handle;
+    ptr<entity_registry> registry;
 };
-template<class T>
-T& entity::add_component(bool active)
+template<class T, class... Args>
+inline void entity::add_component(Args&&... args)
 {
-    size_type index = components.size();
-    auto idx        = get_type_idx<T>();
-    auto& ret       = components.emplace_back(new T(this, idx, true));
-    componentIndexes.push_back(index);
-    return *std::static_pointer_cast<T>(ret);
+    registry->emplace<T>(handle, std::forward<Args>(args)...);
+}
+template<class... Args>
+inline auto& entity::get_component()
+{
+    return registry->get<Args...>(handle);
+}
+template<class... Args>
+inline const auto& entity::get_component() const
+{
+    return registry->get<Args...>(handle);
 }
 template<class T>
-T& entity::get_component()
+inline bool entity::has_component() const
 {
-    return *((components.at(componentIndexes.at(get_type_idx<T>()))).get());
+    return registry->any_of<T>(handle);
+}
+template<class... Args>
+inline bool entity::has_all_of() const
+{
+    return registry->all_of<Args...>(handle);
+}
+template<class... Args>
+inline bool entity::has_any_of() const
+{
+    return registry->any_of<Args..>(handle);
 }
 template<class T>
-size_type entity::get_type_idx()
+inline void entity::remove_component()
 {
-    static size_type typeIdx = get_index();
-    return typeIdx;
+    registry->remove<T>(handle);
 }
 } // namespace river

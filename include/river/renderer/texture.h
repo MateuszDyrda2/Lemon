@@ -12,6 +12,7 @@ class texture : public object
     ~texture();
 
     const glm::vec2& get_size() const { return size; }
+    void bind();
 
   private:
     u32 handle;

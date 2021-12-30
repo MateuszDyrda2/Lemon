@@ -46,7 +46,7 @@ void renderer::draw_sprite(texture& tex, transform& trans)
 
     model = glm::scale(model, trans.get_scale());
 
-    textureShader->set_uniform("model", model);
+    // textureShader->set_uniform<glm::mat4>("model", model);
 }
 void renderer::init_renderer_data()
 {

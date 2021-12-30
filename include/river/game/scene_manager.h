@@ -1,5 +1,6 @@
 #pragma once
 
+#include "object.h"
 #include "scene.h"
 
 #include <queue>
@@ -10,7 +11,7 @@ class scene_manager : public object
   public:
     scene_manager();
     void push_scene(const std::string& name);
-    void update(float deltaTime);
+    void update(float deltaTime) { }
     void pop_scene();
     scene* get_current_scene();
 

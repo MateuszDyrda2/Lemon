@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game/scene_manager.h"
-#include "renderer/renderer.h"
 #include "time/clock.h"
 #include "window/window.h"
 #include <memory>
@@ -16,7 +15,6 @@ class engine
 
   private:
     owned<window> _window;
-    owned<renderer> _renderer;
     owned<clock> _clock;
     owned<scene_manager> _sceneManager;
 };

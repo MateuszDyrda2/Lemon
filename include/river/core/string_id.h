@@ -15,15 +15,23 @@ namespace river {
 class string_id
 {
   public:
-    using hash_t     = u32;
-    using string_map = std::unordered_map<hash_t, std::string>;
+    using hash_t      = u32;
+    using string_map  = std::unordered_map<hash_t, std::string>;
+    using entity_type = u64;
 
   public:
-     DEBUG_CONSTEXPR explicit string_id(const char* _str);
+    string_id():
+        id(0) { }
+    DEBUG_CONSTEXPR explicit string_id(const char* _str);
     DEBUG_CONSTEXPR explicit string_id(const std::string& _str);
     const std::string& get_string() const;
     hash_t get_id() const { return id; }
     bool operator==(const string_id& other) const;
+
+    operator entity_type() const
+    {
+        return entity_type(id);
+    }
 
     static DEBUG_CONSTEXPR hash_t hash_str(const char* _str);
 
@@ -31,7 +39,7 @@ class string_id
     static string_map& get_map();
 
   private:
-    hash_t id;
+    entity_type id;
 };
 } // namespace river
 namespace std {

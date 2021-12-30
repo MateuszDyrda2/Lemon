@@ -37,16 +37,24 @@ set(river_SRC
 	${river_SRC_DIR}game/component.cpp
 	${river_SRC_DIR}game/entity.cpp
 	${river_SRC_DIR}game/scene.cpp
+	${river_SRC_DIR}game/scene_manager.cpp
+	${river_SRC_DIR}game/transform_system.cpp
 	${river_SRC_DIR}event_system/event_handler.cpp
 	${river_SRC_DIR}renderer/renderer.cpp
+	${river_SRC_DIR}renderer/rendering_system.cpp
 	${river_SRC_DIR}renderer/shader.cpp
-	${river_SRC_DIR}renderer/camera.cpp
-	${river_SRC_DIR}renderer/ortho_camera.cpp
+	${river_SRC_DIR}renderer/batch_renderer.cpp
+	${river_SRC_DIR}renderer/opengl_context.cpp
+	${river_SRC_DIR}renderer/texture.cpp
+	${river_SRC_DIR}renderer/vertex_buffer.cpp
+	${river_SRC_DIR}renderer/vertex_array.cpp
+	${river_SRC_DIR}time/clock.cpp
+	${river_SRC_DIR}scripting/scripting_system.cpp
 )
 
 add_library(river ${river_SRC})
 
-target_link_libraries(river PUBLIC glad glfw glm stb)
+target_link_libraries(river PUBLIC glad glfw glm stb EnTT::EnTT)
 
 target_include_directories(river PUBLIC include)
 

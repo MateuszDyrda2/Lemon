@@ -1,5 +1,3 @@
-#pragma once
-
 #include <river/game/scene_manager.h>
 
 namespace river {
