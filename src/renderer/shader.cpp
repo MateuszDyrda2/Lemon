@@ -7,8 +7,8 @@
 #include <string>
 
 namespace river {
-shader::shader(const std::string& vertexPath, const std::string& fragmentPath):
-    object("shader")
+shader::shader(string_id name, const std::string& vertexPath, const std::string& fragmentPath):
+    object(name)
 {
     std::string vertexCode;
     std::string fragmentCode;
@@ -34,7 +34,6 @@ shader::shader(const std::string& vertexPath, const std::string& fragmentPath):
     }
     catch(std::ifstream::failure& e)
     {
-        // shader read file error
         LOG_ERROR("Shader read failure! %s or %s", vertexPath, fragmentPath);
     }
     const char* vShaderCode = vertexCode.c_str();
@@ -84,6 +83,24 @@ shader::shader(const std::string& vertexPath, const std::string& fragmentPath):
     glDetachShader(ID, fragment);
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+}
+shader::~shader()
+{
+    if(ID) glDeleteProgram(ID);
+}
+shader::shader(shader&& other) noexcept:
+    object(other), ID(other.ID)
+{
+    other.ID = 0;
+}
+shader& shader::operator=(shader&& other) noexcept
+{
+    if(this != &other)
+    {
+        object::operator=(std::move(other));
+        std::swap(ID, other.ID);
+    }
+    return *this;
 }
 void shader::use()
 {

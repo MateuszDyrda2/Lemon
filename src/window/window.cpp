@@ -1,15 +1,15 @@
 #include <river/window/window.h>
 
 #include <river/core/logger.h>
+#include <river/input/key_codes.h>
 
 namespace river {
 window::window(const std::string& name, size_type width, size_type height):
-    _name(name), _width(width), _height(height)
+    _name(name), _width(width), _height(height), eventHandler(services::get<event_handler>())
 {
     if(!glfwInit())
     {
         LOG_FATAL("GLFW initialization failure");
-        // initialization failure
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -18,16 +18,15 @@ window::window(const std::string& name, size_type width, size_type height):
     if(!(_handle = glfwCreateWindow(width, height, name.c_str(), NULL, NULL)))
     {
         LOG_FATAL("Window or OpenGL context creation failed");
-        // window or OpenGL context creation failed
     }
     glfwMakeContextCurrent(_handle);
     glfwSwapInterval(1);
 
-    glfwSetWindowUserPointer(_handle, (void*)this);
+    glfwSetWindowUserPointer(_handle, (void*)eventHandler);
     setup_callbacks();
-    windowResize = event_handler::subscribe<size_type, size_type>(
-        "WindowSize",
-        [this](size_type width, size_type height) {
+    windowResize = eventHandler->subscribe<int, int>(
+        string_id("WindowSize"),
+        [this](int width, int height) {
             LOG_MESSAGE("Window resize: %dx%d", width, height);
             _width  = width;
             _height = height;
@@ -37,14 +36,12 @@ window::window(const std::string& name, size_type width, size_type height):
         LOG_ERROR("GLFWError: %s", description);
     });
     LOG_MESSAGE("Window created %dx%d", width, height);
-    glfwMakeContextCurrent(_handle);
 }
 window::~window()
 {
     glfwDestroyWindow(_handle);
     glfwTerminate();
     LOG_MESSAGE("Window destroyed");
-    windowResize.dispose();
 }
 bool window::should_close()
 {
@@ -57,46 +54,47 @@ void window::end_frame()
 }
 void window::setup_callbacks()
 {
-    event_handler::register_event<int, int, int, int>("KeyPressed");
-    event_handler::register_event("WindowClose");
-    event_handler::register_event<int, int>("WindowSize");
-    event_handler::register_event<int, int>("FramebufferSize");
-    event_handler::register_event<float, float>("WindowContentScale");
-    event_handler::register_event<int, int>("WindowPos");
-    event_handler::register_event<int>("WindowIconify");
-    event_handler::register_event<int>("WindowMaximize");
-    event_handler::register_event<int>("WindowFocused");
-    event_handler::register_event("WindowRefresh");
 
-    glfwSetKeyCallback(_handle, [](GLFWwindow*, int key, int scancode, int action, int mods) {
-        event_handler::dispatch("KeyPressed", key, scancode, action, mods);
+    glfwSetKeyCallback(_handle, [](GLFWwindow* w, int k, int scancode, int action, int mods) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("KeyPressed"), key::keycode(k),
+                          scancode, key::action(action), key::keymod(mods));
     });
-    glfwSetWindowCloseCallback(_handle, [](GLFWwindow*) {
-        event_handler::dispatch("WindowClose");
+    glfwSetWindowCloseCallback(_handle, [](GLFWwindow* w) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowClose"));
     });
-    glfwSetWindowSizeCallback(_handle, [](GLFWwindow*, int width, int height) {
-        event_handler::dispatch("WindowSize", width, height);
+    glfwSetWindowSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowSize"), width, height);
     });
-    glfwSetFramebufferSizeCallback(_handle, [](GLFWwindow*, int width, int height) {
-        event_handler::dispatch("FramebufferSize", width, height);
+    glfwSetFramebufferSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("FramebufferSize"), width, height);
     });
-    glfwSetWindowContentScaleCallback(_handle, [](GLFWwindow*, float xscale, float yscale) {
-        event_handler::dispatch("WindowContentScale", xscale, yscale);
+    glfwSetWindowContentScaleCallback(_handle, [](GLFWwindow* w, float xscale, float yscale) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowContentScale"), xscale, yscale);
     });
-    glfwSetWindowPosCallback(_handle, [](GLFWwindow*, int xpos, int ypos) {
-        event_handler::dispatch("WindowPos", xpos, ypos);
+    glfwSetWindowPosCallback(_handle, [](GLFWwindow* w, int xpos, int ypos) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowPos"), xpos, ypos);
     });
-    glfwSetWindowIconifyCallback(_handle, [](GLFWwindow*, int iconified) {
-        event_handler::dispatch("WindowIconify", iconified);
+    glfwSetWindowIconifyCallback(_handle, [](GLFWwindow* w, int iconified) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowIconify"), iconified);
     });
-    glfwSetWindowMaximizeCallback(_handle, [](GLFWwindow*, int maximized) {
-        event_handler::dispatch("WindowMaximize", maximized);
+    glfwSetWindowMaximizeCallback(_handle, [](GLFWwindow* w, int maximized) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowMaximize"), maximized);
     });
-    glfwSetWindowFocusCallback(_handle, [](GLFWwindow*, int focused) {
-        event_handler::dispatch("WindowFocused", focused);
+    glfwSetWindowFocusCallback(_handle, [](GLFWwindow* w, int focused) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowFocused"), focused);
     });
-    glfwSetWindowRefreshCallback(_handle, [](GLFWwindow*) {
-        event_handler::dispatch("WindowRefresh");
+    glfwSetWindowRefreshCallback(_handle, [](GLFWwindow* w) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("WindowRefresh"));
     });
 }
 }

@@ -14,6 +14,7 @@ using namespace river;
     {                                         \
         auto eng = new GAME_NAME(argc, argv); \
         eng->run();                           \
+        delete eng;                           \
         return 0;                             \
     }
 

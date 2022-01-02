@@ -3,17 +3,12 @@
 
 namespace river {
 event_handler::event_handler():
-    object("event_handler")
+    events{}
 {
-    LOG_MESSAGE("Event handler created");
+    LOG_MESSAGE("Event Handler created");
 }
 event_handler::~event_handler()
 {
-    LOG_MESSAGE("Event handler destroyed");
-}
-event_handler& event_handler::get()
-{
-    static event_handler g;
-    return g;
+    LOG_MESSAGE("Event Handler destroyed");
 }
 } // namespace river

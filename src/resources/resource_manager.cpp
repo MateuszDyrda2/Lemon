@@ -1,15 +1,19 @@
 #include <river/resources/resource_manager.h>
 
+#include <river/core/logger.h>
+
 namespace river {
-resource_manager::resource_manager()
+resource_manager::resource_manager():
+    resources{}
 {
+    LOG_MESSAGE("Resource Manager created");
 }
 resource_manager::~resource_manager()
 {
+    LOG_MESSAGE("Resource Manager destroyed");
 }
-resource_manager& resource_manager::get()
+void resource_manager::unload(string_id name)
 {
-    static resource_manager instance;
-    return instance;
+    resources.erase(name);
 }
 } // namespace river

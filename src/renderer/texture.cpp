@@ -8,42 +8,61 @@
 #include <glad/glad.h>
 
 namespace river {
-texture::texture(const std::string& name, const std::string& path):
+texture::texture(string_id name, const std::string& path):
     object(name)
 {
     int w, h, noc;
-    glGenTextures(1, &handle);
-    glBindTexture(GL_TEXTURE_2D, handle);
-    // set the texture wrapping / filtering options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(path.c_str(), &w, &h, &noc, 0);
     if(data)
     {
+        glGenTextures(1, &handle);
+        glBindTexture(GL_TEXTURE_2D, handle);
+        // set the texture wrapping / filtering options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        // load and generate the texture
         size.x       = w;
         size.y       = h;
         nrOfChannels = noc;
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y,
-                     0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y,
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        stbi_image_free(data);
     }
     else
     {
-        LOG_ERROR("Failed to load texture: %s from %s", name, path);
+        LOG_ERROR("Failed to load texture: %s from %s", name.get_string().c_str(), path.c_str());
     }
-    stbi_image_free(data);
 }
 void texture::bind()
 {
     glBindTexture(GL_TEXTURE_2D, handle);
 }
+void texture::unbind()
+{
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 texture::~texture()
 {
     glDeleteTextures(1, &handle);
+}
+texture::texture(texture&& other) noexcept:
+    object(other), handle(other.handle)
+{
+    other.handle = 0;
+}
+texture& texture::operator=(texture&& other) noexcept
+{
+    if(this != &other)
+    {
+        object::operator=(std::move(other));
+        std::swap(handle, other.handle);
+    }
+    return *this;
 }
 } // namespace river

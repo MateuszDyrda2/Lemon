@@ -12,6 +12,10 @@
 #include <glm/vec4.hpp>
 
 namespace river {
+struct tag
+{
+    string_id id;
+};
 struct dirty
 { };
 struct transform
@@ -20,30 +24,34 @@ struct transform
     glm::vec3 scale{ 1.f, 1.f, 1.f };
     f32 rotation{ 0.0f };
     glm::mat4 model{ 1.f };
+    entity_handle first{ entt::null };
+    entity_handle next{ entt::null };
+    entity_handle parent{ entt::null };
     size_type order{};
-    ptr<transform> first{};
-    ptr<transform> next{};
-    ptr<transform> parent{};
+
+    transform() = default;
     transform(const glm::vec3 position, const glm::vec3 scale, f32 rotation,
-              ptr<transform> parent):
+              entity_handle parent, size_type order):
         position(position),
         scale(scale),
-        rotation(rotation), parent(parent), order(parent->order + 1)
+        rotation(rotation), parent(parent), order(order)
     {
     }
-    transform(ptr<transform> parent):
+    transform(entity_handle parent):
         parent(parent) { }
 };
 struct camera
 {
-    glm::vec4 viewport;
-    glm::mat4 projection;
+    glm::vec4 viewport{};
+    glm::mat4 projection{ 1.0f };
 };
 struct sprite_renderer
 {
     glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
     glm::vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
-    resource<texture> texture;
+    resource<texture> text{};
+    sprite_renderer(resource<texture> tex):
+        text(tex) { }
 };
 struct script_component
 {
@@ -52,14 +60,9 @@ struct script_component
     script_component(owned<cpp_script>&& script):
         script(std::move(script)) { }
 
-    inline void on_create() { script->on_create(); }
+    inline void on_create(entity_registry&, entity_handle) { script->on_create(); }
     inline void on_update(float dt) { script->on_update(dt); }
     inline void on_late_update(float dt) { script->on_late_update(dt); }
-    inline void on_destroy(float dt) { script->on_destroy(); }
-};
-template<>
-struct entt::component_traits<river::transform> : basic_component_traits
-{
-    using in_place_delete = std::true_type;
+    inline void on_destroy(entity_registry&, entity_handle) { script->on_destroy(); }
 };
 } // namespace river

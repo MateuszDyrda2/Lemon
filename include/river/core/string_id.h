@@ -15,31 +15,31 @@ namespace river {
 class string_id
 {
   public:
-    using hash_t      = u32;
-    using string_map  = std::unordered_map<hash_t, std::string>;
-    using entity_type = u64;
+    using hash_t     = u32;
+    using string_map = std::unordered_map<hash_t, std::string>;
 
   public:
     string_id():
         id(0) { }
     DEBUG_CONSTEXPR explicit string_id(const char* _str);
     DEBUG_CONSTEXPR explicit string_id(const std::string& _str);
-    const std::string& get_string() const;
-    hash_t get_id() const { return id; }
-    bool operator==(const string_id& other) const;
+    string_id(const string_id&) = default;
+    string_id& operator=(const string_id&) = default;
+    constexpr string_id(hash_t value):
+        id(value) { }
 
-    operator entity_type() const
-    {
-        return entity_type(id);
-    }
+    const std::string& get_string() const;
+    constexpr hash_t get_id() const { return id; }
+    bool operator==(const string_id& other) const;
 
     static DEBUG_CONSTEXPR hash_t hash_str(const char* _str);
 
   private:
-    static string_map& get_map();
-
+#if defined(RIVER_DEBUG)
+    static string_map map;
+#endif
   private:
-    entity_type id;
+    hash_t id;
 };
 } // namespace river
 namespace std {
@@ -47,7 +47,7 @@ using namespace river;
 template<>
 struct hash<string_id>
 {
-    std::size_t operator()(const string_id& k) const
+    std::size_t operator()(const string_id& k) const noexcept
     {
         return k.get_id();
     }

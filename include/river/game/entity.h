@@ -5,17 +5,20 @@
 #include <river/core/string_id.h>
 
 namespace river {
-using entity_registry = entt::basic_registry<string_id>;
+using entity_registry = entt::registry;
+using entity_handle   = entt::entity;
 class entity
 {
   public:
-    entity(ptr<entity_registry> registry, string_id name);
+    entity(ptr<entity_registry> registry, entity_handle name);
     template<class T, class... Args>
     void add_component(Args&&... args);
+    template<class T, class... Args>
+    void change_component(Args&&... args);
     template<class... Args>
-    auto& get_component();
+    decltype(auto) get_component();
     template<class... Args>
-    const auto& get_component() const;
+    decltype(auto) get_component() const;
     template<class T>
     bool has_component() const;
     template<class... Args>
@@ -24,25 +27,33 @@ class entity
     bool has_any_of() const;
     template<class T>
     void remove_component();
+    static void destroy(entity ent);
+    static entity clone(entity orginal, string_id name);
 
-    string_id get_handle() const { return handle; }
+    entity_handle get_handle() const { return handle; }
+    ptr<entity_registry> get_registry() { return registry; }
 
   private:
-    string_id handle;
     ptr<entity_registry> registry;
+    entity_handle handle;
 };
 template<class T, class... Args>
 inline void entity::add_component(Args&&... args)
 {
     registry->emplace<T>(handle, std::forward<Args>(args)...);
 }
+template<class T, class... Args>
+inline void entity::change_component(Args&&... args)
+{
+    registry->replace<T>(handle, std::forward<Args>(args)...);
+}
 template<class... Args>
-inline auto& entity::get_component()
+inline decltype(auto) entity::get_component()
 {
     return registry->get<Args...>(handle);
 }
 template<class... Args>
-inline const auto& entity::get_component() const
+inline decltype(auto) entity::get_component() const
 {
     return registry->get<Args...>(handle);
 }
@@ -59,7 +70,7 @@ inline bool entity::has_all_of() const
 template<class... Args>
 inline bool entity::has_any_of() const
 {
-    return registry->any_of<Args..>(handle);
+    return registry->any_of<Args...>(handle);
 }
 template<class T>
 inline void entity::remove_component()

@@ -3,10 +3,12 @@
 #include "resource.h"
 
 #include <river/core/basic_types.h>
+#include <river/service/service.h>
+
 #include <unordered_map>
 
 namespace river {
-class resource_manager
+class resource_manager : public service
 {
   public:
     using self_type      = resource_manager;
@@ -17,12 +19,25 @@ class resource_manager
     ~resource_manager();
 
     template<class T>
-    static resource<T> get_resource(const string_id& name);
-    template<class T>
-    static void load(const std::string& path, const std::string& name);
+    resource<T> get_resource(string_id name);
+    template<class T, class... Args>
+    resource<T> load(string_id name, Args&&... args);
+    void unload(string_id name);
 
   private:
-    static resource_manager& get();
     container_type resources;
 };
+template<class T>
+resource<T> resource_manager::get_resource(string_id name)
+{
+    return resource<T>(static_cast<T*>(resources.at(name).get()));
+}
+template<class T, class... Args>
+resource<T> resource_manager::load(string_id name, Args&&... args)
+{
+    auto inserted = resources.insert(std::make_pair(name, create_owned<T>(name, std::forward<Args>(args)...)));
+    RIVER_ASSERT(inserted.second);
+    return resource<T>(static_cast<T*>(((*inserted.first).second.get())));
+}
+
 } // namespace river

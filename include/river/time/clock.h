@@ -15,6 +15,7 @@ class clock
 
   public:
     clock();
+    ~clock();
     time_point get_real_time() const noexcept
     {
         return realLastFrameTime;

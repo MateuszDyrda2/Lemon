@@ -6,11 +6,12 @@
 #include <glm/vec4.hpp>
 
 namespace river {
-class opengl_context
+class rendering_context
 {
   public:
-    opengl_context();
-    ~opengl_context();
+    rendering_context();
+    ~rendering_context();
+    void enable_blending();
     void set_viewport(const glm::ivec4& vp);
     void clear_screen(const glm::vec4& color);
     void draw_arrays(GLenum mode, size_type first, size_type count);

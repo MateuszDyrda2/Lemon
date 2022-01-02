@@ -1,11 +1,15 @@
 #include <river/core/string_id.h>
 
 namespace river {
+
+#if defined(RIVER_DEBUG)
+string_id::string_map string_id::map;
+#endif
+
 DEBUG_CONSTEXPR string_id::string_id(const char* _str):
     id(hash_str(_str))
 {
 #if defined(RIVER_DEBUG)
-    auto& map = get_map();
     if(map.count(id) == 1)
     {
         if(map.at(id) != _str)
@@ -41,7 +45,7 @@ DEBUG_CONSTEXPR string_id::hash_t string_id::hash_str(const char* _str)
 const std::string& string_id::get_string() const
 {
 #if defined(RIVER_DEBUG)
-    return get_map().at(id);
+    return map.at(id);
 #else
     return "";
 #endif // RIVER_DEBUG
@@ -49,10 +53,5 @@ const std::string& string_id::get_string() const
 bool string_id::operator==(const string_id& other) const
 {
     return id == other.id;
-}
-string_id::string_map& string_id::get_map()
-{
-    static string_map map;
-    return map;
 }
 } // namespace river

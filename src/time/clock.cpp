@@ -1,10 +1,18 @@
 #include <river/time/clock.h>
 
+#include <river/core/logger.h>
+
 namespace river {
 clock::clock():
     startTime(clock_type::now()), virtualFrameTime{}, deltaTime{},
     realDeltaTime{}, timeScale{ 1.0f }
-{ }
+{
+    LOG_MESSAGE("Clock created");
+}
+clock::~clock()
+{
+    LOG_MESSAGE("Clock destroyed");
+}
 clock::duration_type clock::elapsed_from_start(const time_point& tp) const noexcept
 {
     return tp - startTime;

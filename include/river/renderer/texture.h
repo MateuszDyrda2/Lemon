@@ -8,11 +8,16 @@ namespace river {
 class texture : public object
 {
   public:
-    texture(const std::string& name, const std::string& path);
+    texture(string_id name, const std::string& path);
     ~texture();
+    texture(const texture&) = delete;
+    texture& operator=(const texture&) = delete;
+    texture(texture&& other) noexcept;
+    texture& operator=(texture&& other) noexcept;
 
-    const glm::vec2& get_size() const { return size; }
+    const glm::ivec2& get_size() const { return size; }
     void bind();
+    void unbind();
 
   private:
     u32 handle;

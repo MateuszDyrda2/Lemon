@@ -14,7 +14,23 @@ class resource
     resource(T* res):
         res(res)
     { }
-    ~resource();
+    resource(const resource<T>& other):
+        res(other.res) { }
+    template<class W>
+    resource(const resource<W>& other):
+        res(static_cast<T*>(other.res)) { }
+    ~resource() { }
+    resource<T>& operator=(const resource<T>&) = default;
+    template<class W>
+    resource<T>& operator=(const resource<W>& other)
+    {
+        if(this != &other)
+        {
+            res = static_cast<T*>(other.res);
+        }
+        return *this;
+    }
+
     T& operator*()
     {
         RIVER_ASSERT(res);

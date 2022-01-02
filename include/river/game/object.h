@@ -7,7 +7,11 @@ class object
 {
   public:
     object(string_id id);
-    object(const std::string& name);
+    object(const object&)     = default;
+    object(object&&) noexcept = default;
+    object& operator=(const object&) = default;
+    object& operator=(object&&) noexcept = default;
+
     const std::string& get_name() const { return id.get_string(); }
     const string_id& get_id() const { return id; }
     bool operator==(const object& other);
