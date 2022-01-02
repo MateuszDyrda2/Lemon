@@ -3,13 +3,15 @@
 #include "object.h"
 #include "scene.h"
 
+#include <river/service/service.h>
+
 #include <queue>
 
 namespace river {
-class scene_manager
+class scene_manager : public service
 {
   public:
-    scene_manager(ptr<rendering_context> context);
+    scene_manager();
     void push_scene(string_id name);
     void update(float deltaTime);
     void pop_scene();

@@ -1,8 +1,10 @@
 #include <river/game/scene_manager.h>
 
+#include <river/service/services.h>
+
 namespace river {
-scene_manager::scene_manager(ptr<rendering_context> context):
-    context(context)
+scene_manager::scene_manager():
+    context(services::get<rendering_context>())
 {
     LOG_MESSAGE("Scene Manager created");
 }

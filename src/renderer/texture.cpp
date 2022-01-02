@@ -1,5 +1,6 @@
 #include <river/renderer/texture.h>
 
+#include <river/core/assert.h>
 #include <river/core/logger.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -13,7 +14,7 @@ texture::texture(string_id name, const std::string& path):
 {
     int w, h, noc;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(path.c_str(), &w, &h, &noc, 0);
+    unsigned char* data = stbi_load((RIVER_RESOURCE_PATH + path).c_str(), &w, &h, &noc, 0);
     if(data)
     {
         glGenTextures(1, &handle);

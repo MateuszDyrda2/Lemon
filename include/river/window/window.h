@@ -1,6 +1,7 @@
 #pragma once
 
-#include <river/core/basic_types.h>
+#include "window_base.h"
+
 #include <river/event_system/event_handler.h>
 #include <river/service/services.h>
 
@@ -10,19 +11,18 @@
 #include <string>
 
 namespace river {
-class window
+class window : public window_base
 {
   public:
     window(const std::string& name, size_type width, size_type height);
     ~window();
 
-    bool should_close();
-    void end_frame();
+    bool end_frame() override;
 
-    size_type get_width() const { return _width; }
-    size_type get_height() const { return _height; }
+    size_type get_width() const override { return _width; }
+    size_type get_height() const override { return _height; }
 
-    void on_resize(size_type width, size_type height);
+    void* get_handle() override { return (void*)_handle; }
 
   private:
     GLFWwindow* _handle;

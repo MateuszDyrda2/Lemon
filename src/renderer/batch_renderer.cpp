@@ -83,8 +83,8 @@ void batch_renderer::batch::flush(const glm::mat4& viewProj, resource<shader> te
 }
 batch_renderer::batch_renderer():
     textureShader{ services::get<resource_manager>()->load<shader>(
-        string_id("TextureShader"), "/home/matzix/proj/river/src/renderer/shaders/texture_shader.vs",
-        "/home/matzix/proj/river/src/renderer/shaders/texture_shader.fs") },
+        string_id("TextureShader"), "shaders/texture_shader.vs",
+        "shaders/texture_shader.fs") },
     batches()
 {
 }

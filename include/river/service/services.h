@@ -15,16 +15,13 @@ class services
     {
         return static_cast<ptr<T>>(serviceArray[get_type_index<std::decay_t<T>>()].get());
     }
-
-  private:
-    friend class engine;
-    services() = default;
     template<class T>
     static void provide(owned<T>&& serv)
     {
         get_type_index<std::decay_t<T>>();
         serviceArray.push_back(std::move(serv));
     }
+    static void cleanup();
 
   private:
     static std::vector<owned<service>> serviceArray;

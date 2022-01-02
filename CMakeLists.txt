@@ -21,6 +21,7 @@ elseif(UNIX)
 	#platform linux
 	add_compile_definitions(RIVER_LINUX)
 endif(WIN32)
+add_compile_definitions(RIVER_RESOURCE_PATH="../../../resources/")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DRIVER_DEBUG")
 

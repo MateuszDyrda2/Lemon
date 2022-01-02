@@ -1,11 +1,12 @@
 #pragma once
 
 #include <river/core/basic_types.h>
+#include <river/service/service.h>
 
 #include <chrono>
 
 namespace river {
-class clock
+class clock : public service
 {
   public:
     using self_type     = clock;

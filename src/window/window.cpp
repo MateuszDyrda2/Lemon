@@ -43,14 +43,11 @@ window::~window()
     glfwTerminate();
     LOG_MESSAGE("Window destroyed");
 }
-bool window::should_close()
-{
-    return !!glfwWindowShouldClose(_handle);
-}
-void window::end_frame()
+bool window::end_frame()
 {
     glfwSwapBuffers(_handle);
     glfwPollEvents();
+    return !!glfwWindowShouldClose(_handle);
 }
 void window::setup_callbacks()
 {

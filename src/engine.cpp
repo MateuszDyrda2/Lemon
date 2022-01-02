@@ -10,26 +10,23 @@ namespace river {
 engine::engine(int, char**)
 {
     LOG_MESSAGE("Engine created");
-
-    services::provide(create_owned<event_handler>());
-    services::provide(create_owned<resource_manager>());
-    _window = create_owned<window>("river", 1080, 720);
-    services::provide(create_owned<input>(_window.get()));
-    _context      = create_owned<rendering_context>();
-    _sceneManager = create_owned<scene_manager>(_context.get());
-    _clock        = create_owned<clock>();
 }
 engine::~engine()
 {
+    services::cleanup();
     LOG_MESSAGE("Engine destroyed");
 }
-void engine::run()
+void engine::initialize()
 {
-    while(!_window->should_close())
-    {
-        _clock->update();
-        _sceneManager->update(_clock->delta_time());
-        _window->end_frame();
-    }
+    _context      = services::get<rendering_context>();
+    _sceneManager = services::get<scene_manager>();
+    _clock        = services::get<clock>();
+    _window       = services::get<window_base>();
+}
+bool engine::update()
+{
+    _clock->update();
+    _sceneManager->update(_clock->delta_time());
+    return !_window->end_frame();
 }
 }

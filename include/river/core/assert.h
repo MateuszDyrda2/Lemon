@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef RIVER_RESOURCE_PATH
+#    define RIVER_RESOURCE_PATH "resources/"
+#endif
 #if defined(RIVER_DEBUG)
 #    if defined(RIVER_WINDOWS)
 #        define RIVER_DB() __debugbreak()

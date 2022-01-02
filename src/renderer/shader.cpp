@@ -19,8 +19,8 @@ shader::shader(string_id name, const std::string& vertexPath, const std::string&
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try
     {
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
+        vShaderFile.open(RIVER_RESOURCE_PATH + vertexPath);
+        fShaderFile.open(RIVER_RESOURCE_PATH + fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
 
         vShaderStream << vShaderFile.rdbuf();

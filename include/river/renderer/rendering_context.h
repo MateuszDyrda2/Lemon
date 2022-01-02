@@ -1,12 +1,13 @@
 #pragma once
 
 #include <river/core/basic_types.h>
+#include <river/service/service.h>
 
 #include <glad/glad.h>
 #include <glm/vec4.hpp>
 
 namespace river {
-class rendering_context
+class rendering_context : public service
 {
   public:
     rendering_context();
