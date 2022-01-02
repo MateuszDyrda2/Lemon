@@ -56,7 +56,10 @@ set(river_SRC
 
 add_library(river ${river_SRC})
 
-target_link_libraries(river PUBLIC glad glfw glm stb EnTT::EnTT)
+find_package(glfw3 3.3 REQUIRED)
+find_package(glm REQUIRED)
+
+target_link_libraries(river PUBLIC glad glfw glm stb EnTT::EnTT ${CMAKE_DL_LIBS})
 
 target_include_directories(river PUBLIC include)
 
