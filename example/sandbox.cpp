@@ -39,6 +39,6 @@ void Sandbox::initialize()
     auto scn             = _sceneManager->get_current_scene();
     auto ent             = scn->add_entity(string_id("box"));
     ent.add_component<sprite_renderer>(tex);
-    LOG_MESSAGE("Initialized sandbox");
+    LOG_MESSAGE("Initialized %s", _sceneManager->get_current_scene()->get_name());
 }
 GAME_RUN(Sandbox);
