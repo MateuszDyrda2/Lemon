@@ -10,7 +10,9 @@ set(river_DESC "2D game engine written in C++")
 # ------ ENTT, GLAD, STB --------------
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 # -------------------------------------
+# ---------------OPENAL----------------
 find_package(OpenAL REQUIRED)
+# -------------------------------------
 # --------------- GLFW ----------------
 find_package(glfw3 3.3 REQUIRED)
 # -------------------------------------
@@ -47,14 +49,16 @@ set(river_SRC
 	${river_SRC_DIR}game/scene_manager.cpp
 	${river_SRC_DIR}game/transform_system.cpp
 	${river_SRC_DIR}event_system/event_handler.cpp
+	${river_SRC_DIR}renderer/rendering_context.cpp
 	${river_SRC_DIR}renderer/rendering_system.cpp
 	${river_SRC_DIR}renderer/shader.cpp
 	${river_SRC_DIR}renderer/batch_renderer.cpp
-	${river_SRC_DIR}renderer/rendering_context.cpp
 	${river_SRC_DIR}renderer/texture.cpp
 	${river_SRC_DIR}renderer/vertex_buffer.cpp
 	${river_SRC_DIR}renderer/vertex_array.cpp
 	${river_SRC_DIR}renderer/framebuffer.cpp
+	${river_SRC_DIR}audio/sound_context.cpp
+	${river_SRC_DIR}audio/audio_file.cpp
 	${river_SRC_DIR}time/clock.cpp
 	${river_SRC_DIR}scripting/scripting_system.cpp
 	${river_SRC_DIR}resources/resource_manager.cpp
@@ -64,7 +68,16 @@ set(river_SRC
 
 add_library(river ${river_SRC})
 add_library(river::river ALIAS river)
-target_link_libraries(river PUBLIC glad glfw glm OpenAl stb EnTT::EnTT ${CMAKE_DL_LIBS})
+target_link_libraries(river PUBLIC 
+	glad 
+	glfw
+	glm
+	${OPENAL_LIBRARY} 
+	stb 
+	EnTT::EnTT 
+	wave
+	${CMAKE_DL_LIBS}
+)
 
 target_include_directories(river PUBLIC include)
 

@@ -1,6 +1,4 @@
-# add_subdirectory(glfw)
-# add_subdirectory(glm)
 add_subdirectory(glad)
 add_subdirectory(stb)
 add_subdirectory(entt)
-# add_subdirectory(openal-soft)
+add_subdirectory(wave)
