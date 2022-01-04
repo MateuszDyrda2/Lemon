@@ -1,0 +1,1 @@
+target_sources(lemon PRIVATE input.cpp)
