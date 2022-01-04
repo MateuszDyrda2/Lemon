@@ -8,15 +8,15 @@ scene_manager::scene_manager():
 {
     LOG_MESSAGE("Scene Manager created");
 }
-void scene_manager::push_scene(string_id name)
+ptr<scene> scene_manager::push_scene(string_id name)
 {
     LOG_MESSAGE("New scene %s", name.get_string());
-    scenes.push(create_owned<scene>(name, context));
+    return scenes.emplace(create_owned<scene>(name)).get();
 }
-void scene_manager::update(float deltaTime)
+void scene_manager::update()
 {
     if(scenes.size())
-        scenes.front()->update(deltaTime);
+        scenes.front()->update();
 }
 void scene_manager::pop_scene()
 {

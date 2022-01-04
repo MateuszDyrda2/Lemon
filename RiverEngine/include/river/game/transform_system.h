@@ -1,6 +1,7 @@
 #pragma once
 
 #include <river/game/basic_components.h>
+#include <river/game/system.h>
 
 #include <concepts>
 #include <entt/entt.hpp>
@@ -8,7 +9,7 @@
 
 namespace river {
 class scene;
-class transform_system
+class transform_system : public system
 {
   public:
     template<class F>
@@ -20,7 +21,7 @@ class transform_system
 
     transform_system(ptr<scene> s);
     ~transform_system();
-    void update(entity_registry& registry);
+    void update(entity_registry& registry) override;
     friend class scene;
 };
 template<class F>

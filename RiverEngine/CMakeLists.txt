@@ -75,7 +75,6 @@ target_link_libraries(river PUBLIC
 	${OPENAL_LIBRARY} 
 	stb 
 	EnTT::EnTT 
-	wave
 	${CMAKE_DL_LIBS}
 )
 

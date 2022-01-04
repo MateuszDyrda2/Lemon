@@ -6,12 +6,13 @@
 #include <algorithm>
 
 namespace river {
-scene::scene(string_id name, ptr<rendering_context> context):
-    object(name), registry(),
-    scriptingSystem(create_owned<scripting_system>(this)),
-    renderingSystem(create_owned<rendering_system>(this, context)),
-    transformSystem(create_owned<transform_system>(this))
+scene::scene(string_id name):
+    object(name), registry(), mainCamera(&registry, registry.create())
 {
+    mainCamera.add_component<tag>(string_id("MainCamera"));
+    mainCamera.add_component<transform>();
+    mainCamera.add_component<dirty>();
+    mainCamera.add_component<camera>();
 }
 scene::~scene()
 {
@@ -22,17 +23,17 @@ void scene::initialize()
 void scene::begin()
 {
 }
-void scene::update(float dt)
+void scene::update()
 {
-    scriptingSystem->update(registry, dt);
-    transformSystem->update(registry);
-    renderingSystem->render(registry);
+    for(auto& s : systems)
+        s->update(registry);
 }
 entity scene::add_entity(string_id name)
 {
     auto ent = registry.create();
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent);
+    registry.emplace<dirty>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, entity parent)
@@ -40,6 +41,7 @@ entity scene::add_entity(string_id name, entity parent)
     auto ent = registry.create();
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent, parent.get_handle());
+    registry.emplace<dirty>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, const glm::vec3 position,
@@ -48,6 +50,7 @@ entity scene::add_entity(string_id name, const glm::vec3 position,
     auto ent = registry.create();
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent, position, scale, rotation, entt::null, entt::null);
+    registry.emplace<dirty>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, const glm::vec3 position,
@@ -58,6 +61,7 @@ entity scene::add_entity(string_id name, const glm::vec3 position,
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent, position, scale, rotation, parent.get_handle(),
                                 order);
+    registry.emplace<dirty>(ent);
     return entity(&registry, ent);
 }
 entity scene::clone_entity(entity ent, string_id name)
@@ -68,6 +72,7 @@ entity scene::clone_entity(entity ent, string_id name)
         if(auto& storage = curr.second; storage.contains(ent.get_handle()))
             storage.emplace(cloned.get_handle(), storage.get(ent.get_handle()));
     registry.replace<tag>(cloned_handle, name);
+    registry.emplace_or_replace<dirty>(cloned_handle);
     return cloned;
 }
 void scene::remove_entity(entity& ent)

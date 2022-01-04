@@ -1,6 +1,3 @@
 [submodule "external/entt"]
-	path = external/entt
+	path = RiverEngine/external/entt
 	url = https://github.com/skypjack/entt.git
-[submodule "RiverEngine/external/openal-soft"]
-	path = RiverEngine/external/openal-soft
-	url = https://github.com/kcat/openal-soft.git

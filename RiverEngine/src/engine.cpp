@@ -26,7 +26,7 @@ void engine::initialize()
 bool engine::update()
 {
     _clock->update();
-    _sceneManager->update(_clock->delta_time());
+    _sceneManager->update();
     return !_window->end_frame();
 }
 }

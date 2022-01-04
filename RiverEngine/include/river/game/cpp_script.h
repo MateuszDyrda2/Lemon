@@ -6,7 +6,8 @@ namespace river {
 class cpp_script
 {
   public:
-    cpp_script()          = default;
+    cpp_script(const entity& ent):
+        ent(ent) { }
     virtual ~cpp_script() = default;
 
     virtual void on_create() { }

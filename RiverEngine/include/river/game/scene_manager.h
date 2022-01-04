@@ -12,8 +12,8 @@ class scene_manager : public service
 {
   public:
     scene_manager();
-    void push_scene(string_id name);
-    void update(float deltaTime);
+    ptr<scene> push_scene(string_id name);
+    void update();
     void pop_scene();
     scene* get_current_scene();
 

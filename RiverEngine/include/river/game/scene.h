@@ -1,21 +1,28 @@
 #pragma once
 
 #include "entity.h"
+#include "system.h"
 #include "transform_system.h"
 
 #include <river/renderer/rendering_system.h>
 #include <river/scripting/scripting_system.h>
 
-#include <entt/entt.hpp>
+#include <vector>
 
 namespace river {
 class scene : public object
 {
   public:
-    scene(string_id name, ptr<rendering_context> context);
+    scene(string_id name);
     ~scene();
+    template<class T>
+    inline ptr<scene> add_system()
+    {
+        systems.push_back(create_owned<T>(this));
+        return this;
+    }
     void initialize();
-    void update(float dt);
+    void update();
     void begin();
 
     entity add_entity(string_id name);
@@ -27,11 +34,11 @@ class scene : public object
     entity clone_entity(entity ent, string_id name);
     void remove_entity(entity& ent);
     entity_registry& get_registry() { return registry; }
+    entity get_main_camera() const { return mainCamera; }
 
   private:
     entity_registry registry;
-    owned<scripting_system> scriptingSystem;
-    owned<rendering_system> renderingSystem;
-    owned<transform_system> transformSystem;
+    entity mainCamera;
+    std::vector<owned<system>> systems;
 };
 } // namespace river

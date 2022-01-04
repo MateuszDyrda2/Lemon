@@ -58,6 +58,15 @@ void window::setup_callbacks()
         handler->dispatch(string_id("KeyPressed"), key::keycode(k),
                           scancode, key::action(action), key::keymod(mods));
     });
+    glfwSetMouseButtonCallback(_handle, [](GLFWwindow* w, int button, int action, int mods) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("MouseButtonPressed"), key::mouse(button),
+                          key::action(action), key::keymod(mods));
+    });
+    glfwSetScrollCallback(_handle, [](GLFWwindow* w, double xoffset, double yoffset) {
+        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
+        handler->dispatch(string_id("MouseScroll"), xoffset, yoffset);
+    });
     glfwSetWindowCloseCallback(_handle, [](GLFWwindow* w) {
         auto handler = (event_handler*)glfwGetWindowUserPointer(w);
         handler->dispatch(string_id("WindowClose"));

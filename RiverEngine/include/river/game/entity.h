@@ -10,6 +10,7 @@ using entity_handle   = entt::entity;
 class entity
 {
   public:
+    entity() = default;
     entity(ptr<entity_registry> registry, entity_handle name);
     template<class T, class... Args>
     void add_component(Args&&... args);
@@ -33,9 +34,14 @@ class entity
     entity_handle get_handle() const { return handle; }
     ptr<entity_registry> get_registry() { return registry; }
 
+    explicit operator bool() const
+    {
+        return registry != nullptr;
+    }
+
   private:
-    ptr<entity_registry> registry;
-    entity_handle handle;
+    ptr<entity_registry> registry{};
+    entity_handle handle{ entt::null };
 };
 template<class T, class... Args>
 inline void entity::add_component(Args&&... args)

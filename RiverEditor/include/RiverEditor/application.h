@@ -18,6 +18,7 @@ class editor_engine : public engine
     ~editor_engine();
     void initialize();
     friend class application;
+    ptr<scene> currentScene;
 };
 class application
 {
@@ -32,4 +33,13 @@ class application
     std::unique_ptr<framebuffer> frameBuffer;
     event_handler* handler;
     ImVec2 oldViewport;
+    ImGuiIO* io;
+    ptr<scene> editedScene;
+    entity selection;
+
+  private:
+    void draw_hierarchy();
+    void update_viewport();
+    void draw_properties();
+    void set_imgui_style();
 };

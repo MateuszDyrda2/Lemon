@@ -12,9 +12,10 @@ set(RiverEditor_SRC
 	${RiverEditor_SRC_DIR}main.cpp
 	${RiverEditor_SRC_DIR}application.cpp
 	${RiverEditor_SRC_DIR}editor_window.cpp
+	${RiverEditor_SRC_DIR}editor_system.cpp
 )
 
 add_executable(RiverEditor ${RiverEditor_SRC})
-target_include_directories(RiverEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(RiverEditor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(RiverEditor PUBLIC river::river imgui)

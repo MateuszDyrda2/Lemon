@@ -5,27 +5,26 @@
 #include <river/service/services.h>
 
 namespace river {
-rendering_system::rendering_system(ptr<scene> s,
-                                   ptr<rendering_context> context):
+rendering_system::rendering_system(ptr<scene> s):
     spriteRenderer(create_owned<batch_renderer>()),
-    context(context), mainCamera(s->add_entity(string_id("MainCamera"))),
-    handler(services::get<event_handler>())
+    context(services::get<rendering_context>()),
+    mainCamera(s->get_main_camera())
 {
-    mainCamera.add_component<camera>();
-    vpResize = handler->subscribe<int, int>(
+    vpResize = services::get<event_handler>()->subscribe<int, int>(
         string_id("FramebufferSize"),
         [this](int width, int height) {
-            LOG_MESSAGE("Viewport resize: %dx%d", width, height);
             mainCamera.change_component<camera>(
                 glm::vec4{ 0.0f, 0.0f, width, height },
-                glm::ortho(width / -2.f, width / 2.f, height / -2.f, height / 2.f));
+                glm::ortho(
+                    (-1.f) * (width >> 1), (float)(width >> 1),
+                    (-1.f) * (height >> 1), (float)(height >> 1)));
         });
     context->enable_blending();
 }
 rendering_system::~rendering_system()
 {
 }
-void rendering_system::render(entity_registry& registry)
+void rendering_system::update(entity_registry& registry)
 {
     auto [cameraComponent, cameraTransform] =
         mainCamera.get_component<camera, transform>();
