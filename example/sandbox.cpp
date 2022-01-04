@@ -1,10 +1,10 @@
-#include <river/entry_point.h>
+#include <lemon/entry_point.h>
 
-#include <river/input/input.h>
-#include <river/input/key_codes.h>
-#include <river/window/window.h>
+#include <lemon/input/input.h>
+#include <lemon/input/key_codes.h>
+#include <lemon/window/window.h>
 
-using namespace river;
+using namespace lemon;
 
 class Sandbox : public engine
 {
@@ -23,7 +23,7 @@ Sandbox::Sandbox(int argc, char** argv):
     services::provide(create_owned<input>());
     services::provide(create_owned<rendering_context>());
     services::provide(create_owned<scene_manager>());
-    services::provide(create_owned<river::clock>());
+    services::provide(create_owned<lemon::clock>());
     this->initialize();
 }
 Sandbox::~Sandbox()
