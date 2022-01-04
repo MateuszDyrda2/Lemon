@@ -1,0 +1,3 @@
+[submodule "Lemon/external/entt"]
+	path = Lemon/external/entt
+	url = https://github.com/skypjack/entt.git
