@@ -20,15 +20,12 @@ class resource
     ~resource();
     void increment() noexcept;
     u32 decrement() noexcept;
-    bool abandoned() const noexcept;
     bool loaded() const noexcept;
     ptr<object> get() noexcept;
     ptr<object> get() const noexcept;
-    u32 get_count() const noexcept;
 
   private:
     std::atomic<u32> _count;
-    std::string filepath;
     bool _loaded;
     ptr<object> _stored;
 };
@@ -41,8 +38,7 @@ class asset_storage
     asset_storage(const std::string& dataPath);
     ~asset_storage();
 
-    template<class T>
-    ptr<T> get_asset(string_id name) const;
+    ptr<object> get_asset(string_id name) const;
     template<class T>
     bool register_asset(string_id name);
     void release_asset(string_id name);
@@ -52,6 +48,9 @@ class asset_storage
     container_type cachedAssets;
     owned<asset_loader> loader;
 };
+namespace asset_impl {
+static ptr<asset_storage> storage;
+}
 template<class T>
 bool asset_storage::register_asset(string_id name)
 {
@@ -64,14 +63,5 @@ bool asset_storage::register_asset(string_id name)
         cachedAssets.insert(std::make_pair(
             name, resource(loader->load_resource<T>(name))));
     }
-}
-template<class T>
-ptr<T> asset_storage::get_asset(string_id name) const
-{
-    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
-    {
-        return res->second.get();
-    }
-    return nullptr;
 }
 } // namespace lemon

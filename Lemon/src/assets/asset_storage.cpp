@@ -23,7 +23,8 @@ resource::self_type& resource::operator=(self_type&& other) noexcept
 }
 resource::~resource()
 {
-    delete _stored;
+    if(_stored)
+        delete _stored;
 }
 void resource::increment() noexcept
 {
@@ -32,10 +33,6 @@ void resource::increment() noexcept
 u32 resource::decrement() noexcept
 {
     return _count.fetch_sub(1, std::memory_order_release);
-}
-bool resource::abandoned() const noexcept
-{
-    return _count.load() == 0;
 }
 bool resource::loaded() const noexcept
 {
@@ -49,16 +46,21 @@ ptr<object> resource::get() const noexcept
 {
     return _stored;
 }
-u32 resource::get_count() const noexcept
-{
-    return _count.load();
-}
 asset_storage::asset_storage(const std::string& dataPath):
     loader(create_owned<asset_loader>(dataPath))
 {
+    asset_impl::storage = this;
 }
 asset_storage::~asset_storage()
 {
+}
+ptr<object> asset_storage::get_asset(string_id name) const
+{
+    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
+    {
+        return res->second.get();
+    }
+    return nullptr;
 }
 void asset_storage::release_asset(string_id name)
 {
@@ -74,4 +76,7 @@ void asset_storage::clone_asset(string_id name)
     LEMON_ASSERT(cachedAssets.contains(name));
     cachedAssets[name].increment();
 }
+namespace asset_impl {
+ptr<asset_storage> storage = nullptr;
+} // namespace asset_impl
 } // namespace lemon

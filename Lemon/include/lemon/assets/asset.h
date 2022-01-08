@@ -1,10 +1,10 @@
 #pragma once
 
 #include "asset_storage.h"
+
 #include <lemon/core/assert.h>
 
 namespace lemon {
-
 template<class T>
 class asset
 {
@@ -17,7 +17,7 @@ class asset
     using const_reference = const T&;
 
   public:
-    asset();
+    asset() = default;
     asset(string_id name);
     asset(const self_type& other);
     self_type& operator=(const self_type& other);
@@ -39,23 +39,18 @@ class asset
 
   private:
     string_id res;
-    static asset_storage storage;
 };
-template<class T>
-asset<T>::asset():
-    res{}
-{ }
 template<class T>
 asset<T>::asset(string_id name):
     res{ name }
 {
-    storage.register_asset(name);
+    asset_impl::storage->register_asset(name);
 }
 template<class T>
 asset<T>::asset(const self_type& other):
     res{ other.res }
 {
-    storage.clone_asset(res);
+    asset_impl::storage->clone_asset(res);
 }
 template<class T>
 typename asset<T>::self_type&
@@ -63,9 +58,9 @@ asset<T>::operator=(const self_type& other)
 {
     if(this != &other)
     {
-        if(res) storage.release_asset(res);
+        if(res) asset_impl::storage->release_asset(res);
         res = other.res;
-        storage.clone_asset(res);
+        asset_impl::storage->clone_asset(res);
     }
     return *this;
 }
@@ -88,19 +83,19 @@ asset<T>::operator=(self_type&& other) noexcept
 template<class T>
 asset<T>::~asset()
 {
-    if(res) storage.release_asset(res);
+    if(res) asset_impl::storage->release_asset(res);
 }
 template<class T>
 typename asset<T>::const_pointer
 asset<T>::get() const noexcept
 {
-    return storage.get_asset<T>(name);
+    return asset_impl::storage->get_asset<T>(name);
 }
 template<class T>
 typename asset<T>::pointer
 asset<T>::get() noexcept
 {
-    return storage.get_asset<T>(name);
+    return asset_impl::storage->get_asset<T>(name);
 }
 template<class T>
 bool asset<T>::operator==(const self_type& other) const noexcept
