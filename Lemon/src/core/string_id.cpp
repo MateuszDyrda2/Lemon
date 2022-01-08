@@ -17,4 +17,8 @@ bool string_id::operator==(const string_id& other) const
 {
     return id == other.id;
 }
+string_id::operator bool() const noexcept
+{
+    return id != 0u;
+}
 } // namespace lemon

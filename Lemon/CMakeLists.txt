@@ -7,7 +7,7 @@ set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_
 
 set(lemon_DESC "2D game engine written in C++")
 
-# ------ ENTT, GLAD, STB --------------
+# ---- ENTT, GLAD, STB, RAPIDXML ------
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 # -------------------------------------
 # ---------------OPENAL----------------
@@ -46,6 +46,7 @@ target_link_libraries(lemon PUBLIC
 	${OPENAL_LIBRARY} 
 	stb 
 	EnTT::EnTT 
+	rapidxml
 	${CMAKE_DL_LIBS}
 )
 

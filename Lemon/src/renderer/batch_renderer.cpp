@@ -53,11 +53,11 @@ void batch_renderer::batch::add_quad(const glm::mat4& trans, glm::vec4 color, gl
     vao->unbind();
     usedVertices += 6;
 }
-void batch_renderer::batch::set_texture(resource<texture> tex)
+void batch_renderer::batch::set_texture(asset<texture> tex)
 {
     _texture = tex;
 }
-bool batch_renderer::batch::is_texture(resource<texture> other) const
+bool batch_renderer::batch::is_texture(asset<texture> other) const
 {
     return other == _texture;
 }
@@ -69,7 +69,7 @@ bool batch_renderer::batch::is_full() const
 {
     return batch_renderer::maxVertices - usedVertices < 6;
 }
-void batch_renderer::batch::flush(const glm::mat4& viewProj, resource<shader> textureShader, ptr<rendering_context> context)
+void batch_renderer::batch::flush(const glm::mat4& viewProj, asset<shader> textureShader, ptr<rendering_context> context)
 {
     if(usedVertices == 0) return;
     textureShader->use();

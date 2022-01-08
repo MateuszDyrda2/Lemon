@@ -28,14 +28,25 @@ using owned = std::unique_ptr<T>;
 template<class T>
 using ptr = T*;
 
+template<class T>
+inline ref<T> create_ref(size_type size) requires std::is_array_v<T>
+{
+    return std::make_shared<T>(size);
+}
 template<class T, class... Args>
-ref<T> create_ref(Args&&... args)
+inline ref<T> create_ref(Args&&... args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
+template<class T>
+inline owned<T> create_owned(size_type size) requires std::is_array_v<T>
+{
+    return std::make_unique<T>(size);
+}
 template<class T, class... Args>
-owned<T> create_owned(Args&&... args)
+inline owned<T> create_owned(Args&&... args)
 {
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
+
 }

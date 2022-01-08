@@ -28,16 +28,16 @@ class batch_renderer
     {
         size_type usedVertices;
         owned<vertex_array> vao;
-        resource<texture> _texture;
+        asset<texture> _texture;
 
         batch();
         bool is_empty() const noexcept { return usedVertices == 0ULL; }
         void add_quad(const glm::mat4& trans, glm::vec4 color, glm::vec4 texCoords);
-        void set_texture(resource<texture> tex);
-        bool is_texture(resource<texture> other) const;
+        void set_texture(asset<texture> tex);
+        bool is_texture(asset<texture> other) const;
         ptr<batch> get_bigger(ptr<batch> other) const;
         bool is_full() const;
-        void flush(const glm::mat4& viewProj, resource<shader> textureShader, ptr<rendering_context> context);
+        void flush(const glm::mat4& viewProj, asset<shader> textureShader, ptr<rendering_context> context);
     };
 
   public:
@@ -54,7 +54,7 @@ class batch_renderer
     void end_render(const glm::mat4& viewProj, ptr<rendering_context> context);
 
   private:
-    resource<shader> textureShader;
+    asset<shader> textureShader;
     container_type batches;
 };
 } // namespace lemon

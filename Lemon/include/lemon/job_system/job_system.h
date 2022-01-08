@@ -33,8 +33,13 @@ class job_system
     template<class F>
     void schedule(F&& callable);
     template<class F, class... Args>
+    void schedule(F&& callable, Args&&... args);
+    template<class F>
+    future_type<std::invoke_result_t<std::decay_t<F>>>
+    schedule_r(F&& callable);
+    template<class F, class... Args>
     future_type<std::invoke_result_t<std::decay_t<F>, std::decay_t<Args>...>>
-    schedule(F&& callable, Args&&... args);
+    schedule_r(F&& callable, Args&&... args);
 
   private:
     worker_container_type workers;
@@ -50,10 +55,37 @@ void job_system::schedule(F&& callable)
     mtx.lock();
     tasks.push_back(std::move(task));
     mtx.unlock();
+    cvar.notify_one();
 }
 template<class F, class... Args>
-typename job_system::future_type<std::invoke_result_t<std::decay_t<F>, std::decay_t<Args>...>> job_system::
-    schedule(F&& callable, Args&&... args)
+void job_system::schedule(F&& callable, Args&&... args)
+{
+    auto task = create_owned<task_type>(
+        [callable = std::forward<F>(callable), ... args = std::forward<Args>(args)]() {
+            std::forward<F>(callable)(std::forward<Args>(args)...);
+        });
+    mtx.lock();
+    tasks.push_back(std::move(task));
+    mtx.unlock();
+    cvar.notify_one();
+}
+template<class F>
+typename job_system::future_type<std::invoke_result_t<std::decay_t<F>>>
+job_system::schedule_r(F&& callable)
+{
+    using return_type = std::invoke_result_t<std::decay_t<F>>;
+    auto task         = create_owned<task_type>(std::forward<F>(callable));
+    auto returnFuture = task.get_future();
+    mtx.lock();
+    tasks.push_back(std::move(task));
+    mtx.unlock();
+    cvar.notify_one();
+
+    return returnFuture;
+}
+template<class F, class... Args>
+typename job_system::future_type<std::invoke_result_t<std::decay_t<F>, std::decay_t<Args>...>>
+job_system::schedule_r(F&& callable, Args&&... args)
 {
     using return_type = std::invoke_result_t<std::decay_t<F>, std::decay_t<Args>...>;
     std::promise<return_type> returnValue;
@@ -67,6 +99,7 @@ typename job_system::future_type<std::invoke_result_t<std::decay_t<F>, std::deca
     mtx.lock();
     tasks.push_back(std::move(task));
     mtx.unlock();
+    cvar.notify_one();
 
     return returnFuture;
 }
