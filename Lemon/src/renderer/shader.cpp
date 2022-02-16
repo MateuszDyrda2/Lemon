@@ -4,38 +4,34 @@
 #include <sstream>
 
 namespace lemon {
-shader::shader(string_id name, const std::string& vertexPath, const std::string& fragmentPath):
+shader::shader(string_id name, const std::string& shaderPath):
     object(name)
 {
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
+    std::string shaderCode;
+    std::ifstream shaderFile;
 
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try
     {
-        vShaderFile.open(LEMON_RESOURCE_PATH + vertexPath);
-        fShaderFile.open(LEMON_RESOURCE_PATH + fragmentPath);
-        std::stringstream vShaderStream, fShaderStream;
+        shaderFile.open(LEMON_RESOURCE_PATH + shaderPath);
+        std::stringstream shaderStream;
 
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
+        shaderStream << shaderFile.rdbuf();
 
-        vShaderFile.close();
-        fShaderFile.close();
+        shaderFile.close();
 
-        vertexCode   = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
+        shaderCode = shaderStream.str();
     }
     catch(std::ifstream::failure& e)
     {
-        LOG_ERROR("Shader read failure! %s or %s",
-                  vertexPath.c_str(), fragmentPath.c_str());
+        LOG_ERROR("Shader read failure! %s",
+                  shaderPath.c_str());
     }
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
+
+    std::string vsDefines   = "#version 330\n#define VERTEX_PROGRAM\n";
+    std::string fsDefines   = "#version 330\n#define FRAGMENT_PROGRAM\n";
+    const char* vShaderCode = (vsDefines + shaderCode).c_str();
+    const char* fShaderCode = (fsDefines + shaderCode).c_str();
 
     // compile shaders
     int success;

@@ -9,10 +9,10 @@
 
 namespace lemon {
 class window_base;
-class input : public service
+class input
 {
   public:
-    input();
+    input(ptr<window_base> window);
     ~input() = default;
     [[nodiscard]] bool is_key_pressed(key::keycode key) const;
     [[nodiscard]] bool is_mouse_pressed(key::mouse button) const;

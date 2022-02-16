@@ -4,8 +4,7 @@
 
 namespace lemon {
 window::window(const std::string& name, size_type width, size_type height):
-    window_base(width, height), _name(name),
-    eventHandler(services::get<event_handler>())
+    window_base(width, height), _name(name)
 {
     if(!glfwInit())
     {
@@ -22,9 +21,9 @@ window::window(const std::string& name, size_type width, size_type height):
     glfwMakeContextCurrent(_handle);
     glfwSwapInterval(1);
 
-    glfwSetWindowUserPointer(_handle, (void*)eventHandler);
+    glfwSetWindowUserPointer(_handle, (void*)&eventDispatcher);
     setup_callbacks();
-    windowResize = eventHandler->subscribe<int, int>(
+    windowResize = listener<int, int>(
         string_id("WindowSize"),
         [this](int width, int height) {
             LOG_MESSAGE("Window resize: %dx%d", width, height);
@@ -51,56 +50,54 @@ bool window::end_frame()
 }
 void window::setup_callbacks()
 {
-
     glfwSetKeyCallback(_handle, [](GLFWwindow* w, int k, int scancode, int action, int mods) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("KeyPressed"), key::keycode(k),
-                          scancode, key::action(action), key::keymod(mods));
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("KeyPressed"), key::keycode(k), scancode, key::action(action), key::keymod(mods));
     });
     glfwSetMouseButtonCallback(_handle, [](GLFWwindow* w, int button, int action, int mods) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("MouseButtonPressed"), key::mouse(button),
-                          key::action(action), key::keymod(mods));
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("MouseButtonPressed"), key::mouse(button),
+                   key::action(action), key::keymod(mods));
     });
     glfwSetScrollCallback(_handle, [](GLFWwindow* w, double xoffset, double yoffset) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("MouseScroll"), xoffset, yoffset);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("MouseScroll"), xoffset, yoffset);
     });
     glfwSetWindowCloseCallback(_handle, [](GLFWwindow* w) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowClose"));
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowClose"));
     });
     glfwSetWindowSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowSize"), width, height);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowSize"), width, height);
     });
     glfwSetFramebufferSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("FramebufferSize"), width, height);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("FramebufferSize"), width, height);
     });
     glfwSetWindowContentScaleCallback(_handle, [](GLFWwindow* w, float xscale, float yscale) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowContentScale"), xscale, yscale);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowContentScale"), xscale, yscale);
     });
     glfwSetWindowPosCallback(_handle, [](GLFWwindow* w, int xpos, int ypos) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowPos"), xpos, ypos);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowPos"), xpos, ypos);
     });
     glfwSetWindowIconifyCallback(_handle, [](GLFWwindow* w, int iconified) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowIconify"), iconified);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowIconify"), iconified);
     });
     glfwSetWindowMaximizeCallback(_handle, [](GLFWwindow* w, int maximized) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowMaximize"), maximized);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowMaximize"), maximized);
     });
     glfwSetWindowFocusCallback(_handle, [](GLFWwindow* w, int focused) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowFocused"), focused);
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowFocused"), focused);
     });
     glfwSetWindowRefreshCallback(_handle, [](GLFWwindow* w) {
-        auto handler = (event_handler*)glfwGetWindowUserPointer(w);
-        handler->dispatch(string_id("WindowRefresh"));
+        ((dispatcher*)glfwGetWindowUserPointer(w))
+            ->send(string_id("WindowRefresh"));
     });
 }
 }

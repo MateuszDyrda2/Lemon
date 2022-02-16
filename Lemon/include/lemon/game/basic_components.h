@@ -3,9 +3,9 @@
 #include "cpp_script.h"
 #include "entity.h"
 
+#include <lemon/assets/asset.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/renderer/texture.h>
-#include <lemon/resources/resource.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>

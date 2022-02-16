@@ -1,13 +1,12 @@
 #pragma once
 
 #include <lemon/core/basic_types.h>
-#include <lemon/service/service.h>
 
 #include <glad/glad.h>
 #include <glm/vec4.hpp>
 
 namespace lemon {
-class rendering_context : public service
+class rendering_context
 {
   public:
     rendering_context();

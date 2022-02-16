@@ -3,15 +3,13 @@
 #include "object.h"
 #include "scene.h"
 
-#include <lemon/service/service.h>
-
 #include <queue>
 
 namespace lemon {
-class scene_manager : public service
+class scene_manager
 {
   public:
-    scene_manager();
+    scene_manager(ptr<rendering_context> context);
     ptr<scene> push_scene(string_id name);
     void update();
     void pop_scene();

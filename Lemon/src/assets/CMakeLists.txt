@@ -1,4 +1,5 @@
 target_sources(lemon PRIVATE
-	resource_manager.cpp
+	asset_loader.cpp
+	asset_storage.cpp
 	file.cpp
 )

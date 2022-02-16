@@ -2,8 +2,8 @@
 
 #include "window_base.h"
 
-#include <lemon/event_system/event_handler.h>
-#include <lemon/service/services.h>
+#include <lemon/events/dispatcher.h>
+#include <lemon/events/listener.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -23,8 +23,8 @@ class window : public window_base
   private:
     GLFWwindow* _handle;
     std::string _name;
-    unsubscriber<int, int> windowResize;
-    ptr<event_handler> eventHandler;
+    listener<int, int> windowResize;
+    dispatcher eventDispatcher;
 
     void setup_callbacks();
 };

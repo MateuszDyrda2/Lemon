@@ -1,18 +1,23 @@
 #include <lemon/assets/asset_storage.h>
 
+#include <lemon/renderer/shader.h>
+#include <lemon/renderer/texture.h>
+
 namespace lemon {
-resource::resource():
+ptr<asset_storage> asset_storage::storage = nullptr;
+asset_storage::resource::resource():
     _stored{ nullptr }, _count{ 0 }
 { }
-resource::resource(object* ptr):
+asset_storage::resource::resource(object* ptr):
     _stored(ptr), _count(1)
 { }
-resource::resource(self_type&& other) noexcept:
+asset_storage::resource::resource(self_type&& other) noexcept:
     _stored(other._stored), _count(other._count.load())
 {
     other._stored = nullptr;
 }
-resource::self_type& resource::operator=(self_type&& other) noexcept
+asset_storage::resource::self_type&
+asset_storage::resource::operator=(self_type&& other) noexcept
 {
     if(this != &other)
     {
@@ -21,46 +26,50 @@ resource::self_type& resource::operator=(self_type&& other) noexcept
     }
     return *this;
 }
-resource::~resource()
+asset_storage::resource::~resource()
 {
     if(_stored)
         delete _stored;
 }
-void resource::increment() noexcept
+void asset_storage::resource::increment() noexcept
 {
     _count.fetch_add(1, std::memory_order_relaxed);
 }
-u32 resource::decrement() noexcept
+u32 asset_storage::resource::decrement() noexcept
 {
     return _count.fetch_sub(1, std::memory_order_release);
 }
-bool resource::loaded() const noexcept
+bool asset_storage::resource::loaded() const noexcept
 {
-    return _loaded;
+    return _stored != nullptr;
 }
-ptr<object> resource::get() noexcept
+ptr<object> asset_storage::resource::get() noexcept
 {
     return _stored;
 }
-ptr<object> resource::get() const noexcept
+ptr<object> asset_storage::resource::get() const noexcept
 {
     return _stored;
+}
+void asset_storage::resource::set(ptr<object> ptr)
+{
+    _stored = ptr;
 }
 asset_storage::asset_storage(const std::string& dataPath):
     loader(create_owned<asset_loader>(dataPath))
 {
-    asset_impl::storage = this;
+    LEMON_ASSERT(!storage);
+    storage = this;
+
+    auto _texture = string_id("mock_texture");
+    auto _shader  = string_id("mock_shader");
+    cachedAssets.insert(std::make_pair(
+        _texture, resource(loader->load_resource<texture>(_texture))));
+    cachedAssets.insert(std::make_pair(
+        _shader, resource(loader->load_resource<shader>(_shader))));
 }
 asset_storage::~asset_storage()
 {
-}
-ptr<object> asset_storage::get_asset(string_id name) const
-{
-    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
-    {
-        return res->second.get();
-    }
-    return nullptr;
 }
 void asset_storage::release_asset(string_id name)
 {
@@ -71,12 +80,10 @@ void asset_storage::release_asset(string_id name)
         cachedAssets.erase(name);
     }
 }
-void asset_storage::clone_asset(string_id name)
+string_id asset_storage::clone_asset(string_id name)
 {
     LEMON_ASSERT(cachedAssets.contains(name));
     cachedAssets[name].increment();
+    return name;
 }
-namespace asset_impl {
-ptr<asset_storage> storage = nullptr;
-} // namespace asset_impl
 } // namespace lemon

@@ -1,12 +1,11 @@
 #pragma once
 
 #include <lemon/core/basic_types.h>
-#include <lemon/service/service.h>
 
 #include <glm/vec2.hpp>
 
 namespace lemon {
-class window_base : public service
+class window_base
 {
   public:
     window_base(size_type width, size_type height):

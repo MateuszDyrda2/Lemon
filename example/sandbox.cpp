@@ -19,7 +19,7 @@ Sandbox::Sandbox(int argc, char** argv):
     engine(argc, argv)
 {
     services::provide(create_owned<event_handler>());
-    services::provide(create_owned<job_system>(std::thread::hardware_concurrency()));
+    services::provide(create_owned<scheduler>(std::thread::hardware_concurrency()));
     services::provide(create_owned<resource_manager>());
     services::provide<window_base>(create_owned<window>("Sandbox", 1080, 720));
     services::provide(create_owned<input>());

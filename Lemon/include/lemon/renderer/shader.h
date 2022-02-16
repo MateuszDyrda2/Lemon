@@ -11,7 +11,7 @@ namespace lemon {
 class shader : public object
 {
   public:
-    shader(string_id name, const std::string& vertexPath, const std::string& fragmentPath);
+    shader(string_id name, const std::string& shaderPath);
     shader(const shader&) = delete;
     shader& operator=(const shader&) = delete;
     shader(shader&& other) noexcept;

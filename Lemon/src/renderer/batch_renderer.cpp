@@ -1,7 +1,7 @@
 #include <lemon/renderer/batch_renderer.h>
 
 #include <algorithm>
-#include <lemon/resources/resource_manager.h>
+#include <lemon/assets/asset.h>
 
 namespace lemon {
 batch_renderer::batch::batch():
@@ -53,11 +53,11 @@ void batch_renderer::batch::add_quad(const glm::mat4& trans, glm::vec4 color, gl
     vao->unbind();
     usedVertices += 6;
 }
-void batch_renderer::batch::set_texture(asset<texture> tex)
+void batch_renderer::batch::set_texture(ptr<texture> tex)
 {
     _texture = tex;
 }
-bool batch_renderer::batch::is_texture(asset<texture> other) const
+bool batch_renderer::batch::is_texture(ptr<texture> other) const
 {
     return other == _texture;
 }
@@ -69,7 +69,7 @@ bool batch_renderer::batch::is_full() const
 {
     return batch_renderer::maxVertices - usedVertices < 6;
 }
-void batch_renderer::batch::flush(const glm::mat4& viewProj, asset<shader> textureShader, ptr<rendering_context> context)
+void batch_renderer::batch::flush(const glm::mat4& viewProj, ptr<shader> textureShader, ptr<rendering_context> context)
 {
     if(usedVertices == 0) return;
     textureShader->use();
@@ -82,15 +82,12 @@ void batch_renderer::batch::flush(const glm::mat4& viewProj, asset<shader> textu
     usedVertices = 0;
 }
 batch_renderer::batch_renderer():
-    textureShader{ services::get<resource_manager>()->load<shader>(
-        string_id("TextureShader"), "shaders/texture_shader.vs",
-        "shaders/texture_shader.fs") },
+    textureShader(string_id("textureShader")),
     batches()
 {
 }
 batch_renderer::~batch_renderer()
 {
-    services::get<resource_manager>()->unload(string_id("TextureShader"));
 }
 void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_context> context,
                                    sprite_renderer& sComponent, transform& tComponent)
@@ -100,7 +97,7 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_cont
     ptr<batch> found{};
     for(auto& b : batches)
     {
-        if(b.is_texture(sComponent.text))
+        if(b.is_texture(sComponent.text.get()))
         {
             found = &b;
         }
@@ -112,17 +109,17 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_cont
     if(found)
     {
         if(found->is_full())
-            found->flush(viewProj, textureShader, context);
+            found->flush(viewProj, textureShader.get(), context);
     }
     else if(empty)
     {
-        empty->set_texture(sComponent.text);
+        empty->set_texture(sComponent.text.get());
         found = empty;
     }
     else
     {
-        biggestBatch->flush(viewProj, textureShader, context);
-        biggestBatch->set_texture(sComponent.text);
+        biggestBatch->flush(viewProj, textureShader.get(), context);
+        biggestBatch->set_texture(sComponent.text.get());
         found        = biggestBatch;
         biggestBatch = &batches.front();
     }
@@ -131,6 +128,6 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_cont
 void batch_renderer::end_render(const glm::mat4& viewProj, ptr<rendering_context> context)
 {
     for(auto& b : batches)
-        b.flush(viewProj, textureShader, context);
+        b.flush(viewProj, textureShader.get(), context);
 }
 } // namespace lemon

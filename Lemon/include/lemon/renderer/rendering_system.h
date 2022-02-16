@@ -3,7 +3,7 @@
 #include "batch_renderer.h"
 
 #include <lemon/core/string_id.h>
-#include <lemon/event_system/event_handler.h>
+#include <lemon/events/listener.h>
 
 #include <lemon/game/system.h>
 
@@ -20,6 +20,6 @@ class rendering_system : public system
     owned<batch_renderer> spriteRenderer;
     ptr<rendering_context> context;
     entity mainCamera;
-    unsubscriber<int, int> vpResize;
+    listener<int, int> vpResize;
 };
 } // namespace lemon

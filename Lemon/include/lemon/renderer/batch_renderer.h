@@ -6,7 +6,6 @@
 #include <lemon/game/basic_components.h>
 #include <lemon/renderer/texture.h>
 #include <lemon/renderer/vertex_array.h>
-#include <lemon/resources/resource_manager.h>
 #include <lemon/service/services.h>
 
 #include <array>
@@ -28,23 +27,23 @@ class batch_renderer
     {
         size_type usedVertices;
         owned<vertex_array> vao;
-        asset<texture> _texture;
+        ptr<texture> _texture;
 
         batch();
         bool is_empty() const noexcept { return usedVertices == 0ULL; }
         void add_quad(const glm::mat4& trans, glm::vec4 color, glm::vec4 texCoords);
-        void set_texture(asset<texture> tex);
-        bool is_texture(asset<texture> other) const;
+        void set_texture(ptr<texture> tex);
+        bool is_texture(ptr<texture> other) const;
         ptr<batch> get_bigger(ptr<batch> other) const;
         bool is_full() const;
-        void flush(const glm::mat4& viewProj, asset<shader> textureShader, ptr<rendering_context> context);
+        void flush(const glm::mat4& viewProj, ptr<shader> textureShader, ptr<rendering_context> context);
     };
 
   public:
     static constexpr size_type maxBatches  = 10;
     static constexpr size_type maxVertices = 1024;
 
-    using container_type = std::array<batch, 10>;
+    using container_type = std::array<batch, maxBatches>;
 
   public:
     batch_renderer();

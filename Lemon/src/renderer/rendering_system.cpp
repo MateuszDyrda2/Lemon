@@ -1,16 +1,15 @@
 #include <lemon/renderer/rendering_system.h>
 
+#include <lemon/game.h>
 #include <lemon/game/basic_components.h>
 #include <lemon/game/scene.h>
-#include <lemon/service/services.h>
 
 namespace lemon {
 rendering_system::rendering_system(ptr<scene> s):
     spriteRenderer(create_owned<batch_renderer>()),
-    context(services::get<rendering_context>()),
-    mainCamera(s->get_main_camera())
-{
-    vpResize = services::get<event_handler>()->subscribe<int, int>(
+    context(game::get_rendering_context()),
+    mainCamera(s->get_main_camera()),
+    vpResize(
         string_id("FramebufferSize"),
         [this](int width, int height) {
             mainCamera.change_component<camera>(
@@ -18,7 +17,8 @@ rendering_system::rendering_system(ptr<scene> s):
                 glm::ortho(
                     (-1.f) * (width >> 1), (float)(width >> 1),
                     (-1.f) * (height >> 1), (float)(height >> 1)));
-        });
+        })
+{
     context->enable_blending();
 }
 rendering_system::~rendering_system()
