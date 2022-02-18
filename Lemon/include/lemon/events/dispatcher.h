@@ -25,7 +25,7 @@ template<class... Args>
 void dispatcher::send(string_id event, Args&&... args)
 {
     auto&& e = handler.events.find(event);
-    if(e != events.find())
+    if(e != handler.events.end())
     {
         auto& c = static_cast<event_handler::event<Args...>&>(*e->second);
         c.dispatch(std::forward<Args>(args)...);

@@ -25,10 +25,6 @@ auto game::get_scene_manager() -> ptr<scene_manager>
 {
     return eng->_sceneManager.get();
 }
-auto game::get_rendering_context() -> ptr<rendering_context>
-{
-    return eng->_context.get();
-}
 auto game::get_input_handler() -> ptr<input>
 {
     return eng->_input.get();

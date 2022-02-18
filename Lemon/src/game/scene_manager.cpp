@@ -1,8 +1,7 @@
 #include <lemon/game/scene_manager.h>
 
 namespace lemon {
-scene_manager::scene_manager(ptr<rendering_context> context):
-    context(context)
+scene_manager::scene_manager()
 {
     LOG_MESSAGE("Scene Manager created");
 }

@@ -1,4 +1,4 @@
-target_sources(lemon PRIVATE engine.cpp)
+target_sources(lemon PRIVATE engine.cpp game.cpp)
 
 add_subdirectory(core)
 add_subdirectory(services)
@@ -9,6 +9,6 @@ add_subdirectory(input)
 add_subdirectory(renderer)
 add_subdirectory(threads)
 add_subdirectory(events)
-add_subdirectory(resources)
+add_subdirectory(assets)
 add_subdirectory(audio)
 add_subdirectory(scripting)

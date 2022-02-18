@@ -36,7 +36,7 @@ class batch_renderer
         bool is_texture(ptr<texture> other) const;
         ptr<batch> get_bigger(ptr<batch> other) const;
         bool is_full() const;
-        void flush(const glm::mat4& viewProj, ptr<shader> textureShader, ptr<rendering_context> context);
+        void flush(const glm::mat4& viewProj, ptr<shader> textureShader);
     };
 
   public:
@@ -48,9 +48,9 @@ class batch_renderer
   public:
     batch_renderer();
     ~batch_renderer();
-    void render_sprite(const glm::mat4& viewProj, ptr<rendering_context> context,
+    void render_sprite(const glm::mat4& viewProj,
                        sprite_renderer& sComponent, transform& tComponent);
-    void end_render(const glm::mat4& viewProj, ptr<rendering_context> context);
+    void end_render(const glm::mat4& viewProj);
 
   private:
     asset<shader> textureShader;

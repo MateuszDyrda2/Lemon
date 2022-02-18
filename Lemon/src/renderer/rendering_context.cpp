@@ -4,7 +4,7 @@
 #include <lemon/window/window.h>
 
 namespace lemon {
-rendering_context::rendering_context()
+void rendering_context::create()
 {
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -12,7 +12,7 @@ rendering_context::rendering_context()
     }
     LOG_MESSAGE("Rendering context created");
 }
-rendering_context::~rendering_context()
+void rendering_context::drop()
 {
     LOG_MESSAGE("Rendering context destroyed");
 }

@@ -88,11 +88,11 @@ template<class T>
 asset<T>::asset(string_id name):
     storage(*asset_storage::storage), res(name)
 {
-    storage->register_asset(name);
+    storage.register_asset<T>(name);
 }
 template<class T>
 asset<T>::asset(const self_type& other):
-    storage(*asset_storage::storage), res(storage->clone_asset(other.res))
+    storage(*asset_storage::storage), res(storage.clone_asset(other.res))
 { }
 template<class T>
 typename asset<T>::self_type&
@@ -100,8 +100,8 @@ asset<T>::operator=(const self_type& other)
 {
     if(this != &other)
     {
-        if(res) storage->release_asset(res);
-        res = storage->clone_asset(other.res);
+        if(res) storage.release_asset(res);
+        res = storage.clone_asset(other.res);
     }
     return *this;
 }
@@ -117,7 +117,7 @@ asset<T>::operator=(self_type&& other) noexcept
 {
     if(this != &other)
     {
-        if(res) storage->release_asset(res);
+        if(res) storage.release_asset(res);
         res       = other.res;
         other.res = nullptr;
     }
@@ -126,19 +126,19 @@ asset<T>::operator=(self_type&& other) noexcept
 template<class T>
 asset<T>::~asset()
 {
-    if(res) storage->release_asset(res);
+    if(res) storage.release_asset(res);
 }
 template<class T>
 typename asset<T>::const_pointer
 asset<T>::get() const noexcept
 {
-    return storage->get_asset<T>(name);
+    return storage.get_asset<T>(res);
 }
 template<class T>
 typename asset<T>::pointer
 asset<T>::get() noexcept
 {
-    return storage->get_asset<T>(name);
+    return storage.get_asset<T>(res);
 }
 template<class T>
 bool asset<T>::operator==(const self_type& other) const noexcept

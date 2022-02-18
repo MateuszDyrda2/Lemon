@@ -11,7 +11,7 @@ class listener
     using callable_type  = std::function<void(Args...)>;
     using container_type = std::list<callable_type>;
     using iterator_type  = container_type::iterator;
-    using self_type      = listener<Args>;
+    using self_type      = listener<Args...>;
 
   public:
     /** @brief Creates an empty listener */
@@ -53,10 +53,10 @@ listener<Args...>::listener():
 }
 template<class... Args>
 template<class F>
-listener<Args...>::listener(string_id event, F&& callable):
+listener<Args...>::listener(string_id event, F&& callable)
 {
     event_handler& handler = *event_handler::handler;
-    callable_type l(std::forward<F>(callable)...);
+    callable_type l(std::forward<F>(callable));
     auto e = handler.events.find(event);
     if(e != handler.events.end())
     {
@@ -83,9 +83,9 @@ template<class... Args>
 typename listener<Args...>::self_type&
 listener<Args...>::operator=(self_type&& other) noexcept
 {
-    if(this != other)
+    if(this != &other)
     {
-        if(list) list->erase();
+        if(list) list->erase(iterator);
         list       = other.list;
         iterator   = other.iterator;
         other.list = nullptr;

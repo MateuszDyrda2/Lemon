@@ -59,6 +59,7 @@ class event_handler
     map_type events;
     static ptr<event_handler> handler;
 
+    template<class... Args>
     friend class listener;
     friend class dispatcher;
 };

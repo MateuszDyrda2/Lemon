@@ -2,23 +2,30 @@
 
 #include <RiverEditor/editor_system.h>
 
+#include <lemon/game.h>
+#include <lemon/game/basic_components.h>
 #include <lemon/game/system.h>
 #include <lemon/input/input.h>
+#include <lemon/threads/scheduler.h>
+
+#include <thread>
 
 editor_engine::editor_engine(int argc, char** argv):
     engine(argc, argv)
 {
-    services::provide(create_owned<event_handler>());
-    services::provide(create_owned<resource_manager>());
-    services::provide<window_base>(create_owned<editor_window>(1920, 1080));
-    services::provide(create_owned<input>());
-    services::provide(create_owned<rendering_context>());
-    services::provide(create_owned<scene_manager>());
-    services::provide(create_owned<lemon::clock>());
-    this->initialize();
+    _scheduler = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
+    _events    = create_owned<event_handler>();
+    _resources = create_owned<asset_storage>("path");
+    _clock     = create_owned<lemon::clock>();
+    _window    = create_owned<editor_window>(1920, 1080);
+    rendering_context::create();
+    _input        = create_owned<input>(_window.get());
+    _sceneManager = create_owned<scene_manager>();
 }
+
 editor_engine::~editor_engine()
 {
+    rendering_context::drop();
 }
 void editor_engine::initialize()
 {
@@ -27,19 +34,15 @@ void editor_engine::initialize()
                        ->add_system<editor_system>()
                        ->add_system<rendering_system>();
 
-    auto resourceManager = services::get<resource_manager>();
-    auto tex             = resourceManager->load<texture>(string_id("Box"), "textures/box.png");
-    auto scn             = _sceneManager->get_current_scene();
-    auto ent             = scn->add_entity(string_id("box"));
-    ent.add_component<sprite_renderer>(tex);
+    auto ent = currentScene->add_entity(string_id("boxEnt"));
+    ent.add_component<sprite_renderer>(asset<texture>(string_id("box")));
 }
 application::application():
     eng(std::make_unique<editor_engine>(0, nullptr)),
     oldViewport(0.f, 0.f)
 {
-    _window     = (editor_window*)services::get<window_base>();
+    _window     = (editor_window*)game::get_main_window();
     frameBuffer = std::make_unique<framebuffer>(_window->get_size());
-    handler     = services::get<event_handler>();
     editedScene = eng->currentScene;
 
     // Setup Dear ImGui context
@@ -60,7 +63,7 @@ void application::loop()
 {
     do
     {
-        eng->_context->clear_screen({ 1.f, 1.f, 1.f, 1.f });
+        rendering_context::clear_screen({ 1.f, 1.f, 1.f, 1.f });
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -112,9 +115,7 @@ void application::loop()
                 ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_DockSpace);
                 ImGui::DockBuilderSetNodeSize(dockspaceID, ImGui::GetMainViewport()->Size);
 
-                ImGuiID dock_main_id = dockspaceID;
-                // ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(
-                //  dock_main_id, ImGuiDir_Left, 0.15f, NULL, &dock_main_id);
+                ImGuiID dock_main_id  = dockspaceID;
                 ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(
                     dock_main_id, ImGuiDir_Right, 0.175f, NULL, &dock_main_id);
                 ImGuiID dock_right_down_id = ImGui::DockBuilderSplitNode(
@@ -122,7 +123,6 @@ void application::loop()
                 ImGuiID dock_down_id = ImGui::DockBuilderSplitNode(
                     dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
 
-                // ImGui::DockBuilderDockWindow("SceneView", dock_left_id);
                 ImGui::DockBuilderDockWindow("Hierarchy", dock_right_id);
                 ImGui::DockBuilderDockWindow("Properties", dock_right_down_id);
                 ImGui::DockBuilderDockWindow("Resources", dock_down_id);
@@ -166,8 +166,7 @@ void application::update_viewport()
 
     if(_size.x != oldViewport.x || _size.y != oldViewport.y)
     {
-        handler->dispatch<int, int>(
-            string_id("FramebufferSize"), (int)_size.x, (int)_size.y);
+        disp.send(string_id("FramebufferSize"), (int)_size.x, (int)_size.y);
         frameBuffer->resize({ (int)_size.x, (int)_size.y });
         oldViewport = _size;
     }
@@ -191,8 +190,8 @@ void application::update_viewport()
     frameBuffer->bind();
     eng->_sceneManager->update();
     frameBuffer->unbind();
-    eng->_context->set_viewport({ 0.f, 0.f,
-                                  _window->get_width(), _window->get_height() });
+    rendering_context::set_viewport({ 0.f, 0.f,
+                                      _window->get_width(), _window->get_height() });
 
     ImGui::Image((ImTextureID)frameBuffer->get_texture(), _size,
                  { 0, 0 }, { -1, -1 });

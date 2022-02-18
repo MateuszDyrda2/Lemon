@@ -22,9 +22,10 @@ class scheduler
     {
         std::function<void()> task;
         std::chrono::high_resolution_clock::time_point time;
-        bool operator<(const function& other)
+
+        friend bool operator<(const function& lhs, const function& rhs)
         {
-            return time > other.time;
+            return lhs.time > rhs.time;
         }
     };
 
@@ -39,8 +40,6 @@ class scheduler
     using mutex_type              = std::mutex;                         ///< mutex type
     using condition_variable_type = std::condition_variable;            ///< condition variable type
     using bool_flag_type          = std::atomic_bool;                   ///< type of a bool flag
-    template<class R>
-    using future_type = std::future<R>; ///< future type
 
   public:
     /** @brief Creates a scheduler with a specified number of worker threads running */
@@ -61,26 +60,6 @@ class scheduler
      * @param at time in the future the callable should run at
      */
     static void run_at(const callable_type& callable, const time_point& at);
-    /** @brief Schedules a task to run now and returns a future
-     * @param callable a callable object / function / method to be scheduled
-     * @return future containing the result of the function
-     */
-    template<class F>
-    static future_type<std::invoke_result_t<std::decay_t<F>>> run_r(F&& callable);
-    /** @brief Schedules a task to run after a specific interval and returns a future
-     * @param callable a callable object / function / method to be scheduled
-     * @param after time after the callable should be run
-     * @return future containing the result of the function
-     */
-    template<class F>
-    static future_type<std::invoke_result_t<std::decay_t<F>>> run_after_r(F&& callable, const duration& after);
-    /** @brief Schedules a task to run at a set time in the future and returns a future
-     * @param callable a callable object / function / method to be scheduled
-     * @param at time in the future the callable should run at
-     * @return future containing the result of the function
-     */
-    template<class F>
-    static future_type<std::invoke_result_t<std::decay_t<F>>> run_at_r(F&& callable, const time_point& at);
 
   private:
     worker_container_type workers;
@@ -90,32 +69,4 @@ class scheduler
     bool_flag_type finish;
     static ptr<scheduler> system;
 };
-template<class F>
-typename scheduler::future_type<std::invoke_result_t<std::decay_t<F>>>
-scheduler::run_r(F&& callable)
-{
-    return run_at_r(std::forward<F>(callable), clock_type::now());
-}
-template<class F>
-typename scheduler::future_type<std::invoke_result_t<std::decay_t<F>>>
-scheduler::run_after_r(F&& callable, const duration& after)
-{
-    return run_at_r(std::forward<F>(callable), clock_type::now() + after);
-}
-template<class F>
-typename scheduler::future_type<std::invoke_result_t<std::decay_t<F>>>
-scheduler::run_at_r(F&& callable, const time_point& at)
-{
-    using return_type = std::invoke_result_t<std::decay_t<F>>;
-    scheduler* js     = system;
-    auto task         = create_owned<task_type>(std::forward<F>(callable));
-    auto returnFuture = task.get_future();
-
-    js->mtx.lock();
-    js->tasks.push(function{ std::move(task), at });
-    js->mtx.unlock();
-    js->cvar.notify_one();
-
-    return returnFuture;
-}
 } // namespace lemon

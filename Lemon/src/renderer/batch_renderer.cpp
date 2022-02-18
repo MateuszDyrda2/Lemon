@@ -69,14 +69,14 @@ bool batch_renderer::batch::is_full() const
 {
     return batch_renderer::maxVertices - usedVertices < 6;
 }
-void batch_renderer::batch::flush(const glm::mat4& viewProj, ptr<shader> textureShader, ptr<rendering_context> context)
+void batch_renderer::batch::flush(const glm::mat4& viewProj, ptr<shader> textureShader)
 {
     if(usedVertices == 0) return;
     textureShader->use();
     textureShader->set_uniform("viewProj", viewProj);
     _texture->bind();
     vao->bind();
-    context->draw_arrays(GL_TRIANGLES, 0, usedVertices);
+    rendering_context::draw_arrays(GL_TRIANGLES, 0, usedVertices);
     vao->unbind();
     _texture->unbind();
     usedVertices = 0;
@@ -89,7 +89,7 @@ batch_renderer::batch_renderer():
 batch_renderer::~batch_renderer()
 {
 }
-void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_context> context,
+void batch_renderer::render_sprite(const glm::mat4& viewProj,
                                    sprite_renderer& sComponent, transform& tComponent)
 {
     static ptr<batch> biggestBatch = &batches.front();
@@ -109,7 +109,7 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_cont
     if(found)
     {
         if(found->is_full())
-            found->flush(viewProj, textureShader.get(), context);
+            found->flush(viewProj, textureShader.get());
     }
     else if(empty)
     {
@@ -118,16 +118,16 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj, ptr<rendering_cont
     }
     else
     {
-        biggestBatch->flush(viewProj, textureShader.get(), context);
+        biggestBatch->flush(viewProj, textureShader.get());
         biggestBatch->set_texture(sComponent.text.get());
         found        = biggestBatch;
         biggestBatch = &batches.front();
     }
     found->add_quad(tComponent.model, sComponent.color, sComponent.texCoords);
 }
-void batch_renderer::end_render(const glm::mat4& viewProj, ptr<rendering_context> context)
+void batch_renderer::end_render(const glm::mat4& viewProj)
 {
     for(auto& b : batches)
-        b.flush(viewProj, textureShader.get(), context);
+        b.flush(viewProj, textureShader.get());
 }
 } // namespace lemon

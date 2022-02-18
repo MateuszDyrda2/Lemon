@@ -2,7 +2,7 @@
 
 #include <lemon/assets/file.h>
 
-#include <rapidxml/rapidxml.hpp>
+#include <rapidxml.hpp>
 
 namespace lemon {
 asset_loader::asset_loader(const std::string& dataPath)
@@ -34,10 +34,10 @@ bool asset_loader::resource_exists(string_id name) const noexcept
 {
     return resourcePaths.contains(name);
 }
-buffer<byte> asset_loader::load_from_file(const std::string& path)
+std::vector<byte> asset_loader::load_from_file(const std::string& path)
 {
     file dataFile(path, std::ios::binary | std::ios::in);
-    buffer<byte> buff;
+    std::vector<byte> buff;
     dataFile.read(buff);
     dataFile.close();
     return buff;

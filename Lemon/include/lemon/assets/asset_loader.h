@@ -37,16 +37,16 @@ class asset_loader
     container_type resourcePaths; ///< map of paths of the resources
 
   private:
-    buffer<byte> load_from_file(const std::string& path);
+    std::vector<byte> load_from_file(const std::string& path);
 };
 template<class T>
 ptr<T> asset_loader::load_resource(string_id name)
 {
-    if(resourcePaths.contains(name))
+    ptr<T> resource{};
+    if(auto res = resourcePaths.find(name); res != resourcePaths.end())
     {
-        ptr<T> resource = new T(std::move(load_from_file(resourcePaths[name])));
-        return resource;
+        resource = new T(name, load_from_file(res->second));
     }
-    return nullptr;
+    return resource;
 }
 } // namespace lemon

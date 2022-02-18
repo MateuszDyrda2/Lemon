@@ -86,7 +86,7 @@ template<class T>
 void buffer<T>::swap(buffer& other) noexcept
 {
     std::swap(_buffer, other._buffer);
-    std::swap(_size, other_size);
+    std::swap(_size, other._size);
 }
 template<class T>
 buffer<T>::operator bool() const noexcept

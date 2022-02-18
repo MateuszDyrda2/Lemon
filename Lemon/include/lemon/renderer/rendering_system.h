@@ -18,7 +18,6 @@ class rendering_system : public system
 
   private:
     owned<batch_renderer> spriteRenderer;
-    ptr<rendering_context> context;
     entity mainCamera;
     listener<int, int> vpResize;
 };

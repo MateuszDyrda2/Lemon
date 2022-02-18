@@ -9,7 +9,7 @@ namespace lemon {
 class scene_manager
 {
   public:
-    scene_manager(ptr<rendering_context> context);
+    scene_manager();
     ptr<scene> push_scene(string_id name);
     void update();
     void pop_scene();
@@ -17,6 +17,5 @@ class scene_manager
 
   private:
     std::queue<owned<scene>> scenes;
-    ptr<rendering_context> context;
 };
 } // namespace lemon

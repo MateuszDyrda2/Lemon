@@ -1,13 +1,16 @@
 #pragma once
 
 #include "asset_loader.h"
+
 #include <lemon/game/object.h>
 #include <lemon/renderer/shader.h>
 #include <lemon/renderer/texture.h>
-#include <lemon/threads/scheduler.h>
 
 #include <atomic>
 
+/** @TODO: Resources should be destroyed in a seperate update method in the render thread
+ * @TODO: Loading the data from files should take place on a seperate thread
+ */
 namespace lemon {
 /** Class storing the actual assets, allowing for caching assets
  * that are used in many places and managing their lifetime.
@@ -15,8 +18,7 @@ namespace lemon {
 class asset_storage
 {
   private:
-    /** @brief Stored resource. It keeps
-     * a reference count. */
+    /** @brief Stored resource. Keeps a reference count. */
     struct resource
     {
         using self_type = resource;
@@ -36,8 +38,8 @@ class asset_storage
         void set(object* ptr);
 
       private:
-        std::atomic<u32> _count; ///< reference count of the resource
         ptr<object> _stored;     ///< pointer to the resource
+        std::atomic<u32> _count; ///< reference count of the resource
     };
 
   public:
@@ -81,47 +83,40 @@ class asset_storage
   private:
     container_type cachedAssets; ///< map of the resources
     owned<asset_loader> loader;  ///< asset loader
+    template<class T>
     friend class asset;
     static ptr<asset_storage> storage;
+
+  private:
+    template<class T>
+    ptr<T> get_mock_asset() const;
 };
+template<class T>
+ptr<T> asset_storage::get_mock_asset() const
+{
+    LEMON_ASSERT(NULL);
+}
+template<>
+inline ptr<texture> asset_storage::get_mock_asset() const
+{
+    return static_cast<ptr<texture>>(cachedAssets.at(string_id("mock_texture")).get());
+}
+template<>
+inline ptr<shader> asset_storage::get_mock_asset() const
+{
+    return static_cast<ptr<shader>>(cachedAssets.at(string_id("mock_shader")).get());
+}
 template<class T>
 ptr<T> asset_storage::get_asset(string_id name) const
 {
     if(auto res = cachedAssets.find(name); res != cachedAssets.end())
     {
-        LEMON_ASSERT(!res->second.loaded());
-        return static_cast<T*>(res->second.get());
+        return static_cast<ptr<T>>(res->second.get());
     }
-    LOG_ERROR("Can't find resource %s", name.get_string());
-    return nullptr;
-}
-template<>
-ptr<shader> asset_storage::get_asset(string_id name) const
-{
-    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
+    else
     {
-        if(!res->second.loaded())
-        {
-            return static_cast<shader*>(cachedAssets.at(string_id("mock_shader")).get());
-        }
-        return static_cast<shader*>(res->second.get());
+        return get_mock_asset<T>();
     }
-    LOG_ERROR("Can't find resource %s", name.get_string());
-    return nullptr;
-}
-template<>
-ptr<texture> asset_storage::get_asset(string_id name) const
-{
-    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
-    {
-        if(!res->second.loaded())
-        {
-            return static_cast<texture*>(cachedAssets.at(string_id("mock_texture")).get());
-        }
-        return static_cast<texture*>(res->second.get());
-    }
-    LOG_ERROR("Can't find resource %s", name.get_string());
-    return nullptr;
 }
 template<class T>
 void asset_storage::register_asset(string_id name)
@@ -132,12 +127,10 @@ void asset_storage::register_asset(string_id name)
     }
     else
     {
-        auto&& [pair, _] = cachedAssets.insert(std::make_pair(
-            name, resource()));
-        auto& val        = pair->second;
-        scheduler::run([&, name]() {
-            val.set(loader->load_resource<T>(name));
-        });
+        if(auto ptr = loader->load_resource<T>(name))
+        {
+            cachedAssets.insert(std::make_pair(name, resource(ptr)));
+        }
     }
 }
 } // namespace lemon

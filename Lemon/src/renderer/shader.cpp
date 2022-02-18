@@ -78,6 +78,59 @@ shader::shader(string_id name, const std::string& shaderPath):
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
+shader::shader(string_id name, const std::vector<byte>& buffer):
+    object(name)
+{
+    const char* vShaderCode[2] = { "#version 330\n#define VERTEX_PROGRAM\n",
+                                   reinterpret_cast<const char*>(buffer.data()) };
+    const char* fShaderCode[2] = { "#version 330\n#define FRAGMENT_PROGRAM\n",
+                                   reinterpret_cast<const char*>(buffer.data()) };
+
+    // compile shaders
+    int success;
+    char infoLog[512];
+
+    // vertex shader
+    unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vShaderCode[0], NULL);
+    glCompileShader(vertex);
+
+    // print compile errors if any
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        LOG_ERROR("Vertex shader compilation failure!: %s", infoLog);
+    }
+    // fragment shader
+    unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fShaderCode[0], NULL);
+    glCompileShader(fragment);
+
+    // print compile errors if any
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        LOG_ERROR("Fragment shader compilation failure!: %s", infoLog);
+    }
+    ID = glCreateProgram();
+    glAttachShader(ID, vertex);
+    glAttachShader(ID, fragment);
+    glLinkProgram(ID);
+
+    // print errors
+    glGetProgramiv(ID, GL_LINK_STATUS, &success);
+    if(success == GL_FALSE)
+    {
+        glGetProgramInfoLog(ID, 512, NULL, infoLog);
+        LOG_ERROR("Shader program linking failure!: %s", infoLog);
+    }
+    glDetachShader(ID, vertex);
+    glDetachShader(ID, fragment);
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+}
 shader::~shader()
 {
     if(ID) glDeleteProgram(ID);
