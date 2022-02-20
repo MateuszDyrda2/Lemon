@@ -57,8 +57,16 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
         size.y       = h;
         nrOfChannels = noc;
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        if(noc == 3)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y,
+                         0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        }
+        else if(noc == 4)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y,
+                         0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
         // glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
         stbi_image_free(data);

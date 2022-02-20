@@ -4,6 +4,7 @@
 #include <lemon/core/basic_types.h>
 
 #include <fstream>
+#include <iterator>
 #include <vector>
 
 namespace lemon {
@@ -29,9 +30,9 @@ class file
 template<class T>
 void file::read(buffer<T>& buff)
 {
-    stream.seekg(std::ios::end);
+    stream.seekg(0, stream.end);
     size_type size = stream.tellg();
-    stream.seekg(std::ios::beg);
+    stream.seekg(0, stream.beg);
 
     buff = buffer<T>(size);
     stream.read((char*)buff.get(), size);
@@ -39,11 +40,11 @@ void file::read(buffer<T>& buff)
 template<class T>
 void file::read(std::vector<T>& buff)
 {
-    stream.seekg(std::ios::end);
+    stream.seekg(0, stream.end);
     size_type size = stream.tellg();
-    stream.seekg(std::ios::beg);
+    stream.seekg(0, stream.beg);
 
-    buff.reserve(size);
+    buff.resize(size);
     stream.read((char*)buff.data(), size);
 }
 } // namespace lemon

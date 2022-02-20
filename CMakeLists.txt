@@ -4,5 +4,5 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(Lemon)
-# add_subdirectory(example)
-add_subdirectory(Lemonade)
+add_subdirectory(example)
+# add_subdirectory(Lemonade)

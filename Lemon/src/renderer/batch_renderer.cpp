@@ -82,7 +82,7 @@ void batch_renderer::batch::flush(const glm::mat4& viewProj, ptr<shader> texture
     usedVertices = 0;
 }
 batch_renderer::batch_renderer():
-    textureShader(string_id("textureShader")),
+    textureShader(string_id("mock_shader")),
     batches()
 {
 }

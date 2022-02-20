@@ -1,10 +1,10 @@
 #pragma once
 
-#include <lemon/containers/buffer.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/core/string_id.h>
 
 #include <unordered_map>
+#include <vector>
 
 namespace lemon {
 /** Class loading resources from files */

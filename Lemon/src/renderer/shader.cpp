@@ -92,7 +92,7 @@ shader::shader(string_id name, const std::vector<byte>& buffer):
 
     // vertex shader
     unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode[0], NULL);
+    glShaderSource(vertex, 2, vShaderCode, NULL);
     glCompileShader(vertex);
 
     // print compile errors if any
@@ -104,14 +104,14 @@ shader::shader(string_id name, const std::vector<byte>& buffer):
     }
     // fragment shader
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCode[0], NULL);
+    glShaderSource(fragment, 2, fShaderCode, NULL);
     glCompileShader(fragment);
 
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
     if(!success)
     {
-        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
         LOG_ERROR("Fragment shader compilation failure!: %s", infoLog);
     }
     ID = glCreateProgram();

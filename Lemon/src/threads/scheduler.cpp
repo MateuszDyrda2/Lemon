@@ -16,7 +16,7 @@ scheduler::scheduler(size_type workerCount):
                     callable_type task;
                     {
                         std::unique_lock<mutex_type> lck(mtx);
-                        while(!finish && tasks.empty() && tasks.top().time < clock_type::now())
+                        while(!finish && (tasks.empty() || tasks.top().time < clock_type::now()))
                             cvar.wait(lck);
                         if(finish.load()) break;
                         task = std::move(tasks.top().task);

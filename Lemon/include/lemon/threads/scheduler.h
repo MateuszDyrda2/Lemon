@@ -23,9 +23,9 @@ class scheduler
         std::function<void()> task;
         std::chrono::high_resolution_clock::time_point time;
 
-        friend bool operator<(const function& lhs, const function& rhs)
+        bool operator<(const function& other) const
         {
-            return lhs.time > rhs.time;
+            return time > other.time;
         }
     };
 
