@@ -1,17 +1,20 @@
 #pragma once
 
+#include <lemon/core/assert.h>
+#include <lemon/game/object.h>
+
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
-#include <lemon/core/assert.h>
-#include <lemon/game/object.h>
+#include <vector>
 
 namespace lemon {
 class shader : public object
 {
   public:
-    shader(string_id name, const std::string& vertexPath, const std::string& fragmentPath);
+    shader(string_id name, const std::string& shaderPath);
+    shader(string_id name, const std::vector<byte>& buffer);
     shader(const shader&) = delete;
     shader& operator=(const shader&) = delete;
     shader(shader&& other) noexcept;

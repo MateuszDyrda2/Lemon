@@ -2,23 +2,30 @@
 
 #include <RiverEditor/editor_system.h>
 
+#include <lemon/game.h>
+#include <lemon/game/basic_components.h>
 #include <lemon/game/system.h>
 #include <lemon/input/input.h>
+#include <lemon/threads/scheduler.h>
+
+#include <thread>
 
 editor_engine::editor_engine(int argc, char** argv):
     engine(argc, argv)
 {
-    services::provide(create_owned<event_handler>());
-    services::provide(create_owned<resource_manager>());
-    services::provide<window_base>(create_owned<editor_window>(1920, 1080));
-    services::provide(create_owned<input>());
-    services::provide(create_owned<rendering_context>());
-    services::provide(create_owned<scene_manager>());
-    services::provide(create_owned<lemon::clock>());
-    this->initialize();
+    _scheduler = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
+    _events    = create_owned<event_handler>();
+    _resources = create_owned<asset_storage>("path");
+    _clock     = create_owned<lemon::clock>();
+    _window    = create_owned<editor_window>(1920, 1080);
+    rendering_context::create();
+    _input        = create_owned<input>(_window.get());
+    _sceneManager = create_owned<scene_manager>();
 }
+
 editor_engine::~editor_engine()
 {
+    rendering_context::drop();
 }
 void editor_engine::initialize()
 {
@@ -27,19 +34,15 @@ void editor_engine::initialize()
                        ->add_system<editor_system>()
                        ->add_system<rendering_system>();
 
-    auto resourceManager = services::get<resource_manager>();
-    auto tex             = resourceManager->load<texture>(string_id("Box"), "textures/box.png");
-    auto scn             = _sceneManager->get_current_scene();
-    auto ent             = scn->add_entity(string_id("box"));
-    ent.add_component<sprite_renderer>(tex);
+    auto ent = currentScene->add_entity(string_id("boxEnt"));
+    ent.add_component<sprite_renderer>(asset<texture>(string_id("box")));
 }
 application::application():
     eng(std::make_unique<editor_engine>(0, nullptr)),
     oldViewport(0.f, 0.f)
 {
-    _window     = (editor_window*)services::get<window_base>();
+    _window     = (editor_window*)game::get_main_window();
     frameBuffer = std::make_unique<framebuffer>(_window->get_size());
-    handler     = services::get<event_handler>();
     editedScene = eng->currentScene;
 
     // Setup Dear ImGui context
@@ -60,7 +63,7 @@ void application::loop()
 {
     do
     {
-        eng->_context->clear_screen({ 1.f, 1.f, 1.f, 1.f });
+        rendering_context::clear_screen({ 1.f, 1.f, 1.f, 1.f });
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -96,10 +99,10 @@ void application::loop()
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
-        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking
                                        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
                                        | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-                                       | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                       | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBackground
                                        | ImGuiWindowFlags_NoNavFocus;
         ImGui::Begin("MainDockspace", nullptr, windowFlags);
         {
@@ -112,22 +115,22 @@ void application::loop()
                 ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_DockSpace);
                 ImGui::DockBuilderSetNodeSize(dockspaceID, ImGui::GetMainViewport()->Size);
 
-                ImGuiID dock_main_id = dockspaceID;
-                ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(
-                    dock_main_id, ImGuiDir_Left, 0.15f, NULL, &dock_main_id);
+                ImGuiID dock_main_id  = dockspaceID;
                 ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(
                     dock_main_id, ImGuiDir_Right, 0.175f, NULL, &dock_main_id);
+                ImGuiID dock_right_down_id = ImGui::DockBuilderSplitNode(
+                    dock_right_id, ImGuiDir_Down, 0.4f, NULL, &dock_right_id);
                 ImGuiID dock_down_id = ImGui::DockBuilderSplitNode(
                     dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
 
-                ImGui::DockBuilderDockWindow("SceneView", dock_left_id);
-                ImGui::DockBuilderDockWindow("Properties", dock_right_id);
+                ImGui::DockBuilderDockWindow("Hierarchy", dock_right_id);
+                ImGui::DockBuilderDockWindow("Properties", dock_right_down_id);
                 ImGui::DockBuilderDockWindow("Resources", dock_down_id);
                 ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
                 ImGui::DockBuilderFinish(dockspaceID);
             }
-            ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
-            ImGui::Begin("SceneView");
+            ImGui::DockSpace(dockspaceID, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
+            ImGui::Begin("Hierarchy");
             draw_hierarchy();
             ImGui::End();
             ImGui::Begin("Properties");
@@ -163,8 +166,7 @@ void application::update_viewport()
 
     if(_size.x != oldViewport.x || _size.y != oldViewport.y)
     {
-        handler->dispatch<int, int>(
-            string_id("FramebufferSize"), (int)_size.x, (int)_size.y);
+        disp.send(string_id("FramebufferSize"), (int)_size.x, (int)_size.y);
         frameBuffer->resize({ (int)_size.x, (int)_size.y });
         oldViewport = _size;
     }
@@ -188,8 +190,8 @@ void application::update_viewport()
     frameBuffer->bind();
     eng->_sceneManager->update();
     frameBuffer->unbind();
-    eng->_context->set_viewport({ 0.f, 0.f,
-                                  _window->get_width(), _window->get_height() });
+    rendering_context::set_viewport({ 0.f, 0.f,
+                                      _window->get_width(), _window->get_height() });
 
     ImGui::Image((ImTextureID)frameBuffer->get_texture(), _size,
                  { 0, 0 }, { -1, -1 });
@@ -235,23 +237,40 @@ void application::set_imgui_style()
 {
     ImGuiStyle& style = ImGui::GetStyle();
 
-    style.WindowPadding  = ImVec2(15, 15);
+    ImVec4 lemonYellow{ 0.988f, 1.f, 0.0f, 1.f };
+    ImVec4 lemonYellowL(0.992f, 1.f, 0.38f, 1.f);
+    ImVec4 lemonGreen{ 0.655f, 1.f, 0.f, 1.f };
+    ImVec4 lemonGreenL{ 0.722f, 1.f, 0.192f, 1.f };
+    ImVec4 lemonGreenD{ 0.62f, 0.949f, 0.f, 1.f };
+    ImVec4 lemonPink{ 1.f, 0.f, 0.545f, 1.f };
+    ImVec4 lemonPinkL{ 0.996f, 0.38f, 0.71f, 1.f };
+    ImVec4 lemonPinkD{ 0.863f, 0.f, 0.471f, 1.f };
+    ImVec4 lemonPurple{ 0.678f, 0.051f, 1.f, 1.f };
+    ImVec4 lemonPurpleL{ 0.796f, 0.408f, 0.992f, 1.f };
+    ImVec4 lemonPurpleD{ 0.502f, 0.f, 0.761f, 1.f };
+    ImVec4 lemonGray{ 0.21f, 0.25f, 0.27f, 1.f };
+    ImVec4 lemonGray2{ 0.29f, 0.37f, 0.43f, 1.f };
+    ImVec4 lemonBlack{ 0.14f, 0.13f, 0.12f, 1.f };
+    ImVec4 lemonBlack2{ 0.1f, 0.09f, 0.09f, 1.f };
+    ImVec4 lemonBlack3{ 0.3f, 0.28f, 0.25f, 1.f };
+    ImVec4 lemonBlack4{ 0.22f, 0.21f, 0.19f, 1.f };
+
     style.WindowRounding = 0.0f;
     style.FramePadding   = ImVec2(0.f, 0.f);
 
     style.Colors[ImGuiCol_Text]                  = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
     style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-    style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
+    style.Colors[ImGuiCol_WindowBg]              = lemonBlack;
     style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_PopupBg]               = ImVec4(0.05f, 0.05f, 0.10f, 0.85f);
-    style.Colors[ImGuiCol_Border]                = ImVec4(0.70f, 0.70f, 0.70f, 0.65f);
+    style.Colors[ImGuiCol_Border]                = lemonGray;
     style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.00f, 0.00f, 0.01f, 1.00f);
+    style.Colors[ImGuiCol_FrameBg]               = lemonBlack2;
     style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
     style.Colors[ImGuiCol_FrameBgActive]         = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
-    style.Colors[ImGuiCol_TitleBg]               = ImVec4(0.00f, 0.00f, 0.00f, 0.83f);
-    style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.40f, 0.40f, 0.80f, 0.20f);
-    style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.00f, 0.00f, 0.00f, 0.87f);
+    style.Colors[ImGuiCol_TitleBg]               = lemonBlack2;
+    style.Colors[ImGuiCol_TitleBgCollapsed]      = lemonBlack2;
+    style.Colors[ImGuiCol_TitleBgActive]         = lemonBlack4;
     style.Colors[ImGuiCol_MenuBarBg]             = ImVec4(0.01f, 0.01f, 0.02f, 0.80f);
     style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
     style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
@@ -263,14 +282,14 @@ void application::set_imgui_style()
     style.Colors[ImGuiCol_Button]                = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
     style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
     style.Colors[ImGuiCol_ButtonActive]          = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
-    style.Colors[ImGuiCol_Header]                = ImVec4(0.30f, 0.69f, 0.00f, 0.53f);
-    style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(0.44f, 0.61f, 0.26f, 1.00f);
-    style.Colors[ImGuiCol_HeaderActive]          = ImVec4(0.38f, 0.62f, 0.23f, 1.00f);
-    style.Colors[ImGuiCol_Tab]                   = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
-    style.Colors[ImGuiCol_TabHovered]            = ImVec4(0.26f, 0.59f, 0.28f, 0.80f);
-    style.Colors[ImGuiCol_TabActive]             = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
-    style.Colors[ImGuiCol_TabUnfocused]          = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
-    style.Colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+    style.Colors[ImGuiCol_Header]                = lemonGreen;
+    style.Colors[ImGuiCol_HeaderHovered]         = lemonGreenL;
+    style.Colors[ImGuiCol_HeaderActive]          = lemonGreenD;
+    style.Colors[ImGuiCol_Tab]                   = lemonYellow;
+    style.Colors[ImGuiCol_TabHovered]            = lemonBlack;
+    style.Colors[ImGuiCol_TabActive]             = lemonBlack4;
+    style.Colors[ImGuiCol_TabUnfocused]          = lemonBlack2;
+    style.Colors[ImGuiCol_TabUnfocusedActive]    = lemonBlack2;
     style.Colors[ImGuiCol_ResizeGrip]            = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
     style.Colors[ImGuiCol_ResizeGripHovered]     = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
     style.Colors[ImGuiCol_ResizeGripActive]      = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
@@ -279,8 +298,8 @@ void application::set_imgui_style()
     style.Colors[ImGuiCol_PlotHistogram]         = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
     style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
     style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
-    style.Colors[ImGuiCol_NavHighlight]          = ImVec4(0.26f, 0.59f, 0.18f, 1.00f);
-    style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    style.Colors[ImGuiCol_NavHighlight]          = lemonYellow;
+    style.Colors[ImGuiCol_NavWindowingHighlight] = lemonYellowL;
     style.Colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }

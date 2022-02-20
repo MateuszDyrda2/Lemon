@@ -2,7 +2,9 @@
 
 #include "editor_window.h"
 #include <lemon/engine.h>
-#include <lemon/event_system/event_handler.h>
+#include <lemon/events/dispatcher.h>
+#include <lemon/events/listener.h>
+#include <lemon/game/scene_manager.h>
 #include <lemon/renderer/framebuffer.h>
 
 #include <ImGui/imgui.h>
@@ -31,7 +33,8 @@ class application
     std::unique_ptr<editor_engine> eng;
     editor_window* _window;
     std::unique_ptr<framebuffer> frameBuffer;
-    event_handler* handler;
+    dispatcher disp;
+
     ImVec2 oldViewport;
     ImGuiIO* io;
     ptr<scene> editedScene;

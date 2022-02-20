@@ -1,12 +1,10 @@
 #include <lemon/input/input.h>
 
-#include <lemon/event_system/event_handler.h>
-#include <lemon/service/services.h>
 #include <lemon/window/window.h>
 
 namespace lemon {
-input::input():
-    _window(services::get<window_base>()) { }
+input::input(ptr<window_base> window):
+    _window(window) { }
 bool input::is_key_pressed(key::keycode key) const
 {
     return glfwGetKey(

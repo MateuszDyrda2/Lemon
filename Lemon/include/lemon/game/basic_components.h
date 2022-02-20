@@ -3,9 +3,9 @@
 #include "cpp_script.h"
 #include "entity.h"
 
+#include <lemon/assets/asset.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/renderer/texture.h>
-#include <lemon/resources/resource.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
@@ -49,8 +49,8 @@ struct sprite_renderer
 {
     glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
     glm::vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
-    resource<texture> text{};
-    sprite_renderer(resource<texture> tex):
+    asset<texture> text{};
+    sprite_renderer(asset<texture> tex):
         text(tex) { }
 };
 struct script_component

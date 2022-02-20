@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
+# IMGUI 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
+# AssetManager
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tools/)
 
 project(Lemonade)
 
@@ -22,4 +25,4 @@ set_target_properties(lemonade PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 
-target_link_libraries(lemonade PUBLIC lemon::lemon imgui)
+target_link_libraries(lemonade PUBLIC lemon::lemon lemon::assetManager imgui)

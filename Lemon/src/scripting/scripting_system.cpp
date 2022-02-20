@@ -1,14 +1,14 @@
 #include <lemon/scripting/scripting_system.h>
 
 #include <entt/entt.hpp>
+#include <lemon/game.h>
 #include <lemon/game/basic_components.h>
 #include <lemon/game/scene.h>
-#include <lemon/service/services.h>
 
 namespace lemon {
 scripting_system::scripting_system(ptr<scene> s)
 {
-    clk = services::get<clock>();
+    clk = game::get_game_clock();
     s->get_registry()
         .on_construct<script_component>()
         .connect<entt::invoke<&script_component::on_create>>();

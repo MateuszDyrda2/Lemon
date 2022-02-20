@@ -1,12 +1,11 @@
 #pragma once
 
 #include <lemon/core/basic_types.h>
-#include <lemon/service/service.h>
 
 #include <chrono>
 
 namespace lemon {
-class clock : public service
+class clock
 {
   public:
     using self_type     = clock;

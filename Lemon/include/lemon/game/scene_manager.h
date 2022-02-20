@@ -3,12 +3,10 @@
 #include "object.h"
 #include "scene.h"
 
-#include <lemon/service/service.h>
-
 #include <queue>
 
 namespace lemon {
-class scene_manager : public service
+class scene_manager
 {
   public:
     scene_manager();
@@ -19,6 +17,5 @@ class scene_manager : public service
 
   private:
     std::queue<owned<scene>> scenes;
-    ptr<rendering_context> context;
 };
 } // namespace lemon

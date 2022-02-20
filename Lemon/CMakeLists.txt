@@ -7,7 +7,7 @@ set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_
 
 set(lemon_DESC "2D game engine written in C++")
 
-# ------ ENTT, GLAD, STB --------------
+# ---- ENTT, GLAD, STB, RAPIDXML ------
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 # -------------------------------------
 # ---------------OPENAL----------------
@@ -35,38 +35,10 @@ elseif(UNIX)
 endif(WIN32)
 add_compile_definitions(LEMON_RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 
-
-set(lemon_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-set(lemon_SRC
-	${lemon_SRC_DIR}engine.cpp
-	${lemon_SRC_DIR}window/window.cpp
-	${lemon_SRC_DIR}core/logger.cpp
-	${lemon_SRC_DIR}core/string_id.cpp
-	${lemon_SRC_DIR}game/object.cpp
-	${lemon_SRC_DIR}game/entity.cpp
-	${lemon_SRC_DIR}game/scene.cpp
-	${lemon_SRC_DIR}game/scene_manager.cpp
-	${lemon_SRC_DIR}game/transform_system.cpp
-	${lemon_SRC_DIR}event_system/event_handler.cpp
-	${lemon_SRC_DIR}renderer/rendering_context.cpp
-	${lemon_SRC_DIR}renderer/rendering_system.cpp
-	${lemon_SRC_DIR}renderer/shader.cpp
-	${lemon_SRC_DIR}renderer/batch_renderer.cpp
-	${lemon_SRC_DIR}renderer/texture.cpp
-	${lemon_SRC_DIR}renderer/vertex_buffer.cpp
-	${lemon_SRC_DIR}renderer/vertex_array.cpp
-	${lemon_SRC_DIR}renderer/framebuffer.cpp
-	${lemon_SRC_DIR}audio/sound_context.cpp
-	${lemon_SRC_DIR}audio/audio_file.cpp
-	${lemon_SRC_DIR}time/clock.cpp
-	${lemon_SRC_DIR}scripting/scripting_system.cpp
-	${lemon_SRC_DIR}resources/resource_manager.cpp
-	${lemon_SRC_DIR}services/services.cpp
-	${lemon_SRC_DIR}input/input.cpp
-)
-
-add_library(lemon ${lemon_SRC})
+add_library(lemon)
+add_subdirectory(src)
 add_library(lemon::lemon ALIAS lemon)
+
 target_link_libraries(lemon PUBLIC 
 	glad 
 	glfw
@@ -74,6 +46,7 @@ target_link_libraries(lemon PUBLIC
 	${OPENAL_LIBRARY} 
 	stb 
 	EnTT::EnTT 
+	rapidxml
 	${CMAKE_DL_LIBS}
 )
 

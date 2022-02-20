@@ -20,7 +20,8 @@ class string_id
 
   public:
     string_id():
-        id(0) { }
+        id(0u) { }
+    string_id(std::nullptr_t);
     DEBUG_CONSTEXPR explicit string_id(const char* _str):
         id(hash_str(_str))
     {
@@ -44,6 +45,7 @@ class string_id
     const char* get_string() const;
     constexpr hash_t get_id() const { return id; }
     bool operator==(const string_id& other) const;
+    explicit operator bool() const noexcept;
 
     static DEBUG_CONSTEXPR hash_t hash_str(const char* _str)
     {

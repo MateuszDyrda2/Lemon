@@ -2,6 +2,7 @@
 
 #include <lemon/input/input.h>
 #include <lemon/input/key_codes.h>
+#include <lemon/job_system/job_system.h>
 #include <lemon/window/window.h>
 
 using namespace lemon;
@@ -18,6 +19,7 @@ Sandbox::Sandbox(int argc, char** argv):
     engine(argc, argv)
 {
     services::provide(create_owned<event_handler>());
+    services::provide(create_owned<scheduler>(std::thread::hardware_concurrency()));
     services::provide(create_owned<resource_manager>());
     services::provide<window_base>(create_owned<window>("Sandbox", 1080, 720));
     services::provide(create_owned<input>());

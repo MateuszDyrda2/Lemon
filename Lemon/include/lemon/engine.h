@@ -1,12 +1,18 @@
 #pragma once
 
-#include "game/scene_manager.h"
-#include "renderer/rendering_context.h"
-#include "time/clock.h"
-#include "window/window_base.h"
+#include "core/basic_types.h"
 #include <memory>
 
 namespace lemon {
+class window_base;
+class clock;
+class scene_manager;
+class input;
+
+class scheduler;
+class asset_storage;
+class event_handler;
+
 class engine
 {
   public:
@@ -15,11 +21,18 @@ class engine
     // void run();
     void initialize();
     bool update();
+    void drop();
 
   protected:
-    ptr<window_base> _window;
-    ptr<rendering_context> _context;
-    ptr<clock> _clock;
-    ptr<scene_manager> _sceneManager;
+    friend class game;
+
+    owned<window_base> _window;
+    owned<clock> _clock;
+    owned<scene_manager> _sceneManager;
+    owned<input> _input;
+
+    owned<scheduler> _scheduler;
+    owned<asset_storage> _resources;
+    owned<event_handler> _events;
 };
 }

@@ -1,4 +1,3 @@
-#include <lemon/core/assert.h>
 #include <lemon/core/logger.h>
 
 namespace lemon {
@@ -47,10 +46,5 @@ void logger::output(char const* color, char const* type, char const* file,
 #else
     printf("%s\t%s\n%s:%d\n", type, msg, file, line);
 #endif // LEMON_LINUX
-}
-logger& logger::get()
-{
-    static logger instance;
-    return instance;
 }
 }
