@@ -7,9 +7,9 @@
 #include <lemon/core/basic_types.h>
 #include <lemon/renderer/texture.h>
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include <lemon/math/mat4.h>
+#include <lemon/math/vec3.h>
+#include <lemon/math/vec4.h>
 
 namespace lemon {
 struct tag
@@ -20,17 +20,17 @@ struct dirty
 { };
 struct transform
 {
-    glm::vec3 position{ 0.f, 0.f, 0.f };
-    glm::vec3 scale{ 1.f, 1.f, 1.f };
+    vec3 position{ 0.f, 0.f, 0.f };
+    vec3 scale{ 1.f, 1.f, 1.f };
     f32 rotation{ 0.0f };
-    glm::mat4 model{ 1.f };
+    mat4 model{ 1.f };
     entity_handle first{ entt::null };
     entity_handle next{ entt::null };
     entity_handle parent{ entt::null };
     size_type order{};
 
     transform() = default;
-    transform(const glm::vec3 position, const glm::vec3 scale, f32 rotation,
+    transform(const vec3 position, const vec3 scale, f32 rotation,
               entity_handle parent, size_type order):
         position(position),
         scale(scale),
@@ -42,13 +42,13 @@ struct transform
 };
 struct camera
 {
-    glm::vec4 viewport{};
-    glm::mat4 projection{ 1.0f };
+    vec4 viewport{};
+    mat4 projection{ 1.0f };
 };
 struct sprite_renderer
 {
-    glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
-    glm::vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
+    vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+    vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
     asset<texture> text{};
     sprite_renderer(const asset<texture>& tex):
         text(tex) { }

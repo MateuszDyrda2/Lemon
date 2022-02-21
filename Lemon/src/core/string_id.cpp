@@ -17,6 +17,14 @@ const char* string_id::get_string() const
     return "";
 #endif // LEMON_DEBUG
 }
+const std::string& string_id::get_cpp_string() const
+{
+#if defined(LEMON_DEBUG)
+    return map.at(id);
+#else
+    return "";
+#endif // LEMON_DEBUG
+}
 bool string_id::operator==(const string_id& other) const
 {
     return id == other.id;

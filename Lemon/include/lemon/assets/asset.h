@@ -75,6 +75,7 @@ class asset
      * @return true if the assets represent the same
      */
     bool operator==(const self_type& other) const noexcept;
+    inline string_id get_id() const { return res; }
 
   private:
     asset_storage& storage; ///< reference to the cached resources

@@ -9,6 +9,8 @@
 #include <lemon/time/clock.h>
 #include <lemon/window/window.h>
 
+#include <lemon/serialization/scene_serializer.h>
+
 #include <thread>
 
 using namespace lemon;
@@ -40,13 +42,17 @@ Sandbox::~Sandbox()
 void Sandbox::initialize()
 {
     engine::initialize();
-    auto scene = _sceneManager->push_scene(string_id("SandboxScene"))
+    auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
                      ->add_system<scripting_system>()
                      ->add_system<transform_system>()
                      ->add_system<rendering_system>();
 
-    LOG_MESSAGE("Initialized %s", _sceneManager->get_current_scene()->get_name());
+    LOG_MESSAGE("Initialized %s", scene->get_name());
+
     auto gin = scene->add_entity(string_id("gin"));
     gin.add_component<sprite_renderer>(asset<texture>(string_id("gintoki")));
+
+    scene_serializer serializer;
+    serializer.serialize(scene)->save2file("serialized.json");
 }
 GAME_RUN(Sandbox);

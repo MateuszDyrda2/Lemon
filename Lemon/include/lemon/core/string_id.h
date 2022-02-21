@@ -43,6 +43,7 @@ class string_id
         id(value) { }
 
     const char* get_string() const;
+    const std::string& get_cpp_string() const;
     constexpr hash_t get_id() const { return id; }
     bool operator==(const string_id& other) const;
     explicit operator bool() const noexcept;

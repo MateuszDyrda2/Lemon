@@ -20,4 +20,12 @@ void file::close()
 {
     stream.close();
 }
+void file::write(const std::string& buff)
+{
+    stream.write(buff.c_str(), buff.size());
+}
+void file::write(const char* buff, size_type length)
+{
+    stream.write(buff, length);
+}
 } // namespace lemon
