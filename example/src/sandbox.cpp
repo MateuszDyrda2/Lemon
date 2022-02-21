@@ -40,11 +40,13 @@ Sandbox::~Sandbox()
 void Sandbox::initialize()
 {
     engine::initialize();
-    _sceneManager->push_scene(string_id("SandboxScene"))
-        ->add_system<scripting_system>()
-        ->add_system<transform_system>()
-        ->add_system<rendering_system>();
+    auto scene = _sceneManager->push_scene(string_id("SandboxScene"))
+                     ->add_system<scripting_system>()
+                     ->add_system<transform_system>()
+                     ->add_system<rendering_system>();
 
     LOG_MESSAGE("Initialized %s", _sceneManager->get_current_scene()->get_name());
+    auto gin = scene->add_entity(string_id("gin"));
+    gin.add_component<sprite_renderer>(asset<texture>(string_id("gintoki")));
 }
 GAME_RUN(Sandbox);

@@ -73,17 +73,21 @@ asset_storage::~asset_storage()
 }
 void asset_storage::release_asset(string_id name)
 {
-    LEMON_ASSERT(cachedAssets.contains(name));
-    auto&& res = cachedAssets[name];
-    if(res.decrement() == 1)
+    if(cachedAssets.contains(name))
     {
-        cachedAssets.erase(name);
+        auto&& res = cachedAssets[name];
+        if(res.decrement() == 1)
+        {
+            cachedAssets.erase(name);
+        }
     }
 }
 string_id asset_storage::clone_asset(string_id name)
 {
-    LEMON_ASSERT(cachedAssets.contains(name));
-    cachedAssets[name].increment();
+    if(cachedAssets.contains(name))
+    {
+        cachedAssets[name].increment();
+    }
     return name;
 }
 } // namespace lemon

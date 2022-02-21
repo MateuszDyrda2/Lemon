@@ -40,7 +40,9 @@ texture::texture(string_id name, const std::string& path):
 texture::texture(string_id name, const std::vector<byte>& buffer):
     object(name)
 {
-    int w, h, noc;
+    int w /* width */,
+        h /* height */,
+        noc /* number of channels */;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load_from_memory(buffer.data(), buffer.size(), &w, &h, &noc, 0);
     if(data)
@@ -57,6 +59,7 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
         size.y       = h;
         nrOfChannels = noc;
 
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if(noc == 3)
         {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y,

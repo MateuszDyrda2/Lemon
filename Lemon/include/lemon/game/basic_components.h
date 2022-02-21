@@ -50,7 +50,7 @@ struct sprite_renderer
     glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
     glm::vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
     asset<texture> text{};
-    sprite_renderer(asset<texture> tex):
+    sprite_renderer(const asset<texture>& tex):
         text(tex) { }
 };
 struct script_component
