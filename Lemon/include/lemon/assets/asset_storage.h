@@ -51,7 +51,7 @@ class asset_storage
      * from the specified path
      * @param dataPath path to the file with the asset paths
      */
-    asset_storage(const std::string& dataPath);
+    asset_storage();
     ~asset_storage();
     /** @brief Returns the asset with a specified name
      * or nullptr if the asset is not loaded.

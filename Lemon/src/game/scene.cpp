@@ -3,6 +3,10 @@
 #include <lemon/game/basic_components.h>
 
 namespace lemon {
+scene::scene(string_id name, entity_registry&& registry):
+    object(name), registry(std::move(registry))
+{
+}
 scene::scene(string_id name):
     object(name), registry(), mainCamera(&registry, registry.create())
 {

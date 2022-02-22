@@ -14,7 +14,7 @@ namespace lemon {
 class window : public window_base
 {
   public:
-    window(const std::string& name, size_type width, size_type height);
+    window(size_type width, size_type height);
     ~window();
 
     bool end_frame() override;

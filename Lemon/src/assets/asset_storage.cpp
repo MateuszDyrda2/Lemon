@@ -55,8 +55,8 @@ void asset_storage::resource::set(ptr<object> ptr)
 {
     _stored = ptr;
 }
-asset_storage::asset_storage(const std::string& dataPath):
-    loader(create_owned<asset_loader>(dataPath))
+asset_storage::asset_storage():
+    loader(create_owned<asset_loader>())
 {
     LEMON_ASSERT(!storage);
     storage = this;

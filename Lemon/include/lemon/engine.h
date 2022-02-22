@@ -16,7 +16,7 @@ class event_handler;
 class engine
 {
   public:
-    engine(int argc, char** argv);
+    engine(const std::string& workingDirectory, int argc, char** argv);
     virtual ~engine();
     // void run();
     void initialize();

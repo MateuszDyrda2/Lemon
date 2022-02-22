@@ -11,9 +11,9 @@
 #include <lemon/window/window.h>
 
 namespace lemon {
-engine::engine(int, char**)
+engine::engine(const std::string& workingDirectory, int, char**)
 {
-    game::start_game(this);
+    game::start_game(this, workingDirectory);
     LOG_MESSAGE("Engine created");
 }
 engine::~engine()

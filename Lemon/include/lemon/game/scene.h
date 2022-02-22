@@ -13,6 +13,7 @@ namespace lemon {
 class scene : public object
 {
   public:
+    scene(string_id name, entity_registry&& registry);
     scene(string_id name);
     ~scene();
     template<class T>

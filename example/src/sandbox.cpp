@@ -24,15 +24,15 @@ class Sandbox : public engine
 };
 
 Sandbox::Sandbox(int argc, char** argv):
-    engine(argc, argv)
+    engine(std::string(EXAMPLE_ROOT_DIR), argc, argv)
 {
     _scheduler = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
     _events    = create_owned<event_handler>();
     _clock     = create_owned<lemon::clock>();
-    _window    = create_owned<window>("sandbox", 1920, 1080);
+    _window    = create_owned<window>(1920, 1080);
     _input     = create_owned<input>(_window.get());
     rendering_context::create();
-    _resources    = create_owned<asset_storage>(EXAMPLE_SOURCE_DIR);
+    _resources    = create_owned<asset_storage>();
     _sceneManager = create_owned<scene_manager>();
     this->initialize();
 }
@@ -52,7 +52,6 @@ void Sandbox::initialize()
     auto gin = scene->add_entity(string_id("gin"));
     gin.add_component<sprite_renderer>(asset<texture>(string_id("gintoki")));
 
-    scene_serializer serializer;
-    serializer.serialize(scene)->save2file("serialized.json");
+    scene_serializer::serialize(scene);
 }
 GAME_RUN(Sandbox);

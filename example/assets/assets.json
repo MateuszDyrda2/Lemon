@@ -1,0 +1,14 @@
+[
+    {
+        "name": "mock_shader",
+        "path": "/home/matzix/shared/Lemon/example/assets/shaders/mock_shader.glsl"
+    },
+    {
+        "name": "mock_texture",
+        "path": "/home/matzix/shared/Lemon/example/assets/textures/mock_texture.png"
+    },
+    {
+        "name": "gintoki",
+        "path": "/home/matzix/shared/Lemon/example/assets/textures/gintoki.jpg"
+    }
+]

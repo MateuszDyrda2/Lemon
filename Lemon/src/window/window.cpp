@@ -1,10 +1,11 @@
 #include <lemon/window/window.h>
 
+#include <lemon/game.h>
 #include <lemon/input/key_codes.h>
 
 namespace lemon {
-window::window(const std::string& name, size_type width, size_type height):
-    window_base(width, height), _name(name)
+window::window(size_type width, size_type height):
+    window_base(width, height), _name(game::get_settings().gameName)
 {
     if(!glfwInit())
     {
@@ -14,7 +15,7 @@ window::window(const std::string& name, size_type width, size_type height):
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if(!(_handle = glfwCreateWindow(width, height, name.c_str(), NULL, NULL)))
+    if(!(_handle = glfwCreateWindow(width, height, _name.c_str(), NULL, NULL)))
     {
         LOG_FATAL("Window or OpenGL context creation failed");
     }

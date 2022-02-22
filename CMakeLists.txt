@@ -5,4 +5,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(Lemon)
 add_subdirectory(example)
+add_subdirectory(tools)
 # add_subdirectory(Lemonade)

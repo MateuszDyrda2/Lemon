@@ -18,7 +18,7 @@ class asset_loader
     /** @brief Creates the asset loader, reading the specified
      * xml file containing paths of the resources used in the game
      */
-    asset_loader(const std::string& dataPath);
+    asset_loader();
     ~asset_loader();
     /** @brief Loads the resource from the file and returns the pointer to it
      * @param name id of the resource

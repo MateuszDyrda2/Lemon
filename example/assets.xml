@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<Assets>
-    <Asset name="mock_shader" path="/home/matzix/shared/Lemon/example/assets/mock_shader.glsl"/>
-    <Asset name="mock_texture" path="/home/matzix/shared/Lemon/example/assets/mock_texture.png"/>
-    <Asset name="gintoki" path="/home/matzix/shared/Lemon/example/assets/gintoki.jpg"/>
-</Assets>

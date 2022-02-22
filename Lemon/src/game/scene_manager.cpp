@@ -1,9 +1,19 @@
 #include <lemon/game/scene_manager.h>
 
+#include <lemon/game.h>
+#include <lemon/serialization/scene_serializer.h>
+
 namespace lemon {
 scene_manager::scene_manager()
 {
+
     LOG_MESSAGE("Scene Manager created");
+}
+scene_manager::scene_manager(ptr<scene> scene)
+{
+    LOG_MESSAGE("New scene %s", scene->get_name());
+    scenes.emplace(scene);
+    event_dispatcher.send(string_id("OnSceneBegin"), scene->get_id());
 }
 ptr<scene> scene_manager::push_scene(string_id name)
 {
