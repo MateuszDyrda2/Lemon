@@ -9,12 +9,13 @@
 #include <lemon/math/vec3.h>
 #include <lemon/math/vec4.h>
 
-#include <stringbuffer.h>
-#include <writer.h>
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 namespace lemon {
 namespace internal {
-void serialize(int value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void serialize(i32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void serialize(u32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void serialize(u64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void serialize(i64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
@@ -42,6 +43,38 @@ template<class T>
 inline void serialize(const asset<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     serialize(value.get_id(), writer);
+}
+
+void deserialize(i32& value, const rapidjson::Value& iter);
+void deserialize(i64& value, const rapidjson::Value& iter);
+void deserialize(u32& value, const rapidjson::Value& iter);
+void deserialize(u64& value, const rapidjson::Value& iter);
+void deserialize(f32& value, const rapidjson::Value& iter);
+void deserialize(f64& value, const rapidjson::Value& iter);
+void deserialize(std::string& value, const rapidjson::Value& iter);
+void deserialize(vec2& value, const rapidjson::Value& iter);
+void deserialize(vec3& value, const rapidjson::Value& iter);
+void deserialize(vec4& value, const rapidjson::Value& iter);
+void deserialize(mat4& value, const rapidjson::Value& iter);
+void deserialize(string_id& value, const rapidjson::Value& iter);
+void deserialize(entity_handle& value, const rapidjson::Value& iter);
+template<class T>
+inline void deserialize(std::vector<T>& value, const rapidjson::Value& iter)
+{
+    auto a = iter.GetArray();
+    for(auto i = a.Begin(); i != a.End(); ++i)
+    {
+        T element;
+        deserialize(element, i);
+        value.push_back(element);
+    }
+}
+template<class T>
+inline void deserialize(asset<T>& value, const rapidjson::Value& iter)
+{
+    string_id value_id;
+    deserialize(value_id, iter);
+    value = asset<T>(value_id);
 }
 }
 } // namespace lemon

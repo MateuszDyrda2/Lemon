@@ -22,6 +22,7 @@ class string_id
     string_id():
         id(0u) { }
     string_id(std::nullptr_t);
+    string_id(hash_t value, const std::string& name);
     DEBUG_CONSTEXPR explicit string_id(const char* _str):
         id(hash_str(_str))
     {

@@ -50,6 +50,7 @@ struct sprite_renderer
     vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
     vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
     asset<texture> text{};
+    sprite_renderer() = default;
     sprite_renderer(const asset<texture>& tex):
         text(tex) { }
 };

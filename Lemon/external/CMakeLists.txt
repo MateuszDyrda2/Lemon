@@ -1,5 +1,4 @@
-add_subdirectory(glad)
-add_subdirectory(stb)
 add_subdirectory(entt)
-add_subdirectory(rapidxml)
+add_subdirectory(glad)
 add_subdirectory(rapidjson)
+add_subdirectory(stb)

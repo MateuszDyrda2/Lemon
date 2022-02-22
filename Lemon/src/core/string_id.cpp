@@ -9,6 +9,13 @@ string_id::string_id(std::nullptr_t):
     id(0u)
 {
 }
+string_id::string_id(hash_t value, const std::string& name):
+    id(value)
+{
+#if defined(LEMON_DEBUG)
+    map.insert(std::make_pair(id, name));
+#endif
+}
 const char* string_id::get_string() const
 {
 #if defined(LEMON_DEBUG)
