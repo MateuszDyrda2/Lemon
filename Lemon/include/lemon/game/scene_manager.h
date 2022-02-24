@@ -18,6 +18,7 @@ class scene_manager
     void pop_scene();
     ptr<scene> get_current_scene();
     ptr<scene> change_scene(string_id name);
+    ptr<scene> change_scene(ptr<scene> scene);
 
   private:
     std::queue<owned<scene>> scenes;

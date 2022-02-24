@@ -1,20 +1,29 @@
 #include <lemon/assets/file.h>
 
 namespace lemon {
+using namespace std;
 file::file():
     stream()
 {
 }
-file::file(const std::string& path, openmode flag):
+file::file(const string& path, openmode flag):
     stream(path, flag)
 {
 }
 file::~file()
 {
 }
-void file::open(const std::string& path, openmode flag)
+void file::open(const string& path, openmode flag)
 {
-    stream.open(path, flag);
+    stream.exceptions(fstream::badbit);
+    try
+    {
+        stream.open(path, flag);
+    }
+    catch(const fstream::failure& e)
+    {
+        LOG_ERROR("Failed while trying to open %s with %s", path, e.what());
+    }
 }
 void file::close()
 {

@@ -19,6 +19,7 @@ asset_loader::asset_loader()
     vector<char> buff;
     dataFile.read(buff);
     dataFile.close();
+    buff.push_back('\0');
     Document document;
     document.ParseInsitu(buff.data());
 

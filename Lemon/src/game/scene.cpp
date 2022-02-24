@@ -6,6 +6,8 @@ namespace lemon {
 scene::scene(string_id name, entity_registry&& registry):
     object(name), registry(std::move(registry))
 {
+    auto view  = this->registry.view<camera>();
+    mainCamera = entity(&this->registry, view.front());
 }
 scene::scene(string_id name):
     object(name), registry(), mainCamera(&registry, registry.create())

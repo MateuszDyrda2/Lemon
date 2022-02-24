@@ -6,7 +6,6 @@
 namespace lemon {
 scene_manager::scene_manager()
 {
-
     LOG_MESSAGE("Scene Manager created");
 }
 scene_manager::scene_manager(ptr<scene> scene)
@@ -50,6 +49,18 @@ ptr<scene> scene_manager::change_scene(string_id name)
         scenes.pop();
     }
     auto current = scenes.emplace(create_owned<scene>(name)).get();
+    event_dispatcher.send(string_id("onSceneBegin"), current->get_id());
+    return current;
+}
+ptr<scene> scene_manager::change_scene(ptr<scene> scene)
+{
+    LOG_MESSAGE("New scene %s", scene->get_name());
+    if(scenes.size())
+    {
+        event_dispatcher.send(string_id("onSceneEnd"), get_current_scene()->get_id());
+        scenes.pop();
+    }
+    auto current = scenes.emplace(scene).get();
     event_dispatcher.send(string_id("onSceneBegin"), current->get_id());
     return current;
 }

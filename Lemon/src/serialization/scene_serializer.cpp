@@ -27,7 +27,7 @@ struct output_archive
     }
     void operator()(entt::entity entity)
     {
-        writer.Uint(u32(entity));
+        writer.Uint(static_cast<underlying_type_t<entt::entity>>(entity));
     }
     void operator()(std::underlying_type_t<entt::entity> size)
     {
@@ -53,7 +53,7 @@ struct output_archive
     template<class T>
     inline void operator()(entt::entity entity, const T& component)
     {
-        writer.Uint(u32(entity));
+        writer.Uint(static_cast<underlying_type_t<entt::entity>>(entity));
         serialize_component<T>(component, writer);
     }
 
@@ -63,15 +63,17 @@ struct output_archive
 };
 struct input_archive
 {
-    input_archive():
+    input_archive(vector<char>& buffer):
         started{ 0 }
     {
+        document.ParseInsitu(buffer.data());
         const Value& a = document["entities"];
         enttIterator   = a.Begin();
     }
     void operator()(entt::entity& entity)
     {
-        entity = entt::entity((enttIterator++)->GetUint());
+        auto val = enttIterator->GetUint();
+        entity   = entt::entity((enttIterator++)->GetUint());
     }
     void operator()(std::underlying_type_t<entt::entity>& size)
     {
@@ -101,7 +103,8 @@ struct input_archive
     template<class T>
     inline void operator()(entt::entity& entity, T& component)
     {
-        entity                         = entt::entity((componentIterator++)->GetUint());
+        auto val                       = (componentIterator++)->GetUint();
+        entity                         = entt::entity(val);
         Value::ConstMemberIterator itr = componentIterator->MemberBegin();
         deserialize_component<T>(component, itr);
         componentIterator++;
@@ -141,8 +144,8 @@ ptr<scene> scene_serializer::deserialize(const std::string& name)
     vector<char> buffer;
     f.read(buffer);
     f.close();
-    input_archive input;
-    input.document.Parse(buffer.data());
+    buffer.push_back('\0');
+    input_archive input(buffer);
     entity_registry registry;
     entt::basic_snapshot_loader loader(registry);
     loader
