@@ -12,7 +12,7 @@ class LEMON_PUBLIC vertex_array
     void bind();
     void unbind();
 
-    void add_vertex_buffer(owned<vertex_buffer>&& vertex_buffer);
+    ptr<vertex_buffer> add_vertex_buffer(owned<vertex_buffer>&& vertex_buffer);
 
     u32 get_handle() const { return handle; }
     ptr<vertex_buffer> get_vbo() { return vbo.get(); }

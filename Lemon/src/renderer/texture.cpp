@@ -79,11 +79,11 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
         LOG_ERROR("Failed to load texture: %s from buffer", name.get_string());
     }
 }
-void texture::bind()
+void texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, handle);
 }
-void texture::unbind()
+void texture::unbind() const
 {
     glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -3,10 +3,12 @@
 #include <lemon/game.h>
 #include <lemon/game/basic_components.h>
 #include <lemon/game/scene.h>
+#include <lemon/renderer/basic_renderer.h>
+#include <lemon/renderer/batch_renderer.h>
 
 namespace lemon {
 rendering_system::rendering_system(ptr<scene> s):
-    spriteRenderer(create_owned<batch_renderer>()),
+    spriteRenderer(create_owned<basic_renderer>()),
     mainCamera(s->get_main_camera()),
     vpResize(
         string_id("FramebufferSize"),
@@ -33,10 +35,11 @@ void rendering_system::update(entity_registry& registry)
     glm::mat4 viewProj = cameraComponent.projection * cameraTransform.model;
 
     auto group = registry.group<sprite_renderer>(entt::get<transform>);
+    spriteRenderer->start_render(viewProj);
     for(auto&& [ent, sprite, tran] : group.each())
     {
-        spriteRenderer->render_sprite(viewProj, sprite, tran);
+        spriteRenderer->render_sprite(sprite, tran);
     }
-    spriteRenderer->end_render(viewProj);
+    spriteRenderer->end_render();
 }
 } // namespace lemon

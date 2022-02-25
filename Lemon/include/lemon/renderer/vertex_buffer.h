@@ -18,17 +18,18 @@ class LEMON_PUBLIC vertex_buffer
     }
     ~vertex_buffer();
 
-    void bind();
+    ptr<vertex_buffer> bind();
     template<class T>
-    void add_subdata(size_type offset, size_type size, T* data)
+    ptr<vertex_buffer> add_subdata(size_type offset, size_type size, T* data)
     {
         glBindBuffer(GL_ARRAY_BUFFER, handle);
         glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+        return this;
     }
 
     u32 get_handle() const { return handle; }
-    void enable_vertex_attrib(size_type index, size_type elementCount, GLenum type,
-                              bool normalized, size_type stride, size_type startsAt);
+    ptr<vertex_buffer> enable_vertex_attrib(size_type index, size_type elementCount, GLenum type,
+                                            bool normalized, size_type stride, size_type startsAt);
 
   private:
     u32 handle;

@@ -19,8 +19,8 @@ class LEMON_PUBLIC texture : public object
     texture& operator=(texture&& other) noexcept;
 
     const glm::ivec2& get_size() const { return size; }
-    void bind();
-    void unbind();
+    void bind() const;
+    void unbind() const;
 
   private:
     u32 handle;

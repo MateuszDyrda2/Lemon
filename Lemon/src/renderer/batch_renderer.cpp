@@ -7,10 +7,10 @@ namespace lemon {
 batch_renderer::batch::batch():
     usedVertices{}, vao(create_owned<vertex_array>()), _texture{ nullptr }
 {
-    vao->add_vertex_buffer(create_owned<vertex_buffer>(batch_renderer::maxVertices * sizeof(vertex)));
-    vao->get_vbo()->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(vertex), 0);
-    vao->get_vbo()->enable_vertex_attrib(1, 4, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2));
-    vao->get_vbo()->enable_vertex_attrib(2, 2, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2) + sizeof(glm::vec4));
+    vao->add_vertex_buffer(create_owned<vertex_buffer>(batch_renderer::maxVertices * sizeof(vertex)))
+        ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(vertex), 0)
+        ->enable_vertex_attrib(1, 4, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2))
+        ->enable_vertex_attrib(2, 2, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2) + sizeof(glm::vec4));
     vao->unbind();
 }
 void batch_renderer::batch::add_quad(const glm::mat4& trans, glm::vec4 color, glm::vec4 texCoords)
@@ -57,7 +57,7 @@ void batch_renderer::batch::set_texture(ptr<texture> tex)
 {
     _texture = tex;
 }
-bool batch_renderer::batch::is_texture(ptr<texture> other) const
+bool batch_renderer::batch::is_texture(const ptr<texture> other) const
 {
     return other == _texture;
 }
@@ -89,8 +89,11 @@ batch_renderer::batch_renderer():
 batch_renderer::~batch_renderer()
 {
 }
-void batch_renderer::render_sprite(const glm::mat4& viewProj,
-                                   sprite_renderer& sComponent, transform& tComponent)
+void batch_renderer::start_render(const mat4& viewProj)
+{
+    this->viewProj = viewProj;
+}
+void batch_renderer::render_sprite(sprite_renderer& sComponent, transform& tComponent)
 {
     static ptr<batch> biggestBatch = &batches.front();
     ptr<batch> empty{};
@@ -125,7 +128,7 @@ void batch_renderer::render_sprite(const glm::mat4& viewProj,
     }
     found->add_quad(tComponent.model, sComponent.color, sComponent.texCoords);
 }
-void batch_renderer::end_render(const glm::mat4& viewProj)
+void batch_renderer::end_render()
 {
     for(auto& b : batches)
         b.flush(viewProj, textureShader.get());

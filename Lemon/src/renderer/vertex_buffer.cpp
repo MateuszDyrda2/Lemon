@@ -11,14 +11,16 @@ vertex_buffer::~vertex_buffer()
 {
     glDeleteBuffers(1, &handle);
 }
-void vertex_buffer::bind()
+ptr<vertex_buffer> vertex_buffer::bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, handle);
+    return this;
 }
-void vertex_buffer::enable_vertex_attrib(size_type index, size_type elementCount, GLenum type,
-                                         bool normalized, size_type stride, size_type startsAt)
+ptr<vertex_buffer> vertex_buffer::enable_vertex_attrib(size_type index, size_type elementCount, GLenum type,
+                                                       bool normalized, size_type stride, size_type startsAt)
 {
     glVertexAttribPointer(index, elementCount, type, normalized, stride, (void*)startsAt);
     glEnableVertexAttribArray(index);
+    return this;
 }
 } // namespace lemon

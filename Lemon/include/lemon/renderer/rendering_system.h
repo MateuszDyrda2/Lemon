@@ -1,6 +1,6 @@
 #pragma once
 
-#include "batch_renderer.h"
+#include "renderer2d.h"
 
 #include <lemon/core/string_id.h>
 #include <lemon/events/listener.h>
@@ -17,7 +17,7 @@ class LEMON_PUBLIC rendering_system : public system
     void update(entity_registry& registry) override;
 
   private:
-    owned<batch_renderer> spriteRenderer;
+    owned<renderer2d> spriteRenderer;
     entity mainCamera;
     listener<int, int> vpResize;
 };

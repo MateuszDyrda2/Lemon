@@ -1,21 +1,22 @@
 #pragma once
 
+#include "renderer2d.h"
 #include "rendering_context.h"
 #include "shader.h"
 
-#include <lemon/game/basic_components.h>
 #include <lemon/renderer/texture.h>
 #include <lemon/renderer/vertex_array.h>
-#include <lemon/service/services.h>
+
+#include <lemon/math/mat4.h>
+#include <lemon/math/math.h>
+#include <lemon/math/vec2.h>
+#include <lemon/math/vec3.h>
+#include <lemon/math/vec4.h>
 
 #include <array>
-#include <glm/gtx/transform.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
 
 namespace lemon {
-class LEMON_PUBLIC batch_renderer
+class LEMON_PUBLIC batch_renderer : public renderer2d
 {
     struct vertex
     {
@@ -31,12 +32,12 @@ class LEMON_PUBLIC batch_renderer
 
         batch();
         bool is_empty() const noexcept { return usedVertices == 0ULL; }
-        void add_quad(const glm::mat4& trans, glm::vec4 color, glm::vec4 texCoords);
+        void add_quad(const mat4& trans, vec4 color, vec4 texCoords);
         void set_texture(ptr<texture> tex);
-        bool is_texture(ptr<texture> other) const;
+        bool is_texture(const ptr<texture> other) const;
         ptr<batch> get_bigger(ptr<batch> other) const;
         bool is_full() const;
-        void flush(const glm::mat4& viewProj, ptr<shader> textureShader);
+        void flush(const mat4& viewProj, ptr<shader> textureShader);
     };
 
   public:
@@ -48,12 +49,13 @@ class LEMON_PUBLIC batch_renderer
   public:
     batch_renderer();
     ~batch_renderer();
-    void render_sprite(const glm::mat4& viewProj,
-                       sprite_renderer& sComponent, transform& tComponent);
-    void end_render(const glm::mat4& viewProj);
+    void start_render(const glm::mat4& viewProj) override;
+    void render_sprite(sprite_renderer& sComponent, transform& tComponent) override;
+    void end_render() override;
 
   private:
     asset<shader> textureShader;
     container_type batches;
+    mat4 viewProj;
 };
 } // namespace lemon

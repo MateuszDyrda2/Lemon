@@ -10,5 +10,9 @@
     {
         "name": "gintoki",
         "path": "/home/matzix/shared/Lemon/example/assets/textures/gintoki.jpg"
+    },
+    {
+        "name": "sprite_renderer_shader",
+        "path": "/home/matzix/shared/Lemon/example/assets/shaders/sprite_renderer_shader.glsl"
     }
 ]
