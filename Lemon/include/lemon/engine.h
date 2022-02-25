@@ -1,19 +1,17 @@
 #pragma once
 
-#include "core/basic_types.h"
+#include <lemon/events/event_handler.h>
+#include <lemon/game/scene_manager.h>
+#include <lemon/input/input.h>
+#include <lemon/threads/scheduler.h>
+#include <lemon/time/clock.h>
+#include <lemon/window/window_base.h>
+
 #include <memory>
 
 namespace lemon {
-class window_base;
-class clock;
-class scene_manager;
-class input;
 
-class scheduler;
-class asset_storage;
-class event_handler;
-
-class engine
+class LEMON_PUBLIC engine
 {
   public:
     engine(const std::string& workingDirectory, int argc, char** argv);

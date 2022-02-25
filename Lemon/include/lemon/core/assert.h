@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef LEMON_RESOURCE_PATH
-#    define LEMON_RESOURCE_PATH "resources/"
-#endif
 #if defined(LEMON_DEBUG)
 #    if defined(LEMON_WINDOWS)
 #        define LEMON_DB() __debugbreak()

@@ -9,7 +9,7 @@
 
 namespace lemon {
 class scene;
-class transform_system : public system
+class LEMON_PUBLIC transform_system : public system
 {
   public:
     template<class F>

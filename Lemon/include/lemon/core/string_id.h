@@ -12,7 +12,7 @@ namespace lemon {
 #else
 #    define DEBUG_CONSTEXPR constexpr
 #endif
-class string_id
+class LEMON_PUBLIC string_id
 {
   public:
     using hash_t     = u32;

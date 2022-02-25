@@ -8,7 +8,7 @@
 #include <queue>
 
 namespace lemon {
-class scene_manager
+class LEMON_PUBLIC scene_manager
 {
   public:
     scene_manager();

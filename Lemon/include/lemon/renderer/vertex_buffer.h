@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 
 namespace lemon {
-class vertex_buffer
+class LEMON_PUBLIC vertex_buffer
 {
   public:
     vertex_buffer(size_type byteSize);

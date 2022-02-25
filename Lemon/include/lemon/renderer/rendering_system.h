@@ -9,7 +9,7 @@
 
 namespace lemon {
 class scene;
-class rendering_system : public system
+class LEMON_PUBLIC rendering_system : public system
 {
   public:
     rendering_system(ptr<scene> s);

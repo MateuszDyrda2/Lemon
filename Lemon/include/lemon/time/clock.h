@@ -5,7 +5,7 @@
 #include <chrono>
 
 namespace lemon {
-class clock
+class LEMON_PUBLIC clock
 {
   public:
     using self_type     = clock;

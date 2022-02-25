@@ -3,13 +3,14 @@
 #include "asset_storage.h"
 
 #include <lemon/core/assert.h>
+#include <lemon/core/defines.h>
 
 namespace lemon {
 /** @brief Class for accessing assets in the engine.
  * Contains a reference to the asset storage and key of a stored asset.
  */
 template<class T>
-class asset
+class LEMON_PUBLIC asset
 {
   public:
     using self_type       = asset<T>; ///< this type

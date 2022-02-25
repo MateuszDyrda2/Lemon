@@ -7,7 +7,7 @@
 
 namespace lemon {
 /** OpenGL rendering context */
-class rendering_context
+class LEMON_PUBLIC rendering_context
 {
   public:
     /** @brief Initializes the rendering context */

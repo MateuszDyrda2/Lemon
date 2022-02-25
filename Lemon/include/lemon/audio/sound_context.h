@@ -1,9 +1,10 @@
 #pragma once
 
 #include "sound_utils.h"
+#include <lemon/core/defines.h>
 
 namespace lemon {
-class sound_context
+class LEMON_PUBLIC sound_context
 {
   public:
     sound_context();

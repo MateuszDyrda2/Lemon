@@ -1,12 +1,13 @@
 #pragma once
 
 #include <lemon/core/basic_types.h>
+#include <lemon/core/defines.h>
 #include <lemon/game/scene.h>
 
 #include <string>
 
 namespace lemon {
-class scene_serializer
+class LEMON_PUBLIC scene_serializer
 {
   public:
     static void serialize(ptr<scene> scene);

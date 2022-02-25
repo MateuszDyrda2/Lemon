@@ -35,9 +35,16 @@ elseif(UNIX)
 endif(WIN32)
 add_compile_definitions(LEMON_RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 add_library(lemon)
 add_subdirectory(src)
 add_library(lemon::lemon ALIAS lemon)
+
+if(BUILD_SHARED_LIBS)
+	target_compile_definitions(lemon PRIVATE "EXPORT_LEMON")
+endif()
+
 
 target_link_libraries(lemon PUBLIC 
 	glad 

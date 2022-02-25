@@ -11,7 +11,7 @@
 #include <string>
 
 namespace lemon {
-class window : public window_base
+class LEMON_PUBLIC window : public window_base
 {
   public:
     window(size_type width, size_type height);

@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 
 namespace lemon {
-class window_base
+class LEMON_PUBLIC window_base
 {
   public:
     window_base(size_type width, size_type height):

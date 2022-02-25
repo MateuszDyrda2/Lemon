@@ -2,7 +2,6 @@
 
 #include "engine.h"
 
-using namespace lemon;
 #define GAME_RUN(GAME_NAME)                   \
     int main(int argc, char** argv)           \
     {                                         \

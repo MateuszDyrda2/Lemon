@@ -9,7 +9,7 @@
 
 namespace lemon {
 /** event handler for managing events */
-class event_handler
+class LEMON_PUBLIC event_handler
 {
   public:
     template<class... Args>

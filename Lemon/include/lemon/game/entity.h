@@ -7,7 +7,7 @@
 namespace lemon {
 using entity_registry = entt::registry;
 using entity_handle   = entt::entity;
-class entity
+class LEMON_PUBLIC entity
 {
   public:
     entity() = default;

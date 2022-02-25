@@ -2,6 +2,7 @@
 
 #include "asset_loader.h"
 
+#include <lemon/core/defines.h>
 #include <lemon/game/object.h>
 #include <lemon/renderer/shader.h>
 #include <lemon/renderer/texture.h>
@@ -15,7 +16,7 @@ namespace lemon {
 /** Class storing the actual assets, allowing for caching assets
  * that are used in many places and managing their lifetime.
  */
-class asset_storage
+class LEMON_PUBLIC asset_storage
 {
   private:
     /** @brief Stored resource. Keeps a reference count. */

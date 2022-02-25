@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 
 namespace lemon {
-class framebuffer
+class LEMON_PUBLIC framebuffer
 {
   public:
     framebuffer(const glm::ivec2& size);

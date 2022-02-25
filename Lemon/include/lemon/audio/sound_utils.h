@@ -9,7 +9,7 @@
 #define alCall(function, ...)          alCallImpl(function, __VA_ARGS__)
 #define alcCall(function, device, ...) alcCallImpl(function, device, __VA_ARGS__)
 namespace lemon {
-bool check_al_errors()
+static bool check_al_errors()
 {
     ALenum error = alGetError();
     if(error != AL_NO_ERROR)
@@ -40,7 +40,7 @@ bool check_al_errors()
     return true;
 }
 template<class alFunction, class... Args>
-auto alCallImpl(alFunction function, Args&&... args)
+static auto alCallImpl(alFunction function, Args&&... args)
     -> typename std::enable_if_t<!std::is_same_v<void, decltype(function(args...))>, decltype(function(args...))>
 {
     auto ret = function(std::forward<Args>(args)...);
@@ -48,13 +48,13 @@ auto alCallImpl(alFunction function, Args&&... args)
     return ret;
 }
 template<class alFunction, class... Args>
-auto alCallImpl(alFunction function, Args&&... args)
+static auto alCallImpl(alFunction function, Args&&... args)
     -> typename std::enable_if_t<std::is_same_v<void, decltype(function(args...))>, bool>
 {
     function(std::forward<Args>(args)...);
     return check_al_errors();
 }
-bool check_alc_errors(ALCdevice* device)
+static bool check_alc_errors(ALCdevice* device)
 {
     ALCenum error = alcGetError(device);
     if(error != AL_NO_ERROR)
@@ -85,14 +85,14 @@ bool check_alc_errors(ALCdevice* device)
     return true;
 }
 template<class alFunction, class... Args>
-auto alcCallImpl(alFunction function, ALCdevice* device, Args&&... args)
+static auto alcCallImpl(alFunction function, ALCdevice* device, Args&&... args)
     -> typename std::enable_if_t<std::is_same_v<void, decltype(function(args...))>, bool>
 {
     function(std::forward<Args>(args)...);
     return check_al_errors();
 }
 template<class alFunction, class ReturnType, class... Args>
-auto alcCallImpl(alFunction function, ReturnType& returnValue, ALCdevice* device, Args&&... args)
+static auto alcCallImpl(alFunction function, ReturnType& returnValue, ALCdevice* device, Args&&... args)
     -> typename std::enable_if_t<!std::is_same_v<void, decltype(function(args...))>, bool>
 {
     returnValue = function(std::forward<Args>(args)...);

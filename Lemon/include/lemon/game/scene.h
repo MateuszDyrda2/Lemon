@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace lemon {
-class scene : public object
+class LEMON_PUBLIC scene : public object
 {
   public:
     scene(string_id name, entity_registry&& registry);

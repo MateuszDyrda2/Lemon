@@ -2,13 +2,14 @@
 
 #include <lemon/core/basic_types.h>
 #include <lemon/core/string_id.h>
+#include <lemon/core/defines.h>
 
 #include <unordered_map>
 #include <vector>
 
 namespace lemon {
 /** Class loading resources from files */
-class asset_loader
+class LEMON_PUBLIC asset_loader
 {
   public:
     using self_type      = asset_loader;

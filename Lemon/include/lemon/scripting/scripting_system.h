@@ -5,7 +5,7 @@
 
 namespace lemon {
 class scene;
-class scripting_system : public system
+class LEMON_PUBLIC scripting_system : public system
 {
   public:
     scripting_system(ptr<scene> s);

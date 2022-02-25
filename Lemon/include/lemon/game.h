@@ -1,16 +1,11 @@
 #pragma once
 
 #include <lemon/core/basic_types.h> // for ptr<>
+#include <lemon/engine.h>
 
 namespace lemon {
-// forward declarations for engine components
-class engine;
-class window_base;
-class clock;
-class scene_manager;
-class input;
 /** Game class for accessing single instance components of the game engine */
-class game
+class LEMON_PUBLIC game
 {
   public:
     struct settings

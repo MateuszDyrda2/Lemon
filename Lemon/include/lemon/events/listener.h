@@ -5,7 +5,7 @@
 namespace lemon {
 /** Class for subscribing to a specific type of event */
 template<class... Args>
-class listener
+class LEMON_PUBLIC listener
 {
   public:
     using callable_type  = std::function<void(Args...)>;

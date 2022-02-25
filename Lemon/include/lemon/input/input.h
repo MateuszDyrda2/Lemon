@@ -9,7 +9,7 @@
 
 namespace lemon {
 class window_base;
-class input
+class LEMON_PUBLIC input
 {
   public:
     input(ptr<window_base> window);

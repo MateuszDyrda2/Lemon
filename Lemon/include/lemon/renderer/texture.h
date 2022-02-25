@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace lemon {
-class texture : public object
+class LEMON_PUBLIC texture : public object
 {
   public:
     texture(string_id name, const std::string& path);

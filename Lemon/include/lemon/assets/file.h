@@ -2,13 +2,14 @@
 
 #include <lemon/containers/buffer.h>
 #include <lemon/core/basic_types.h>
+#include <lemon/core/defines.h>
 
 #include <fstream>
 #include <iterator>
 #include <vector>
 
 namespace lemon {
-class file
+class LEMON_PUBLIC file
 {
   public:
     using openmode = std::ios::openmode;

@@ -15,7 +15,7 @@
 #include <glm/vec4.hpp>
 
 namespace lemon {
-class batch_renderer
+class LEMON_PUBLIC batch_renderer
 {
     struct vertex
     {

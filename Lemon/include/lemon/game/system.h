@@ -3,7 +3,7 @@
 #include "entity.h"
 
 namespace lemon {
-class system
+class LEMON_PUBLIC system
 {
   public:
     system()                                       = default;

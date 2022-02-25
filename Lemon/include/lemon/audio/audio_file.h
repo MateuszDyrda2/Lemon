@@ -1,12 +1,13 @@
 #pragma once
 
 #include "sound_utils.h"
+#include <lemon/core/defines.h>
 #include <lemon/game/object.h>
 
 #include <vector>
 
 namespace lemon {
-class audio_file
+class LEMON_PUBLIC audio_file
 {
   public:
     audio_file(string_id name, const std::string& path);

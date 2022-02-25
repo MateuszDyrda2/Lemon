@@ -15,7 +15,7 @@
 
 namespace lemon {
 /** Class for scheduling multithreaded jobs */
-class scheduler
+class LEMON_PUBLIC scheduler
 {
   private:
     struct function

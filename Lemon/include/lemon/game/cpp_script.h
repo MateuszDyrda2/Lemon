@@ -3,7 +3,7 @@
 #include "entity.h"
 
 namespace lemon {
-class cpp_script
+class LEMON_PUBLIC cpp_script
 {
   public:
     cpp_script(const entity& ent):

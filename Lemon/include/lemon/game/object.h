@@ -3,7 +3,7 @@
 #include <lemon/core/string_id.h>
 
 namespace lemon {
-class object
+class LEMON_PUBLIC object
 {
   public:
     object(string_id id);

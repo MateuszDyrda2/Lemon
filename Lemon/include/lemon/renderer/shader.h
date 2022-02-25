@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace lemon {
-class shader : public object
+class LEMON_PUBLIC shader : public object
 {
   public:
     shader(string_id name, const std::string& shaderPath);

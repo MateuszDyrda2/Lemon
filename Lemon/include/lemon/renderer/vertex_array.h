@@ -3,7 +3,7 @@
 #include "vertex_buffer.h"
 
 namespace lemon {
-class vertex_array
+class LEMON_PUBLIC vertex_array
 {
   public:
     vertex_array();

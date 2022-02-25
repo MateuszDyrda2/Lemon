@@ -4,7 +4,7 @@
 
 namespace lemon {
 /** Class allowing for dispatching multiple events */
-class dispatcher
+class LEMON_PUBLIC dispatcher
 {
   public:
     /** @brief Constructs the dispatcher */

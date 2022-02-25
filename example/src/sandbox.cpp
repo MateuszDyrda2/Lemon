@@ -1,12 +1,6 @@
 #include <lemon/entry_point.h>
 
-#include <lemon/assets/asset_storage.h>
-#include <lemon/events/event_handler.h>
-#include <lemon/game/scene_manager.h>
-#include <lemon/input/input.h>
 #include <lemon/renderer/rendering_context.h>
-#include <lemon/threads/scheduler.h>
-#include <lemon/time/clock.h>
 #include <lemon/window/window.h>
 
 #include <lemon/serialization/scene_serializer.h>

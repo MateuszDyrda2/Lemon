@@ -1,5 +1,7 @@
 #pragma once
 
+#include "defines.h"
+
 #include <cstdarg>
 #include <cstdio>
 #include <string>
@@ -22,7 +24,7 @@
     }
 
 namespace lemon {
-class logger
+class LEMON_PUBLIC logger
 {
   public:
     static void print(char const* file, int line, char const* msg, ...);

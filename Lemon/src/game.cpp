@@ -1,12 +1,7 @@
 #include <lemon/game.h>
 
 #include <lemon/assets/file.h>
-#include <lemon/engine.h>
-#include <lemon/game/scene_manager.h>
-#include <lemon/input/input.h>
 #include <lemon/renderer/rendering_context.h>
-#include <lemon/time/clock.h>
-#include <lemon/window/window_base.h>
 
 #include <rapidjson/document.h>
 #include <vector>
