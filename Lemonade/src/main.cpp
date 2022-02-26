@@ -1,8 +1,11 @@
-#include <RiverEditor/application.h>
+#include <QApplication>
+#include "mainwindow.h"
 
 int main(int argc, char** argv)
 {
-    application app;
-    app.loop();
-    return 0;
+    QApplication a(argc, argv);
+    QCoreApplication::setApplicationName("Lemonade");
+    MainWindow window;
+    window.show();
+    return a.exec();
 }

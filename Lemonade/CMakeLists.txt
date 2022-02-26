@@ -1,28 +1,18 @@
-cmake_minimum_required(VERSION 3.22)
+project(Lemonade VERSION 0.1.0 LANGUAGES CXX)
 
-# IMGUI 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
-# AssetManager
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tools/)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
-project(Lemonade)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
-add_compile_definitions(LEMONADE_RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
-set(lemonade_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/ )
-set(lemonade_SRC
-	${lemonade_SRC_DIR}main.cpp
-	${lemonade_SRC_DIR}application.cpp
-	${lemonade_SRC_DIR}editor_window.cpp
-	${lemonade_SRC_DIR}editor_system.cpp
+set(Lemonade_SRC
+    src/main.cpp
+    src/mainwindow.h
+    src/mainwindow.cpp
+    src/mainwindow.ui
 )
 
-add_executable(lemonade ${lemonade_SRC})
-target_include_directories(lemonade PUBLIC 
-${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_executable(lemonade ${Lemonade_SRC})
 
-set_target_properties(lemonade PROPERTIES
-	CXX_STANDARD 20
-	CXX_STANDARD_REQUIRED ON
-)
-
-target_link_libraries(lemonade PUBLIC lemon::lemon lemon::assetManager imgui)
+target_link_libraries(lemonade PUBLIC lemon::lemon Qt6::Widgets)

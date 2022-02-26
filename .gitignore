@@ -10,3 +10,7 @@ nohup.out
 .vs
 # visual studio cmake
 CMakeSettings.json
+# visual studio out build
+out
+# qtcreator cmake
+CMakeLists.txt.user
