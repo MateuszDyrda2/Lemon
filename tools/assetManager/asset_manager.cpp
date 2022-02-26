@@ -20,7 +20,7 @@ bool refresh_directory(const std::string& assetFile, const std::string& director
     for(const auto& entry : fs::recursive_directory_iterator(_path))
     {
         if(!entry.is_directory())
-            assets[entry.path().stem()] = entry.path();
+            assets[entry.path().stem().string()] = entry.path().string();
     }
 
     StringBuffer s;

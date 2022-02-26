@@ -6,3 +6,7 @@ nohup.out
 *.sh
 # vscode dir
 .vscode/
+# visual studio dir
+.vs
+# visual studio cmake
+CMakeSettings.json

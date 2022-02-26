@@ -6,6 +6,7 @@
 #include <functional>
 #include <list>
 #include <unordered_map>
+#include <algorithm>
 
 namespace lemon {
 /** event handler for managing events */

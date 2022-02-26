@@ -42,7 +42,7 @@ add_subdirectory(src)
 add_library(lemon::lemon ALIAS lemon)
 
 if(BUILD_SHARED_LIBS)
-	target_compile_definitions(lemon PRIVATE "EXPORT_LEMON")
+	target_compile_definitions(lemon PUBLIC "EXPORT_LEMON")
 endif()
 
 
@@ -77,5 +77,5 @@ target_compile_definitions(lemon PUBLIC
 )
 target_compile_options(lemon PUBLIC 
 	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wformat=2;-Wunused>"
-	"$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:DEBUG>>:-W3>"
+	"$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:DEBUG>>:-W3;-Zc:preprocessor>"
 )

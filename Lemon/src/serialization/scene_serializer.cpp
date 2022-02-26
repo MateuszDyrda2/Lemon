@@ -72,8 +72,7 @@ struct input_archive
     }
     void operator()(entt::entity& entity)
     {
-        auto val = enttIterator->GetUint();
-        entity   = entt::entity((enttIterator++)->GetUint());
+        entity = entt::entity((enttIterator++)->GetUint());
     }
     void operator()(std::underlying_type_t<entt::entity>& size)
     {
