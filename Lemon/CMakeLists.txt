@@ -7,7 +7,7 @@ set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_
 
 set(lemon_DESC "2D game engine written in C++")
 
-# - ENTT, GLAD, STB, RAPIDJSON -
+# - ENTT, GLAD, STB, RAPIDJSON, AudioFile
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 # -------------------------------------
 # ---------------OPENAL----------------
@@ -35,7 +35,7 @@ elseif(UNIX)
 endif(WIN32)
 add_compile_definitions(LEMON_RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 add_library(lemon)
 add_subdirectory(src)
@@ -54,6 +54,7 @@ target_link_libraries(lemon PUBLIC
 	stb 
 	EnTT::EnTT 
 	rapidjson
+	AudioFile
 	${CMAKE_DL_LIBS}
 )
 

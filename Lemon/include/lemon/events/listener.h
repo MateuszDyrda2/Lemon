@@ -10,7 +10,7 @@ class LEMON_PUBLIC listener
   public:
     using callable_type  = std::function<void(Args...)>;
     using container_type = std::list<callable_type>;
-    using iterator_type  = container_type::iterator;
+    using iterator_type  = typename container_type::iterator;
     using self_type      = listener<Args...>;
 
   public:

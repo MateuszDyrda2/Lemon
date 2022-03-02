@@ -2,8 +2,9 @@
 
 #include <lemon/core/basic_types.h>
 #include <lemon/game/object.h>
+#include <lemon/math/vec2.h>
+#include <lemon/renderer/rendering_context.h>
 
-#include <glm/vec2.hpp>
 #include <vector>
 
 namespace lemon {
@@ -23,8 +24,8 @@ class LEMON_PUBLIC texture : public object
     void unbind() const;
 
   private:
-    u32 handle;
-    glm::ivec2 size;
+    ptr<rendering_context::texture_object> handle;
+    ivec2 size;
     size_type nrOfChannels;
 };
 } // namespace lemon

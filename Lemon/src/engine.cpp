@@ -23,7 +23,7 @@ bool engine::update()
     _sceneManager->update();
     return !_window->end_frame();
 }
-void drop()
+void engine::drop()
 {
 }
 }

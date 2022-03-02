@@ -4,6 +4,8 @@
 #include "entity.h"
 
 #include <lemon/assets/asset.h>
+#include <lemon/audio/sound.h>
+#include <lemon/audio/sound_source.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/renderer/texture.h>
 
@@ -54,6 +56,20 @@ struct sprite_renderer
     sprite_renderer(const asset<texture>& tex):
         text(tex) { }
 };
+struct audio_source
+{
+    sound_source source;
+    asset<sound> sound{};
+    f32 pitch{ 1.0f };
+    f32 gain{ 1.0f };
+    bool loop{ false };
+};
+struct audio_listener
+{
+    f32 masterGain{ 1.0f };
+};
+struct play
+{ };
 struct script_component
 {
     owned<cpp_script> script{};

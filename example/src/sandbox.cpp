@@ -3,6 +3,7 @@
 #include <lemon/renderer/rendering_context.h>
 #include <lemon/window/window.h>
 
+#include <lemon/game.h>
 #include <lemon/serialization/scene_serializer.h>
 
 #include <thread>
@@ -18,7 +19,7 @@ class Sandbox : public engine
 };
 
 Sandbox::Sandbox(int argc, char** argv):
-    engine(std::string(EXAMPLE_ROOT_DIR), argc, argv)
+    engine(std::string(EXAMPLE_ROOT_DIR) + "/lemon.json", argc, argv)
 {
     _scheduler = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
     _events    = create_owned<event_handler>();
@@ -36,7 +37,7 @@ Sandbox::~Sandbox()
 void Sandbox::initialize()
 {
     engine::initialize();
-    auto scene = _sceneManager->change_scene(scene_serializer::deserialize("SandboxScene"))
+    auto scene = _sceneManager->change_scene(scene_serializer::deserialize(game::get_settings().startingScene))
                      ->add_system<scripting_system>()
                      ->add_system<transform_system>()
                      ->add_system<rendering_system>();

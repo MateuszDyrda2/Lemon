@@ -24,13 +24,12 @@ class LEMON_PUBLIC engine
   protected:
     friend class game;
 
+    owned<scheduler> _scheduler;
+    owned<event_handler> _events;
     owned<window_base> _window;
+    owned<asset_storage> _resources;
+    owned<input> _input;
     owned<clock> _clock;
     owned<scene_manager> _sceneManager;
-    owned<input> _input;
-
-    owned<scheduler> _scheduler;
-    owned<asset_storage> _resources;
-    owned<event_handler> _events;
 };
 }

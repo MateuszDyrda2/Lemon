@@ -16,7 +16,7 @@ set(Lemonade_SRC
 )
 
 add_executable(lemonade ${Lemonade_SRC})
-target_include_directories(lemonade PRIVATE src/)
+target_include_directories(lemonade PUBLIC src/)
 
 
 target_link_libraries(lemonade PUBLIC

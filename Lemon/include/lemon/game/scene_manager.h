@@ -13,6 +13,7 @@ class LEMON_PUBLIC scene_manager
   public:
     scene_manager();
     scene_manager(ptr<scene> scene);
+    ~scene_manager();
     ptr<scene> push_scene(string_id name);
     void update();
     void pop_scene();

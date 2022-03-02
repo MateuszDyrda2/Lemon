@@ -26,6 +26,7 @@ scheduler::scheduler(size_type workerCount):
                 }
             });
     }
+    LOG_MESSAGE("Scheduler created");
 }
 scheduler::~scheduler()
 {
@@ -33,6 +34,7 @@ scheduler::~scheduler()
     cvar.notify_all();
     for(auto& w : workers)
         w.join();
+    LOG_MESSAGE("Scheduler destroyed");
 }
 void scheduler::run(const callable_type& callable)
 {

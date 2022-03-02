@@ -48,4 +48,47 @@ void rendering_context::draw_elements_instanced(GLenum mode, size_type count, GL
 {
     glDrawElementsInstanced(mode, count, type, indices, instanceCount);
 }
+ptr<rendering_context::texture_object> rendering_context::generate_texture()
+{
+    texture_object* obj = new texture_object;
+    glGenTextures(1, &obj->texture_id);
+    return obj;
+}
+ptr<rendering_context::texture_object>
+rendering_context::texture_object::set_parameter(int param, int value)
+{
+    glTexParameteri(GL_TEXTURE_2D, param, value);
+    return this;
+}
+ptr<rendering_context::texture_object>
+rendering_context::texture_object::create_image(
+    int level, int internalFormat, ivec2 size, GLenum format, GLenum type, const void* data)
+{
+    glTexImage2D(GL_TEXTURE_2D, level, internalFormat, size.x, size.y, 0, format, type, data);
+    return this;
+}
+ptr<rendering_context::texture_object>
+rendering_context::texture_object::set_unpack_alignment(int value)
+{
+    glPixelStorei(GL_UNPACK_ALIGNMENT, value);
+    return this;
+}
+ptr<rendering_context::texture_object>
+rendering_context::texture_object::bind()
+{
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    return this;
+}
+ptr<rendering_context::texture_object>
+rendering_context::texture_object::unbind()
+{
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return this;
+}
+void rendering_context::destroy_texture(texture_object** handle)
+{
+    glDeleteTextures(1, &((*handle)->texture_id));
+    delete(*handle);
+    *handle = nullptr;
+}
 } // namespace lemon

@@ -4,7 +4,14 @@
 
 namespace lemon {
 input::input(ptr<window_base> window):
-    _window(window) { }
+    _window(window)
+{
+    LOG_MESSAGE("Input manager created");
+}
+input::~input()
+{
+    LOG_MESSAGE("Input manager destroyed");
+}
 bool input::is_key_pressed(key::keycode key) const
 {
     return glfwGetKey(

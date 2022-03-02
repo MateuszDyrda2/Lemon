@@ -67,9 +67,11 @@ asset_storage::asset_storage():
         _texture, resource(loader->load_resource<texture>(_texture))));
     cachedAssets.insert(std::make_pair(
         _shader, resource(loader->load_resource<shader>(_shader))));
+    LOG_MESSAGE("Asset storage created");
 }
 asset_storage::~asset_storage()
 {
+    LOG_MESSAGE("Asset storage destroyed");
 }
 void asset_storage::release_asset(string_id name)
 {

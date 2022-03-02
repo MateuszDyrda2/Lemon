@@ -1,9 +1,9 @@
 #pragma once
 
 #include <lemon/core/basic_types.h> // for size_type
+#include <lemon/math/vec4.h>
 
-#include <glad/glad.h>  // GLenum
-#include <glm/vec4.hpp> // vec4, ivec4
+#include <glad/glad.h> // GLenum
 
 namespace lemon {
 /** OpenGL rendering context */
@@ -19,11 +19,11 @@ class LEMON_PUBLIC rendering_context
     /** @brief Set new viewport
      * @param vp vector4 to set as a viewport (x, y, width, height)
      */
-    static void set_viewport(const glm::ivec4& vp);
+    static void set_viewport(const ivec4& vp);
     /** @brief Clear screen with a color
      * @param color (r, g, b, a)
      */
-    static void clear_screen(const glm::vec4& color);
+    static void clear_screen(const vec4& color);
     /** @brief Render primitives from arrays data
      * @param mode kind of primitives to render
      * @param first starting index in the enabled arrays
@@ -54,5 +54,19 @@ class LEMON_PUBLIC rendering_context
      */
     static void draw_elements_instanced(GLenum mode, size_type count, GLenum type,
                                         const void* indices, size_type instanceCount);
+    // TEXTURES
+    struct texture_object
+    {
+        u32 texture_id;
+
+        ptr<texture_object> bind();
+        ptr<texture_object> set_parameter(int param, int value);
+        ptr<texture_object> create_image(int level, int internalFormat, ivec2 size, GLenum format, GLenum type, const void* data);
+        ptr<texture_object> set_unpack_alignment(int value);
+        ptr<texture_object> unbind();
+    };
+
+    static texture_object* generate_texture();
+    static void destroy_texture(texture_object** handle);
 };
 } // namespace lemon

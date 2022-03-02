@@ -14,6 +14,10 @@ scene_manager::scene_manager(ptr<scene> scene)
     scenes.emplace(scene);
     event_dispatcher.send(string_id("OnSceneBegin"), scene->get_id());
 }
+scene_manager::~scene_manager()
+{
+    LOG_MESSAGE("Scene manager destroyed");
+}
 ptr<scene> scene_manager::push_scene(string_id name)
 {
     LOG_MESSAGE("New scene %s", name.get_string());
