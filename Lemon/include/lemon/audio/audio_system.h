@@ -11,9 +11,11 @@ class LEMON_PUBLIC audio_system : public system
     audio_system(ptr<scene> s);
     ~audio_system();
     void update(entity_registry& registry) override;
+    static void begin_play(entity ent);
+    static void begin_play(entity ent, const asset<sound>& buffer);
 
   private:
     audio_player player;
-	entity listener;
+    entity listener;
 };
 } // namespace lemon

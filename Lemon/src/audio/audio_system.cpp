@@ -3,7 +3,8 @@
 #include <lemon/game/scene.h>
 
 namespace lemon {
-audio_system::audio_system(ptr<scene> s)
+audio_system::audio_system(ptr<scene> s):
+    player(), listener(s->get_main_camera())
 {
 }
 audio_system::~audio_system()
@@ -24,4 +25,19 @@ void audio_system::update(entity_registry& registry)
     }
     registry.clear<play>();
 }
+void audio_system::begin_play(entity ent)
+{
+    LEMON_ASSERT((ent.has_all_of<audio_source, transform>()));
+    auto&& aComponent = ent.get_component<audio_source>();
+    LEMON_ASSERT(aComponent.clip);
+    ent.add_component<play>();
+}
+void audio_system::begin_play(entity ent, const asset<sound>& buffer)
+{
+    LEMON_ASSERT((ent.has_all_of<audio_source, transform>()));
+    auto&& aComponent = ent.get_component<audio_source>();
+    aComponent.clip   = buffer;
+    ent.add_component<play>();
+}
+
 } // namespace lemon

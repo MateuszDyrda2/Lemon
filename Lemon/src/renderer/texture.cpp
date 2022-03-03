@@ -7,7 +7,7 @@
 
 namespace lemon {
 texture::texture(string_id name, const std::string& path):
-    object(name), handle(nullptr)
+    object(name), handle(0)
 {
     int w, h, noc;
     stbi_set_flip_vertically_on_load(true);
@@ -18,21 +18,23 @@ texture::texture(string_id name, const std::string& path):
         size.y       = h;
         nrOfChannels = noc;
 
-        handle = rendering_context::generate_texture()
-                     ->bind()
-                     ->set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER)
-                     ->set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER)
-                     ->set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                     ->set_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-                     ->set_unpack_alignment(1);
+        glGenTextures(1, &handle);
+        glBindTexture(GL_TEXTURE_2D, handle);
+        glTextureParameteri(handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
         if(noc == 3)
-            handle->create_image(0, GL_RGB, size, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
         else if(noc == 4)
         {
-            handle->create_image(0, GL_RGBA, size, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         }
-        handle->unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
         stbi_image_free(data);
     }
     else
@@ -41,7 +43,7 @@ texture::texture(string_id name, const std::string& path):
     }
 }
 texture::texture(string_id name, const std::vector<byte>& buffer):
-    object(name), handle(nullptr)
+    object(name), handle(0)
 {
     int w /* width */,
         h /* height */,
@@ -54,21 +56,23 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
         size.y       = h;
         nrOfChannels = noc;
 
-        handle = rendering_context::generate_texture()
-                     ->bind()
-                     ->set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER)
-                     ->set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER)
-                     ->set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                     ->set_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-                     ->set_unpack_alignment(1);
+        glGenTextures(1, &handle);
+        glBindTexture(GL_TEXTURE_2D, handle);
+        glTextureParameteri(handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
         if(noc == 3)
-            handle->create_image(0, GL_RGB, size, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
         else if(noc == 4)
         {
-            handle->create_image(0, GL_RGBA, size, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         }
-        handle->unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         stbi_image_free(data);
     }
@@ -79,20 +83,21 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
 }
 void texture::bind() const
 {
-    handle->bind();
+    glBindTexture(GL_TEXTURE_2D, handle);
 }
 void texture::unbind() const
 {
-    handle->unbind();
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 texture::~texture()
 {
-    rendering_context::destroy_texture(&handle);
+    if(handle)
+        glDeleteTextures(1, &handle);
 }
 texture::texture(texture&& other) noexcept:
     object(other), handle(other.handle)
 {
-    other.handle = nullptr;
+    other.handle = 0;
 }
 texture& texture::operator=(texture&& other) noexcept
 {

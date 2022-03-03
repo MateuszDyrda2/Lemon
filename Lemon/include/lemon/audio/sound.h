@@ -10,7 +10,7 @@
 
 namespace lemon {
 
-class sound : object
+class LEMON_PUBLIC sound : public object
 {
   public:
     struct info
@@ -32,7 +32,5 @@ class sound : object
   private:
     ALuint handle;
     info header;
-
-    static std::pair<ALuint, info> load_sound(const std::string& path);
 };
 } // namespace lemon

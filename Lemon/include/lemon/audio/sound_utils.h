@@ -89,13 +89,13 @@ static auto alcCallImpl(alFunction function, ALCdevice* device, Args&&... args)
     -> typename std::enable_if_t<std::is_same_v<void, decltype(function(args...))>, bool>
 {
     function(std::forward<Args>(args)...);
-    return check_al_errors();
+    return check_alc_errors(device);
 }
 template<class alFunction, class ReturnType, class... Args>
 static auto alcCallImpl(alFunction function, ReturnType& returnValue, ALCdevice* device, Args&&... args)
     -> typename std::enable_if_t<!std::is_same_v<void, decltype(function(args...))>, bool>
 {
     returnValue = function(std::forward<Args>(args)...);
-    return check_al_errors();
+    return check_alc_errors(device);
 }
 } // namespace lemon

@@ -153,4 +153,93 @@ void shader::use()
 {
     glUseProgram(ID);
 }
+void shader::set_uniform(const char* name, f32 v1)
+{
+    glUniform1f(glGetUniformLocation(ID, name), v1);
+}
+void shader::set_uniform(const char* name, f32 v1, f32 v2)
+{
+    glUniform2f(glGetUniformLocation(ID, name), v1, v2);
+}
+void shader::set_uniform(const char* name, f32 v1, f32 v2, f32 v3)
+{
+    glUniform3f(glGetUniformLocation(ID, name), v1, v2, v3);
+}
+void shader::set_uniform(const char* name, f32 v1, f32 v2, f32 v3, f32 v4)
+{
+    glUniform4f(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+}
+void shader::set_uniform(const char* name, i32 v1)
+{
+    glUniform1i(glGetUniformLocation(ID, name), v1);
+}
+void shader::set_uniform(const char* name, i32 v1, i32 v2)
+{
+    glUniform2i(glGetUniformLocation(ID, name), v1, v2);
+}
+void shader::set_uniform(const char* name, i32 v1, i32 v2, i32 v3)
+{
+    glUniform3i(glGetUniformLocation(ID, name), v1, v2, v3);
+}
+void shader::set_uniform(const char* name, i32 v1, i32 v2, i32 v3, i32 v4)
+{
+    glUniform4i(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+}
+void shader::set_uniform(const char* name, u32 v1)
+{
+    glUniform1ui(glGetUniformLocation(ID, name), v1);
+}
+void shader::set_uniform(const char* name, u32 v1, u32 v2)
+{
+    glUniform2ui(glGetUniformLocation(ID, name), v1, v2);
+}
+void shader::set_uniform(const char* name, u32 v1, u32 v2, u32 v3)
+{
+    glUniform3ui(glGetUniformLocation(ID, name), v1, v2, v3);
+}
+void shader::set_uniform(const char* name, u32 v1, u32 v2, u32 v3, u32 v4)
+{
+    glUniform4ui(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+}
+void shader::set_uniform(const char* name, const vec2& value)
+{
+    glUniform2fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const ivec2& value)
+{
+    glUniform2iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const uvec2& value)
+{
+    glUniform2uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const vec3& value)
+{
+    glUniform3fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const ivec3& value)
+{
+    glUniform3iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const uvec3& value)
+{
+    glUniform3uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const vec4& value)
+{
+    glUniform4fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const ivec4& value)
+{
+    glUniform4iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const uvec4& value)
+{
+    glUniform4uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+}
+void shader::set_uniform(const char* name, const mat4& value)
+{
+    glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, glm::value_ptr(value));
+}
+
 } // namespace lemon

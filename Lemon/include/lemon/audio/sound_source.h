@@ -2,8 +2,10 @@
 
 #include "sound_utils.h"
 
+#include <lemon/core/basic_types.h>
+
 namespace lemon {
-class sound_source
+class LEMON_PUBLIC sound_source
 {
   public:
     sound_source();

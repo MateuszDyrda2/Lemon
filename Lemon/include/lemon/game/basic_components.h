@@ -14,13 +14,18 @@
 #include <lemon/math/vec4.h>
 
 namespace lemon {
-struct tag
+/** Id of the entity the component is attached to */
+struct LEMON_PUBLIC tag
 {
     string_id id;
 };
-struct dirty
+/** Attached to the entity with transform component
+ * whose model needs to be recalculated */
+struct LEMON_PUBLIC dirty
 { };
-struct transform
+/** Transform component containing the position, rotation and
+ * scale of the entity in the game world and also relationships */
+struct LEMON_PUBLIC transform
 {
     vec3 position{ 0.f, 0.f, 0.f };
     vec3 scale{ 1.f, 1.f, 1.f };
@@ -42,12 +47,14 @@ struct transform
     transform(entity_handle parent):
         parent(parent) { }
 };
-struct camera
+/** Camera component */
+struct LEMON_PUBLIC camera
 {
     vec4 viewport{};
     mat4 projection{ 1.0f };
 };
-struct sprite_renderer
+/* Component for rendering 2D sprites */
+struct LEMON_PUBLIC sprite_renderer
 {
     vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
     vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
@@ -56,21 +63,26 @@ struct sprite_renderer
     sprite_renderer(const asset<texture>& tex):
         text(tex) { }
 };
-struct audio_source
+/* Sound source in the game world */
+struct LEMON_PUBLIC audio_source
 {
     sound_source source;
-    asset<sound> sound{};
+    asset<sound> clip{};
     f32 pitch{ 1.0f };
     f32 gain{ 1.0f };
     bool loop{ false };
 };
-struct audio_listener
+/* Sound listener in the game world (One must be available in the scene) */
+struct LEMON_PUBLIC audio_listener
 {
     f32 masterGain{ 1.0f };
 };
-struct play
+/* Play tag attached to the entity with audio_source
+ * that wants to play a sound in a specific frame */
+struct LEMON_PUBLIC play
 { };
-struct script_component
+/* Component for attaching scripts to entities */
+struct LEMON_PUBLIC script_component
 {
     owned<cpp_script> script{};
 

@@ -16,6 +16,7 @@
 #include <array>
 
 namespace lemon {
+/** 2D texture renderer working in batches */
 class LEMON_PUBLIC batch_renderer : public renderer2d
 {
     struct vertex
@@ -47,10 +48,14 @@ class LEMON_PUBLIC batch_renderer : public renderer2d
     using container_type = std::array<batch, maxBatches>;
 
   public:
+    /** @brief Creates the batch renderer */
     batch_renderer();
-    ~batch_renderer();
+    virtual ~batch_renderer();
+    /** @see renderer2d::start_render */
     void start_render(const glm::mat4& viewProj) override;
+    /** @see renderer2d::render_sprite */
     void render_sprite(sprite_renderer& sComponent, transform& tComponent) override;
+    /** @see renderer2d::end_render */
     void end_render() override;
 
   private:

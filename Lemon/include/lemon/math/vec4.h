@@ -14,4 +14,5 @@ using glm::u32vec4;
 using glm::u64vec4;
 using glm::u8vec4;
 using glm::vec4;
+using glm::uvec4;
 } // namespace lemon

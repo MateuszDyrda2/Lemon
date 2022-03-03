@@ -62,7 +62,7 @@ class LEMON_PUBLIC asset
      * @param other other asset object to be swapped
      */
     void swap(self_type& other) noexcept;
-    /** @brief Exchagnes the assets the two asset holders represent
+    /** @brief Exchanges the assets the two asset holders represent
      * @param lhs first asset to be swapped
      * @param rhs second asset to be swapped
      */
@@ -76,6 +76,7 @@ class LEMON_PUBLIC asset
      * @return true if the assets represent the same
      */
     bool operator==(const self_type& other) const noexcept;
+    explicit operator bool() const noexcept { return bool(res); }
     inline string_id get_id() const { return res; }
 
   private:

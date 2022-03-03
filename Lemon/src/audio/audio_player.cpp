@@ -14,7 +14,7 @@ void audio_player::start_playing(audio_listener& lComponent, transform& tCompone
 }
 void audio_player::play(audio_source& sComponent, transform& tComponent)
 {
-    auto sound  = sComponent.sound.get();
+    auto sound  = sComponent.clip.get();
     auto source = &sComponent.source;
 
     alCall(alSourcef, source->get_handle(), AL_PITCH, sComponent.pitch);

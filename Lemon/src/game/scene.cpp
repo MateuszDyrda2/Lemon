@@ -16,6 +16,7 @@ scene::scene(string_id name):
     mainCamera.add_component<transform>();
     mainCamera.add_component<dirty>();
     mainCamera.add_component<camera>();
+    mainCamera.add_component<audio_listener>();
 }
 scene::~scene()
 {

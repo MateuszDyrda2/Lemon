@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lemon/core/basic_types.h> // for size_type
+#include <lemon/math/vec2.h>
 #include <lemon/math/vec4.h>
 
 #include <glad/glad.h> // GLenum
@@ -54,19 +55,5 @@ class LEMON_PUBLIC rendering_context
      */
     static void draw_elements_instanced(GLenum mode, size_type count, GLenum type,
                                         const void* indices, size_type instanceCount);
-    // TEXTURES
-    struct texture_object
-    {
-        u32 texture_id;
-
-        ptr<texture_object> bind();
-        ptr<texture_object> set_parameter(int param, int value);
-        ptr<texture_object> create_image(int level, int internalFormat, ivec2 size, GLenum format, GLenum type, const void* data);
-        ptr<texture_object> set_unpack_alignment(int value);
-        ptr<texture_object> unbind();
-    };
-
-    static texture_object* generate_texture();
-    static void destroy_texture(texture_object** handle);
 };
 } // namespace lemon

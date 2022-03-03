@@ -19,12 +19,12 @@ class LEMON_PUBLIC texture : public object
     texture(texture&& other) noexcept;
     texture& operator=(texture&& other) noexcept;
 
-    const glm::ivec2& get_size() const { return size; }
+    const ivec2& get_size() const { return size; }
     void bind() const;
     void unbind() const;
 
   private:
-    ptr<rendering_context::texture_object> handle;
+    u32 handle;
     ivec2 size;
     size_type nrOfChannels;
 };

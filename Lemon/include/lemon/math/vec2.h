@@ -13,5 +13,6 @@ using glm::u16vec2;
 using glm::u32vec2;
 using glm::u64vec2;
 using glm::u8vec2;
+using glm::uvec2;
 using glm::vec2;
 } // namespace lemon

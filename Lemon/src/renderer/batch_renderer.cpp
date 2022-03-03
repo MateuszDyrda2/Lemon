@@ -9,43 +9,44 @@ batch_renderer::batch::batch():
 {
     vao->add_vertex_buffer(create_owned<vertex_buffer>(batch_renderer::maxVertices * sizeof(vertex)))
         ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(vertex), 0)
-        ->enable_vertex_attrib(1, 4, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2))
-        ->enable_vertex_attrib(2, 2, GL_FLOAT, false, sizeof(vertex), sizeof(glm::vec2) + sizeof(glm::vec4));
+        ->enable_vertex_attrib(1, 4, GL_FLOAT, false, sizeof(vertex), sizeof(vec2))
+        ->enable_vertex_attrib(2, 2, GL_FLOAT, false, sizeof(vertex), sizeof(vec2) + sizeof(vec4));
     vao->unbind();
 }
-void batch_renderer::batch::add_quad(const glm::mat4& trans, glm::vec4 color, glm::vec4 texCoords)
+void batch_renderer::batch::add_quad(
+    const mat4& trans, vec4 color, vec4 texCoords)
 {
-    glm::vec2 pos[4] = { { -0.5f, -0.5f },
-                         { 0.5f, -0.5f },
-                         { 0.5f, 0.5f },
-                         { -0.5f, 0.5f } };
-    auto texSize     = _texture->get_size();
-    auto texTrans    = glm::scale(trans, glm::vec3(texSize.x, texSize.y, 1.0f));
-    pos[0]           = texTrans * glm::vec4(pos[0].x, pos[0].y, 0.f, 0.f);
-    pos[1]           = texTrans * glm::vec4(pos[1].x, pos[1].y, 0.f, 0.f);
-    pos[2]           = texTrans * glm::vec4(pos[2].x, pos[2].y, 0.f, 0.f);
-    pos[3]           = texTrans * glm::vec4(pos[3].x, pos[3].y, 0.f, 0.f);
+    vec2 pos[4]   = { { -0.5f, -0.5f },
+                    { 0.5f, -0.5f },
+                    { 0.5f, 0.5f },
+                    { -0.5f, 0.5f } };
+    auto texSize  = _texture->get_size();
+    auto texTrans = scale(trans, vec3(texSize.x, texSize.y, 1.0f));
+    pos[0]        = texTrans * vec4(pos[0].x, pos[0].y, 0.f, 0.f);
+    pos[1]        = texTrans * vec4(pos[1].x, pos[1].y, 0.f, 0.f);
+    pos[2]        = texTrans * vec4(pos[2].x, pos[2].y, 0.f, 0.f);
+    pos[3]        = texTrans * vec4(pos[3].x, pos[3].y, 0.f, 0.f);
 
     vertex vertices[6] = { { pos[0],
                              color,
-                             glm::vec2{ texCoords.x, texCoords.y } },
+                             vec2{ texCoords.x, texCoords.y } },
                            { pos[1],
                              color,
-                             glm::vec2{ texCoords.x + texCoords.z, texCoords.y } },
+                             vec2{ texCoords.x + texCoords.z, texCoords.y } },
                            { pos[2],
                              color,
-                             glm::vec2{ texCoords.x + texCoords.z,
-                                        texCoords.y + texCoords.w } },
+                             vec2{ texCoords.x + texCoords.z,
+                                   texCoords.y + texCoords.w } },
                            { pos[2],
                              color,
-                             glm::vec2{ texCoords.x + texCoords.z,
-                                        texCoords.y + texCoords.w } },
+                             vec2{ texCoords.x + texCoords.z,
+                                   texCoords.y + texCoords.w } },
                            { pos[3],
                              color,
-                             glm::vec2{ texCoords.x, texCoords.y + texCoords.w } },
+                             vec2{ texCoords.x, texCoords.y + texCoords.w } },
                            { pos[0],
                              color,
-                             glm::vec2{ texCoords.x, texCoords.y } } };
+                             vec2{ texCoords.x, texCoords.y } } };
 
     vao->bind();
     vao->get_vbo()->add_subdata(usedVertices * sizeof(vertex),
@@ -69,7 +70,7 @@ bool batch_renderer::batch::is_full() const
 {
     return batch_renderer::maxVertices - usedVertices < 6;
 }
-void batch_renderer::batch::flush(const glm::mat4& viewProj, ptr<shader> textureShader)
+void batch_renderer::batch::flush(const mat4& viewProj, ptr<shader> textureShader)
 {
     if(usedVertices == 0) return;
     textureShader->use();
