@@ -1,9 +1,14 @@
-#include <lemon/entry_point.h>
+#include <lemon/engine/entry_point.h>
 
-#include <lemon/renderer/rendering_context.h>
+#include <lemon/core/game.h>
+#include <lemon/rendering/rendering_context.h>
 #include <lemon/window/window.h>
 
-#include <lemon/game.h>
+#include <lemon/engine/systems/audio_system.h>
+#include <lemon/engine/systems/rendering_system.h>
+#include <lemon/engine/systems/scripting_system.h>
+#include <lemon/engine/systems/transform_system.h>
+
 #include <lemon/serialization/scene_serializer.h>
 
 #include <thread>
@@ -29,6 +34,11 @@ Sandbox::Sandbox(int argc, char** argv):
     rendering_context::create();
     _resources    = create_owned<asset_storage>();
     _sceneManager = create_owned<scene_manager>();
+
+    game::provide_clock(_clock.get());
+    game::provide_input(_input.get());
+    game::provide_window(_window.get());
+    game::provide_scene_manager(_sceneManager.get());
     this->initialize();
 }
 Sandbox::~Sandbox()
@@ -42,7 +52,7 @@ void Sandbox::initialize()
                      ->add_system<transform_system>()
                      ->add_system<rendering_system>();
 
-    LOG_MESSAGE("Initialized %s", scene->get_name());
+    LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
     /*
         auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
                          ->add_system<scripting_system>()
