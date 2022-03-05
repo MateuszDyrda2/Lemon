@@ -8,6 +8,21 @@ sound_source::sound_source()
 }
 sound_source::~sound_source()
 {
-    alCall(alDeleteSources, 1, &handle);
+    if(handle)
+        alCall(alDeleteSources, 1, &handle);
+}
+sound_source::sound_source(sound_source&& other) noexcept:
+    handle(other.handle)
+{
+    other.handle = 0;
+}
+sound_source& sound_source::operator=(sound_source&& other) noexcept
+{
+    if(this != &other)
+    {
+        handle       = other.handle;
+        other.handle = 0;
+    }
+    return *this;
 }
 } // namespace lemon

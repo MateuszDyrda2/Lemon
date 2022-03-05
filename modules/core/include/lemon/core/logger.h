@@ -33,7 +33,13 @@ class LEMON_PUBLIC logger
     static void error(char const* file, int line, char const* msg, ...);
     static void fatal(char const* file, int line, char const* msg, ...);
 
+    static void pprint(std::string message);
+    static void pwarn(std::string message);
+    static void perror(std::string message);
+    static void pfatal(std::string message);
+
   private:
+    static void poutput(std::string message, const char* color, const char* type);
     static void output(char const* color, char const* type,
                        char const* file, int line, char const* msg);
 };

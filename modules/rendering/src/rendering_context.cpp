@@ -25,9 +25,9 @@ void rendering_context::set_viewport(const glm::ivec4& vp)
 {
     glViewport(vp.x, vp.y, vp.z, vp.w);
 }
-void rendering_context::clear_screen(const glm::vec4& color)
+void rendering_context::clear_screen(const color& c)
 {
-    glClearColor(color.x, color.y, color.z, color.w);
+    glClearColor(c.r, c.g, c.b, c.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void rendering_context::draw_arrays(GLenum mode, size_type first, size_type count)

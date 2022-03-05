@@ -8,6 +8,7 @@ scene::scene(string_id name, entity_registry&& registry):
 {
     auto view  = this->registry.view<camera>();
     mainCamera = entity(&this->registry, view.front());
+    mainCamera.add_component<audio_listener>();
 }
 scene::scene(string_id name):
     name(name), registry(), mainCamera(&registry, registry.create())

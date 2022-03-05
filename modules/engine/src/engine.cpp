@@ -7,6 +7,7 @@
 namespace lemon {
 engine::engine(const std::string& workingDirectory, int, char**)
 {
+    init_py();
     game::start_game(workingDirectory);
     LOG_MESSAGE("Engine created");
 }

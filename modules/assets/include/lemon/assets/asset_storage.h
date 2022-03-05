@@ -40,6 +40,8 @@ class LEMON_PUBLIC asset_storage
      */
     template<class T>
     void register_asset(string_id name);
+    template<class T>
+    void register_asset(string_id name, T&& asset);
     /** @brief Releases a reference to the asset. Decreases the
      * reference count of the resource and if it hits 0,
      * removes the resource from the cached assets.
@@ -110,6 +112,18 @@ void asset_storage::register_asset(string_id name)
         {
             cachedAssets.insert(std::make_pair(name, loader->load_resource<T>(name)));
         }
+    }
+}
+template<class T>
+void asset_storage::register_asset(string_id name, T&& asset)
+{
+    if(auto res = cachedAssets.find(name); res != cachedAssets.end())
+    {
+        res->second->increment();
+    }
+    else
+    {
+        cachedAssets.insert(std::make_pair(name, std::move(asset)));
     }
 }
 } // namespace lemon

@@ -2,7 +2,7 @@
 
 namespace lemon {
 resource::resource(string_id name):
-    _count{ 0 }, name(name)
+    _count{ 1 }, name(name)
 { }
 resource::resource(self_type&& other) noexcept:
     _count(other._count.load()), name(other.name)

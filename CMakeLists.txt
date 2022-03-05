@@ -42,7 +42,7 @@ add_compile_definitions(
 	"${LEMON_PLATFORM}"
 )
 add_compile_options(
-	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wformat=2;-Wunused>"
+	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wformat=2;-Wunused;-fvisibility=hidden>"
 	"$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:DEBUG>>:-W3;-Zc:preprocessor>"
 )
 
@@ -55,6 +55,7 @@ add_subdirectory(modules/rendering)
 add_subdirectory(modules/audio)
 add_subdirectory(modules/physics)
 add_subdirectory(modules/assets)
+add_subdirectory(modules/scripting)
 add_subdirectory(modules/engine)
 add_subdirectory(modules/serialization)
 

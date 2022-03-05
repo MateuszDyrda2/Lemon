@@ -31,7 +31,7 @@ void rendering_system::update(entity_registry& registry)
         mainCamera.get_component<camera, transform>();
 
     rendering_context::set_viewport(cameraComponent.viewport);
-    rendering_context::clear_screen({ 0.5f, 0.5f, 0.5f, 1.0f });
+    rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
     glm::mat4 viewProj = cameraComponent.projection * cameraTransform.model;
 
     auto group = registry.group<sprite_renderer>(entt::get<transform>);

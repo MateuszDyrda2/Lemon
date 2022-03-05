@@ -1,6 +1,8 @@
 #include <lemon/audio/sound_context.h>
 
 namespace lemon {
+ptr<ALCdevice> sound_context::openALDevice   = nullptr;
+ptr<ALCcontext> sound_context::openALContext = nullptr;
 void sound_context::create()
 {
     // TODO: enumerate available devices
@@ -20,6 +22,7 @@ void sound_context::create()
     {
         LOG_ERROR("Could not make audio context current");
     }
+    LOG_MESSAGE("Sound context created");
 }
 void sound_context::drop()
 {
@@ -27,6 +30,7 @@ void sound_context::drop()
     alcDestroyContext(openALContext);
 
     alcCloseDevice(openALDevice);
+    LOG_MESSAGE("Sound context destroyed");
 }
 
 } // namespace lemon

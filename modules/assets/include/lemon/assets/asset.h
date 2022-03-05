@@ -31,6 +31,7 @@ class LEMON_PUBLIC asset
      * @param name id of the asset to be loaded
      */
     asset(string_id name);
+    asset(string_id name, T&& asset);
     /** @brief Copy constructs the asset, incremeting the reference count
      * of the represented asset
      * @param other asset to be copied
@@ -92,6 +93,12 @@ asset<T>::asset(string_id name):
     storage(*asset_storage::storage), res(name)
 {
     storage.register_asset<T>(name);
+}
+template<class T>
+asset<T>::asset(string_id name, T&& asset):
+    storage(*asset_storage::storage), res(name)
+{
+    storage.register_asset<T>(name, std::move(asset));
 }
 template<class T>
 asset<T>::asset(const self_type& other):

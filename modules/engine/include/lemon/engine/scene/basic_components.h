@@ -71,6 +71,9 @@ struct LEMON_PUBLIC audio_source
     f32 pitch{ 1.0f };
     f32 gain{ 1.0f };
     bool loop{ false };
+    audio_source() = default;
+    audio_source(const asset<sound>& s):
+        clip(s) { }
 };
 /* Sound listener in the game world (One must be available in the scene) */
 struct LEMON_PUBLIC audio_listener

@@ -4,6 +4,7 @@
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec4.h>
+#include <lemon/core/math/color.h>
 
 #include <glad/glad.h> // GLenum
 
@@ -25,7 +26,7 @@ class LEMON_PUBLIC rendering_context
     /** @brief Clear screen with a color
      * @param color (r, g, b, a)
      */
-    static void clear_screen(const vec4& color);
+    static void clear_screen(const color& c);
     /** @brief Render primitives from arrays data
      * @param mode kind of primitives to render
      * @param first starting index in the enabled arrays

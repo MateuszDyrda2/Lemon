@@ -9,6 +9,7 @@ set(lemon_engine_SRC
 	src/systems/rendering_system.cpp
 	src/systems/scripting_system.cpp
 	src/systems/transform_system.cpp
+	src/py_bindings/py_core.cpp
 )
 
 add_library(lemon_engine ${lemon_engine_SRC})
@@ -25,5 +26,6 @@ target_link_libraries(lemon_engine
 	lemon::audio
 	#lemon::physics
 	lemon::assets
+	lemon::scripting
 	EnTT::EnTT
 )

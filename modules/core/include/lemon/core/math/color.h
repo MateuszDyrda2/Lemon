@@ -3,15 +3,16 @@
 #include "vec3.h"
 #include "vec4.h"
 
-#include <lemon/core/assert.h>
-#include <lemon/core/basic_types.h>
+#include "../assert.h"
+#include "../basic_types.h"
+#include "../defines.h"
 
 #include <cstddef>
 #include <string>
 #include <utility>
 
 namespace lemon {
-struct color
+struct LEMON_PUBLIC color
 {
     union
     {
@@ -49,7 +50,7 @@ struct color
         b(normalize(blue)), a(normalize(alpha)) { }
     color(const char* hex)
     {
-        int ir, ig, ib, is;
+        int ir, ig, ib, ia;
         LEMON_ASSERT(hex[0] == '#');
         std::sscanf(hex, "%*c%02x%02x%02x%02x", &ir, &ig, &ib, &ia);
         rgba = vec4{ normalize(ir), normalize(ig), normalize(ib), normalize(ia) };
@@ -70,7 +71,10 @@ struct color
     std::string to_string() const
     {
         char buffer[10];
-        std::sprintf(buffer, "#%02x%02x%02x%02x", &r, &g, &b, &a);
+        u8 ur = r * 255, ug = g * 255,
+           ub = b * 255, ua = a * 255;
+
+        std::sprintf(buffer, "#%02x%02x%02x%02x", ur, ug, ub, ua);
         return std::string(buffer);
     }
     constexpr std::tuple<u8, u8, u8, u8> to_u8() const

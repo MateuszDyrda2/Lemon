@@ -15,7 +15,6 @@ target_link_libraries(lemon_audio
 	PUBLIC
 	lemon::core
 	lemon::assets
-	PRIVATE
 	${OPENAL_LIBRARY}
-	AudioFile
+	wave
 )

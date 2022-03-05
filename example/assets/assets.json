@@ -14,5 +14,9 @@
     {
         "name": "sprite_renderer_shader",
         "path": "/home/matzix/shared/Lemon/example/assets/shaders/sprite_renderer_shader.glsl"
+    },
+    {
+        "name": "open-the-door",
+        "path": "/home/matzix/shared/Lemon/example/assets/sounds/open-the-door.wav"
     }
 ]

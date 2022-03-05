@@ -8,6 +8,8 @@
 #include <lemon/window/input.h>
 #include <lemon/window/window_base.h>
 
+#include "py_bindings/py_core.h"
+
 #include <memory>
 
 namespace lemon {
