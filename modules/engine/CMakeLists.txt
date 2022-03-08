@@ -2,9 +2,6 @@ project(LemonEngine)
 
 set(lemon_engine_SRC 
 	src/engine.cpp
-	src/scene/entity.cpp
-	src/scene/scene.cpp
-	src/scene/scene_manager.cpp
 	src/systems/audio_system.cpp
 	src/systems/rendering_system.cpp
 	src/systems/scripting_system.cpp
@@ -26,6 +23,6 @@ target_link_libraries(lemon_engine
 	lemon::audio
 	#lemon::physics
 	lemon::assets
+	lemon::scene
 	lemon::scripting
-	EnTT::EnTT
 )

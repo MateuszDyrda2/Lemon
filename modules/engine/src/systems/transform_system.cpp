@@ -2,7 +2,7 @@
 
 #include <glm/gtx/transform.hpp>
 #include <lemon/core/math/math.h>
-#include <lemon/engine/scene/scene.h>
+#include <lemon/scene/scene.h>
 
 namespace lemon {
 static void dirty_on_update(entity_registry& registry, entity_handle ent)
@@ -16,9 +16,9 @@ static void dirty_on_update(entity_registry& registry, entity_handle ent)
 }
 transform_system::transform_system(ptr<scene> s)
 {
-    s->get_registry()
-        .on_update<transform>()
-        .connect<dirty_on_update>();
+    /* s->get_registry()
+         .on_update<transform>()
+         .connect<dirty_on_update>(); */
 }
 transform_system::~transform_system()
 {

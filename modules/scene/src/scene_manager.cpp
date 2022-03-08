@@ -1,4 +1,4 @@
-#include <lemon/engine/scene/scene_manager.h>
+#include <lemon/scene/scene_manager.h>
 
 #include <lemon/core/game.h>
 
@@ -11,7 +11,6 @@ scene_manager::scene_manager(ptr<scene> scene)
 {
     LOG_MESSAGE("New scene %s", scene->get_id().get_string());
     scenes.emplace(scene);
-    event_dispatcher.send(string_id("OnSceneBegin"), scene->get_id());
 }
 scene_manager::~scene_manager()
 {
@@ -21,10 +20,6 @@ ptr<scene> scene_manager::push_scene(string_id name)
 {
     LOG_MESSAGE("New scene %s", name.get_string());
     auto ptr = scenes.emplace(create_owned<scene>(name)).get();
-    if(scenes.size() == 1)
-    {
-        event_dispatcher.send(string_id("OnSceneBegin"), get_current_scene()->get_id());
-    }
 
     return ptr;
 }
@@ -35,9 +30,7 @@ void scene_manager::update()
 }
 void scene_manager::pop_scene()
 {
-    event_dispatcher.send(string_id("onSceneEnd"), get_current_scene()->get_id());
     scenes.pop();
-    event_dispatcher.send(string_id("OnSceneBegin"), get_current_scene()->get_id());
 }
 ptr<scene> scene_manager::get_current_scene()
 {
@@ -48,11 +41,9 @@ ptr<scene> scene_manager::change_scene(string_id name)
     LOG_MESSAGE("New scene %s", name.get_string());
     if(scenes.size())
     {
-        event_dispatcher.send(string_id("onSceneEnd"), get_current_scene()->get_id());
         scenes.pop();
     }
     auto current = scenes.emplace(create_owned<scene>(name)).get();
-    event_dispatcher.send(string_id("onSceneBegin"), current->get_id());
     return current;
 }
 ptr<scene> scene_manager::change_scene(ptr<scene> scene)
@@ -60,11 +51,9 @@ ptr<scene> scene_manager::change_scene(ptr<scene> scene)
     LOG_MESSAGE("New scene %s", scene->get_id().get_string());
     if(scenes.size())
     {
-        event_dispatcher.send(string_id("onSceneEnd"), get_current_scene()->get_id());
         scenes.pop();
     }
     auto current = scenes.emplace(scene).get();
-    event_dispatcher.send(string_id("onSceneBegin"), current->get_id());
     return current;
 }
 } // namespace lemon

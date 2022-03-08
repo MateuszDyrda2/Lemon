@@ -2,7 +2,7 @@
 
 #include "basic_types_serializer.h"
 
-#include <lemon/engine/scene/basic_components.h>
+#include <lemon/scene/basic_components.h>
 
 #define STRINGIZE(arg)  STRINGIZE1(arg)
 #define STRINGIZE1(arg) STRINGIZE2(arg)

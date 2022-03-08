@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../scene/basic_components.h"
-#include "system.h"
+#include <lemon/scene/basic_components.h>
+#include <lemon/scene/system.h>
 
 #include <lemon/assets/asset.h>
 #include <lemon/audio/audio_player.h>

@@ -39,6 +39,8 @@ class LEMON_PUBLIC string_id
     }
     string_id(const string_id&) = default;
     string_id& operator=(const string_id&) = default;
+    string_id(string_id&&) noexcept        = default;
+    string_id& operator=(string_id&&) noexcept = default;
 
     const char* get_string() const;
     const std::string& get_cpp_string() const;

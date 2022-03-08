@@ -3,9 +3,8 @@
 #include <lemon/rendering/renderer2d.h>
 
 #include <lemon/core/string_id.h>
-#include <lemon/events/listener.h>
 
-#include "system.h"
+#include <lemon/scene/system.h>
 
 namespace lemon {
 class scene;
@@ -19,6 +18,5 @@ class LEMON_PUBLIC rendering_system : public system
   private:
     owned<renderer2d> spriteRenderer;
     entity mainCamera;
-    listener<int, int> vpResize;
 };
 } // namespace lemon

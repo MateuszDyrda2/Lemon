@@ -9,7 +9,10 @@ sound_source::sound_source()
 sound_source::~sound_source()
 {
     if(handle)
+    {
+        alCall(alSourceStopv, 1, &handle);
         alCall(alDeleteSources, 1, &handle);
+    }
 }
 sound_source::sound_source(sound_source&& other) noexcept:
     handle(other.handle)

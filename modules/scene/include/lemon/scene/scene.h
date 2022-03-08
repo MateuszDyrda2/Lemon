@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../systems/system.h"
 #include "entity.h"
+#include "system.h"
 
 #include <lemon/core/math/vec3.h>
 

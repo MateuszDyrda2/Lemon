@@ -3,6 +3,8 @@
 #include <lemon/core/game.h>
 #include <lemon/window/key_codes.h>
 
+#include <lemon/window/window_events.h>
+
 namespace lemon {
 window::window(size_type width, size_type height):
     window_base(width, height), _name(game::get_settings().gameName)
@@ -22,14 +24,15 @@ window::window(size_type width, size_type height):
     glfwMakeContextCurrent(_handle);
     glfwSwapInterval(1);
 
-    glfwSetWindowUserPointer(_handle, (void*)&eventDispatcher);
+    // glfwSetWindowUserPointer(_handle, (void*)&eventDispatcher);
     setup_callbacks();
-    windowResize = listener<int, int>(
+    event_handler::subscribe(
         string_id("WindowSize"),
-        [this](int width, int height) {
-            LOG_MESSAGE("Window resize: %dx%d", width, height);
-            _width  = width;
-            _height = height;
+        [this](event_base* e) {
+            WindowSize* s = (WindowSize*)e;
+            _width        = s->width;
+            _height       = s->height;
+            LOG_MESSAGE("Window resize: %dx%d", _width, _height);
         });
 
     glfwSetErrorCallback([](int /* error */, const char* description) {
@@ -52,53 +55,57 @@ bool window::end_frame()
 void window::setup_callbacks()
 {
     glfwSetKeyCallback(_handle, [](GLFWwindow* w, int k, int scancode, int action, int mods) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("KeyPressed"), key::keycode(k), scancode, key::action(action), key::keymod(mods));
+        event_handler::
+            fire_event(string_id("KeyPressed"),
+                       new KeyPressed(
+                           key::keycode(k), scancode,
+                           key::action(action), key::keymod(mods)));
     });
     glfwSetMouseButtonCallback(_handle, [](GLFWwindow* w, int button, int action, int mods) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("MouseButtonPressed"), key::mouse(button),
-                   key::action(action), key::keymod(mods));
+        event_handler ::fire_event(string_id("MouseButtonPressed"),
+                                   new MouseButtonPressed(
+                                       key::mouse(button),
+                                       key::action(action), key::keymod(mods)));
     });
     glfwSetScrollCallback(_handle, [](GLFWwindow* w, double xoffset, double yoffset) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("MouseScroll"), xoffset, yoffset);
+        event_handler ::fire_event(string_id("MouseScroll"),
+                                   new MouseScroll(xoffset, yoffset));
     });
     glfwSetWindowCloseCallback(_handle, [](GLFWwindow* w) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowClose"));
+        event_handler ::fire_event(string_id("WindowClose"),
+                                   new WindowClose);
     });
     glfwSetWindowSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowSize"), width, height);
+        event_handler ::fire_event(string_id("WindowSize"),
+                                   new WindowSize(width, height));
     });
     glfwSetFramebufferSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("FramebufferSize"), width, height);
+        event_handler ::fire_event(string_id("FramebufferSize"),
+                                   new FramebufferSize(width, height));
     });
     glfwSetWindowContentScaleCallback(_handle, [](GLFWwindow* w, float xscale, float yscale) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowContentScale"), xscale, yscale);
+        event_handler ::fire_event(string_id("WindowContentScale"),
+                                   new WindowContentScale(xscale, yscale));
     });
     glfwSetWindowPosCallback(_handle, [](GLFWwindow* w, int xpos, int ypos) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowPos"), xpos, ypos);
+        event_handler ::fire_event(string_id("WindowPos"),
+                                   new WindowPos(xpos, ypos));
     });
     glfwSetWindowIconifyCallback(_handle, [](GLFWwindow* w, int iconified) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowIconify"), iconified);
+        event_handler ::fire_event(string_id("WindowIconify"),
+                                   new WindowIconify(iconified));
     });
     glfwSetWindowMaximizeCallback(_handle, [](GLFWwindow* w, int maximized) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowMaximize"), maximized);
+        event_handler ::fire_event(string_id("WindowMaximize"),
+                                   new WindowMaximize(maximized));
     });
     glfwSetWindowFocusCallback(_handle, [](GLFWwindow* w, int focused) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowFocused"), focused);
+        event_handler ::fire_event(string_id("WindowFocused"),
+                                   new WindowFocused(focused));
     });
     glfwSetWindowRefreshCallback(_handle, [](GLFWwindow* w) {
-        ((dispatcher*)glfwGetWindowUserPointer(w))
-            ->send(string_id("WindowRefresh"));
+        event_handler ::fire_event(string_id("WindowRefresh"),
+                                   new WindowRefresh);
     });
 }
 }

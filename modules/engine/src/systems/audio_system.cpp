@@ -1,6 +1,6 @@
 #include <lemon/engine/systems/audio_system.h>
 
-#include <lemon/engine/scene/scene.h>
+#include <lemon/scene/scene.h>
 
 namespace lemon {
 audio_system::audio_system(ptr<scene> s):

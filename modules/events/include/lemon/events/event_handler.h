@@ -1,79 +1,30 @@
 #pragma once
 
-#include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/string_id.h>
 
-#include <algorithm>
 #include <functional>
 #include <list>
 #include <unordered_map>
 
 namespace lemon {
-/** event handler for managing events */
+struct LEMON_PUBLIC event_base
+{
+    event_base()          = default;
+    virtual ~event_base() = default;
+};
 class LEMON_PUBLIC event_handler
 {
   public:
-    template<class... Args>
-    using listener_type = std::function<void(Args...)>;
-
-  private:
-    class event_base
-    {
-      public:
-        virtual ~event_base() = default;
-    };
-    template<class... Args>
-    class event : public event_base
-    {
-      public:
-        using container_type = std::list<listener_type<Args...>>;
-
-      public:
-        void dispatch(Args&&... args)
-        {
-            std::for_each(listeners.begin(), listeners.end(),
-                          [&args...](const listener_type<Args...>& l) {
-                              l(std::forward<Args>(args)...);
-                          });
-        }
-        auto subscribe(const listener_type<Args...>& listener)
-        {
-            return std::make_pair(&listeners, listeners.insert(listeners.end(), listener));
-        }
-
-      private:
-        container_type listeners;
-    };
-
-  public:
-    /** @brief Creates an event handler */
     event_handler();
-    ~event_handler();
-    /** @brief Registers an event for dispatching
-     * @param name id of the event
-     * @return reference to the registered event
-     */
-    template<class... Args>
-    event<Args...>& add_event(string_id name);
 
-  public:
-    using map_type = std::unordered_map<string_id, owned<event_base>>;
+    static void fire_event(string_id name, event_base* event);
+    static void fire_event(const std::string& name, event_base* event);
+    static void subscribe(string_id name, const std::function<void(event_base*)>& fun);
+    static void subscribe(const std::string& name, const std::function<void(event_base*)>& fun);
 
   private:
-    map_type events;
-    static ptr<event_handler> handler;
-
-    template<class... Args>
-    friend class listener;
-    friend class dispatcher;
+    std::unordered_map<string_id, std::list<std::function<void(event_base*)>>> reg;
+    static event_handler* handler;
 };
-template<class... Args>
-event_handler::event<Args...>&
-event_handler::add_event(string_id name)
-{
-    auto res = events.insert(std::make_pair(name, create_owned<event<Args...>>()));
-    return static_cast<event<Args...>&>(*((*res.first).second.get()));
-}
-
 } // namespace lemon

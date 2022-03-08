@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../scene/entity.h"
+#include <lemon/scene/entity.h>
 
 namespace lemon {
 /** Base system interface */

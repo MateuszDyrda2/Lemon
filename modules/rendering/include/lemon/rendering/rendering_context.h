@@ -2,9 +2,9 @@
 
 #include <lemon/core/basic_types.h> // for size_type
 #include <lemon/core/defines.h>
+#include <lemon/core/math/color.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec4.h>
-#include <lemon/core/math/color.h>
 
 #include <glad/glad.h> // GLenum
 
@@ -13,10 +13,8 @@ namespace lemon {
 class LEMON_PUBLIC rendering_context
 {
   public:
-    /** @brief Initializes the rendering context */
-    static void create();
-    /** @brief Destroys the rendering context */
-    static void drop();
+    rendering_context();
+    ~rendering_context();
     /** @brief Enable blending and set the blend function */
     static void enable_blending();
     /** @brief Set new viewport
@@ -57,5 +55,11 @@ class LEMON_PUBLIC rendering_context
      */
     static void draw_elements_instanced(GLenum mode, size_type count, GLenum type,
                                         const void* indices, size_type instanceCount);
+
+  private:
+    /** @brief Initializes the rendering context */
+    static void create();
+    /** @brief Destroys the rendering context */
+    static void drop();
 };
 } // namespace lemon

@@ -23,8 +23,8 @@ void logger::error(char const* file, int line, char const* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    char buffer[255];
-    vsnprintf(buffer, 255, msg, args);
+    char buffer[512];
+    vsnprintf(buffer, 512, msg, args);
     output("\033[31m", "[ERROR]: ", file, line, buffer);
     va_end(args);
 }

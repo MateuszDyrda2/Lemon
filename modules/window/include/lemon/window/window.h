@@ -2,13 +2,12 @@
 
 #include "window_base.h"
 
-#include <lemon/events/dispatcher.h>
-#include <lemon/events/listener.h>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <string>
+
+#include <lemon/events/event_handler.h>
 
 namespace lemon {
 class LEMON_PUBLIC window : public window_base
@@ -23,8 +22,6 @@ class LEMON_PUBLIC window : public window_base
   private:
     GLFWwindow* _handle;
     std::string _name;
-    listener<int, int> windowResize;
-    dispatcher eventDispatcher;
 
     void setup_callbacks();
 };

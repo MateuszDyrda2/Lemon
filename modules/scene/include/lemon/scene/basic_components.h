@@ -85,6 +85,7 @@ struct LEMON_PUBLIC audio_listener
 struct LEMON_PUBLIC play
 { };
 /* Component for attaching scripts to entities */
+/*
 struct LEMON_PUBLIC script_component
 {
     owned<cpp_script> script{};
@@ -96,5 +97,5 @@ struct LEMON_PUBLIC script_component
     inline void on_update(float dt) { script->on_update(dt); }
     inline void on_late_update(float dt) { script->on_late_update(dt); }
     inline void on_destroy(entity_registry&, entity_handle) { script->on_destroy(); }
-};
+}; */
 } // namespace lemon

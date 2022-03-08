@@ -3,6 +3,14 @@
 namespace lemon {
 ptr<ALCdevice> sound_context::openALDevice   = nullptr;
 ptr<ALCcontext> sound_context::openALContext = nullptr;
+sound_context::sound_context()
+{
+    create();
+}
+sound_context::~sound_context()
+{
+    drop();
+}
 void sound_context::create()
 {
     // TODO: enumerate available devices

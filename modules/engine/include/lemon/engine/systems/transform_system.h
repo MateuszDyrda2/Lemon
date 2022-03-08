@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../scene/basic_components.h"
-#include "system.h"
-
 #include <concepts>
 #include <entt/entt.hpp>
+#include <lemon/scene/basic_components.h>
+#include <lemon/scene/scene.h>
+#include <lemon/scene/system.h>
 #include <type_traits>
 
 namespace lemon {

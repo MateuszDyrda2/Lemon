@@ -13,6 +13,7 @@ target_link_libraries(lemon_scripting
 	PUBLIC
 	lemon::core
 	lemon::assets
+	lemon::scene
 	pybind11::embed
 	pybind11::module
 	pybind11::pybind11

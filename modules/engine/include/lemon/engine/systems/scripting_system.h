@@ -1,6 +1,6 @@
 #pragma once
 
-#include "system.h"
+#include <lemon/scene/system.h>
 
 #include <lemon/core/time/clock.h>
 #include <lemon/scripting/py_engine.h>
@@ -16,6 +16,5 @@ class LEMON_PUBLIC scripting_system : public system
 
   private:
     ptr<clock> clk;
-    py_engine python_engine;
 };
 } // namespace lemon

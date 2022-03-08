@@ -2,7 +2,7 @@
 
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
-#include <lemon/engine/scene/scene.h>
+#include <lemon/scene/scene.h>
 
 #include <string>
 

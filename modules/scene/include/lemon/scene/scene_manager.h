@@ -2,8 +2,6 @@
 
 #include "scene.h"
 
-#include <lemon/events/dispatcher.h>
-
 #include <queue>
 
 namespace lemon {
@@ -24,6 +22,5 @@ class LEMON_PUBLIC scene_manager
 
   private:
     std::queue<owned<scene>> scenes;
-    dispatcher event_dispatcher;
 };
 } // namespace lemon

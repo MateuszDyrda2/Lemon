@@ -56,6 +56,7 @@ add_subdirectory(modules/audio)
 add_subdirectory(modules/physics)
 add_subdirectory(modules/assets)
 add_subdirectory(modules/scripting)
+add_subdirectory(modules/scene)
 add_subdirectory(modules/engine)
 add_subdirectory(modules/serialization)
 

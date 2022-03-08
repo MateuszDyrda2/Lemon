@@ -1,10 +1,8 @@
 #include <lemon/engine/entry_point.h>
 
 #include <lemon/core/game.h>
-#include <lemon/rendering/rendering_context.h>
 #include <lemon/window/window.h>
 
-#include <lemon/audio/sound_context.h>
 #include <lemon/engine/systems/audio_system.h>
 #include <lemon/engine/systems/rendering_system.h>
 #include <lemon/engine/systems/scripting_system.h>
@@ -14,8 +12,9 @@
 
 #include <thread>
 
-#include <lemon/events/listener.h>
+#include <lemon/scripting/py_script.h>
 #include <lemon/window/key_codes.h>
+#include <lemon/window/window_events.h>
 
 using namespace lemon;
 
@@ -25,23 +24,21 @@ class Sandbox : public engine
     Sandbox(int argc, char** argv);
     ~Sandbox();
     void initialize();
-
-    listener<key::keycode, int, key::action, key::keymod> ln;
 };
 
 Sandbox::Sandbox(int argc, char** argv):
     engine(std::string(EXAMPLE_ROOT_DIR) + "/lemon.json", argc, argv)
 {
-    _scheduler = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
-    _events    = create_owned<event_handler>();
-    _clock     = create_owned<lemon::clock>();
-    _window    = create_owned<window>(1920, 1080);
-    _input     = create_owned<input>(_window.get());
-    rendering_context::create();
-    sound_context::create();
-
-    _resources    = create_owned<asset_storage>();
-    _sceneManager = create_owned<scene_manager>();
+    _scriptingEngine  = create_owned<py_engine>();
+    _scheduler        = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
+    _events           = create_owned<event_handler>();
+    _clock            = create_owned<lemon::clock>();
+    _window           = create_owned<window>(1920, 1080);
+    _input            = create_owned<input>(_window.get());
+    _renderingContext = create_owned<rendering_context>();
+    _soundContext     = create_owned<sound_context>();
+    _resources        = create_owned<asset_storage>();
+    _sceneManager     = create_owned<scene_manager>();
 
     game::provide_clock(_clock.get());
     game::provide_input(_input.get());
@@ -63,13 +60,14 @@ void Sandbox::initialize()
                      ->add_system<rendering_system>();
 
     LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
-    ln = listener<key::keycode, int, key::action, key::keymod>(
-        string_id("KeyPressed"),
-        [](key::keycode k, int, key::action, key::keymod) { LOG_MESSAGE("%c pressed", static_cast<char>(k)); });
 
     auto test = scene->add_entity(string_id("sound"));
     test.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
+
     audio_system::begin_play(test);
+
+    scene->get_registry().emplace<script_component>(entt::entity(0), "gin");
+    // test.add_component<script_component>("gin");
     /*
     auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
                      ->add_system<scripting_system>()

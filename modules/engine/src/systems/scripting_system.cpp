@@ -2,8 +2,9 @@
 
 #include <entt/entt.hpp>
 #include <lemon/core/game.h>
-#include <lemon/engine/scene/basic_components.h>
-#include <lemon/engine/scene/scene.h>
+#include <lemon/scene/basic_components.h>
+#include <lemon/scene/scene.h>
+#include <lemon/scripting/py_script.h>
 
 namespace lemon {
 scripting_system::scripting_system(ptr<scene> s)
@@ -11,10 +12,11 @@ scripting_system::scripting_system(ptr<scene> s)
     clk = game::get_game_clock();
     s->get_registry()
         .on_construct<script_component>()
-        .connect<entt::invoke<&script_component::on_create>>();
+        .connect<entt::invoke<&script_component::instantiate>>();
+    /*
     s->get_registry()
         .on_destroy<script_component>()
-        .connect<entt::invoke<&script_component::on_destroy>>();
+        .connect<entt::invoke<&script_component::on_destroy>>(); */
 }
 scripting_system::~scripting_system()
 {
@@ -25,11 +27,11 @@ void scripting_system::update(entity_registry& registry)
     auto view       = registry.view<script_component>();
     for(auto&& [ent, script] : view.each())
     {
-        script.on_update(deltaTime);
+        script.update(deltaTime);
     }
     for(auto&& [ent, script] : view.each())
     {
-        script.on_late_update(deltaTime);
+        script.late_update(deltaTime);
     }
 }
 } // namespace lemon

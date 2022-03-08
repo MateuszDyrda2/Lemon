@@ -2,12 +2,12 @@
 
 #include <lemon/assets/asset.h>
 #include <lemon/core/basic_types.h>
-#include <lemon/core/string_id.h>
-#include <lemon/engine/scene/entity.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec3.h>
 #include <lemon/core/math/vec4.h>
+#include <lemon/core/string_id.h>
+#include <lemon/scene/entity.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>

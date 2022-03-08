@@ -1,9 +1,12 @@
 #pragma once
 
-#include "scene/scene_manager.h"
 #include <lemon/assets/asset_storage.h>
+#include <lemon/audio/sound_context.h>
 #include <lemon/core/time/clock.h>
 #include <lemon/events/event_handler.h>
+#include <lemon/rendering/rendering_context.h>
+#include <lemon/scene/scene_manager.h>
+#include <lemon/scripting/py_engine.h>
 #include <lemon/threading/scheduler.h>
 #include <lemon/window/input.h>
 #include <lemon/window/window_base.h>
@@ -27,9 +30,12 @@ class LEMON_PUBLIC engine
   protected:
     friend class game;
 
+    owned<py_engine> _scriptingEngine;
     owned<scheduler> _scheduler;
     owned<event_handler> _events;
     owned<window_base> _window;
+    owned<rendering_context> _renderingContext;
+    owned<sound_context> _soundContext;
     owned<asset_storage> _resources;
     owned<input> _input;
     owned<clock> _clock;

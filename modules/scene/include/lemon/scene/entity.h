@@ -16,6 +16,8 @@ class LEMON_PUBLIC entity
     template<class T, class... Args>
     void add_component(Args&&... args);
     template<class T, class... Args>
+    void emplace_or_replace(Args&&... args);
+    template<class T, class... Args>
     void change_component(Args&&... args);
     template<class... Args>
     decltype(auto) get_component();
@@ -48,6 +50,11 @@ template<class T, class... Args>
 inline void entity::add_component(Args&&... args)
 {
     registry->emplace<T>(handle, std::forward<Args>(args)...);
+}
+template<class T, class... Args>
+inline void entity::emplace_or_replace(Args&&... args)
+{
+    registry->emplace_or_replace<T>(handle, std::forward<Args>(args)...);
 }
 template<class T, class... Args>
 inline void entity::change_component(Args&&... args)
