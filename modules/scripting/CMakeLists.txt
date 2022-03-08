@@ -3,6 +3,7 @@ project(LemonScripting)
 set(lemon_scripting_SRC
 	src/py_engine.cpp
 	src/py_script.cpp
+	src/scriptable_entity.cpp
 )
 
 add_library(lemon_scripting ${lemon_scripting_SRC})

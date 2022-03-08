@@ -23,6 +23,13 @@ struct LEMON_PUBLIC tag
  * whose model needs to be recalculated */
 struct LEMON_PUBLIC dirty
 { };
+/** Attached when entity is enabled */
+struct LEMON_PUBLIC enabled
+{ };
+/* Play tag attached to the entity with audio_source
+ * that wants to play a sound in a specific frame */
+struct LEMON_PUBLIC play
+{ };
 /** Transform component containing the position, rotation and
  * scale of the entity in the game world and also relationships */
 struct LEMON_PUBLIC transform
@@ -80,22 +87,4 @@ struct LEMON_PUBLIC audio_listener
 {
     f32 masterGain{ 1.0f };
 };
-/* Play tag attached to the entity with audio_source
- * that wants to play a sound in a specific frame */
-struct LEMON_PUBLIC play
-{ };
-/* Component for attaching scripts to entities */
-/*
-struct LEMON_PUBLIC script_component
-{
-    owned<cpp_script> script{};
-
-    script_component(owned<cpp_script>&& script):
-        script(std::move(script)) { }
-
-    inline void on_create(entity_registry&, entity_handle) { script->on_create(); }
-    inline void on_update(float dt) { script->on_update(dt); }
-    inline void on_late_update(float dt) { script->on_late_update(dt); }
-    inline void on_destroy(entity_registry&, entity_handle) { script->on_destroy(); }
-}; */
 } // namespace lemon

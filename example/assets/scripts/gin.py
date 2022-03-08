@@ -1,28 +1,24 @@
-from lemon.core import *
-from lemon.events import *
-from lemon.window.key import keycode
-from lemon.window import input
-from lemon.core.math import *
-from lemon.scene import *
+from core import *
+from events import *
+from input import input
+from input.key import keycode
+from core.math import *
+from scene import *
 
-def create():
-	logger.warn('Script initialized')	
-	logger.warn('Entity id = {}'.format(ent.id))
-	#handler.subscribe('KeyPressed', move)
-
-
-def update(delta):
-	if(game.input().key_pressed(keycode.w)):
-		ent.translate(vec3(0.0, 100.0, 0.0) * delta)
-	if(game.input().key_pressed(keycode.s)):
-		ent.translate(vec3(0.0, -100.0, 0.0) * delta)
-	if(game.input().key_pressed(keycode.d)):
-		ent.translate(vec3(100.0, 0.0, 0.0) * delta)
-	if(game.input().key_pressed(keycode.a)):
-		ent.translate(vec3(-100.0, 0.0, 0.0) * delta)
-
-def late_update(delta):
-	pass
-
-def destroy():
-	logger.warn('Script destroyed')
+class gin(scriptable_entity):
+	def __init__(self, ent):
+		scriptable_entity.__init__(self, ent)
+		logger.warn('entity constructor')
+	def create(self):
+		logger.warn('create')
+	def on_enable(self):
+		pass
+	def update(self, delta):
+		if input.key_pressed(keycode.w):
+			self.translate(vec3(0.0, 1.0, 0.0))
+	def late_update(self, delta):
+		pass
+	def on_disable(self):
+		pass
+	def destroy(self):
+		logger.warn('destroy')

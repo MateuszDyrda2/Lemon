@@ -2,6 +2,8 @@
 
 #include <lemon/window/window.h>
 
+#include <pybind11/embed.h>
+
 namespace lemon {
 input::input(ptr<window_base> window):
     _window(window)

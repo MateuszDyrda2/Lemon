@@ -19,6 +19,8 @@ class LEMON_PUBLIC entity
     void emplace_or_replace(Args&&... args);
     template<class T, class... Args>
     void change_component(Args&&... args);
+    template<class T, class F>
+    void patch_component(F&& callable);
     template<class... Args>
     decltype(auto) get_component();
     template<class... Args>
@@ -60,6 +62,11 @@ template<class T, class... Args>
 inline void entity::change_component(Args&&... args)
 {
     registry->replace<T>(handle, std::forward<Args>(args)...);
+}
+template<class T, class F>
+inline void entity::patch_component(F&& callable)
+{
+    registry->patch<T>(handle, callable);
 }
 template<class... Args>
 inline decltype(auto) entity::get_component()

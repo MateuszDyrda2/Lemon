@@ -41,7 +41,6 @@ Sandbox::Sandbox(int argc, char** argv):
     _sceneManager     = create_owned<scene_manager>();
 
     game::provide_clock(_clock.get());
-    game::provide_input(_input.get());
     game::provide_window(_window.get());
     game::provide_scene_manager(_sceneManager.get());
     this->initialize();

@@ -8,7 +8,6 @@ class engine;
 class window_base;
 class clock;
 class scene_manager;
-class input;
 /** Game class for accessing single instance components of the game engine */
 class LEMON_PUBLIC game
 {
@@ -33,20 +32,16 @@ class LEMON_PUBLIC game
     static auto get_game_clock() -> ptr<clock> { return _clock; }
     /** @return pointer to the game's scene manager */
     static auto get_scene_manager() -> ptr<scene_manager> { return _sceneManager; }
-    /** @return pointe to the game's input handler */
-    static auto get_input_handler() -> ptr<input> { return _input; }
     static const settings& get_settings() { return gameSettings; }
 
     inline static void provide_window(ptr<window_base> window) { _window = window; }
     inline static void provide_clock(ptr<clock> clock) { _clock = clock; }
     inline static void provide_scene_manager(ptr<scene_manager> sceneManager) { _sceneManager = sceneManager; }
-    inline static void provide_input(ptr<input> input) { _input = input; }
 
   private:
     static ptr<window_base> _window;
     static ptr<clock> _clock;
     static ptr<scene_manager> _sceneManager;
-    static ptr<input> _input;
 
     static settings gameSettings;
 };

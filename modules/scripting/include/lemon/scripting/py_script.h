@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scriptable_entity.h"
+
 #include <lemon/assets/resource.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/scene/entity.h>
@@ -9,24 +11,28 @@
 
 namespace lemon {
 namespace py = pybind11;
+
 class LEMON_PUBLIC py_script
 {
   public:
     py_script(const std::string& moduleName);
     void instantiate(entity ent);
+    py::function create;
+    py::function update;
+    py::function lateUpdate;
+    py::function destroy;
+    py::function onEnable;
+    py::function onDisable;
     ~py_script() = default;
 
   private:
     friend class script_component;
 
-    py::function onCreate;
-    py::function onUpdate;
-    py::function onLateUpdate;
-    py::function onDestroy;
-
-    entity ent;
+    ptr<scriptable_entity> s_entity;
     py::module_ mod;
+    py::object py_class;
 };
+
 struct LEMON_PUBLIC script_component
 {
     py_script* script{};
@@ -56,21 +62,21 @@ struct LEMON_PUBLIC script_component
     inline void instantiate(entity_registry& reg, entity_handle h)
     {
         script->instantiate(entity(&reg, h));
-        script->onCreate();
+        script->create();
     }
     inline void update(f32 delta)
     {
-        script->onUpdate(delta);
+        script->update(delta);
     }
     inline void late_update(f32 delta)
     {
-        script->onLateUpdate(delta);
+        script->lateUpdate(delta);
     }
     ~script_component()
     {
         if(script)
         {
-            script->onDestroy();
+            script->destroy();
             delete script;
         }
     }

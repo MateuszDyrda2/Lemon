@@ -7,6 +7,14 @@ set(lemon_engine_SRC
 	src/systems/scripting_system.cpp
 	src/systems/transform_system.cpp
 	src/py_bindings/py_core.cpp
+	src/py_bindings/py_assets.cpp
+	src/py_bindings/py_audio.cpp
+	src/py_bindings/py_events.cpp
+	src/py_bindings/py_input.cpp
+	src/py_bindings/py_scene.cpp
+	src/py_bindings/py_threading.cpp
+	src/py_bindings/py_window.cpp
+	src/py_bindings/py_rendering.cpp
 )
 
 add_library(lemon_engine ${lemon_engine_SRC})

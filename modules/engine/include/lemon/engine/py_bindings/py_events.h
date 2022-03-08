@@ -1,5 +1,6 @@
 #pragma once
 
 namespace lemon {
-void py_init_core();
+void py_init_events();
+
 } // namespace lemon

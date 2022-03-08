@@ -13,11 +13,11 @@ class LEMON_PUBLIC input
   public:
     input(ptr<window_base> window);
     ~input();
-    [[nodiscard]] bool is_key_pressed(key::keycode key) const;
-    [[nodiscard]] bool is_mouse_pressed(key::mouse button) const;
-    [[nodiscard]] vec2 get_mouse_pos() const;
+    [[nodiscard]] static bool is_key_pressed(key::keycode key);
+    [[nodiscard]] static bool is_mouse_pressed(key::mouse button);
+    [[nodiscard]] static vec2 get_mouse_pos();
 
   private:
-    ptr<window_base> _window;
+    static ptr<window_base> _window;
 };
 } // namespace lemon
