@@ -17,9 +17,6 @@ py_engine::py_engine()
                 + "/"
                 + game::get_settings().assetPath
                 + "/scripts");
-        auto test = py::module_::import("example");
-        auto func = test.attr("test_lemon");
-        func();
     }
     catch(const py::error_already_set& err)
     {

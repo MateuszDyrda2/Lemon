@@ -1,7 +1,10 @@
 #include <lemon/rendering/rendering_context.h>
 
 #include <lemon/core/logger.h>
-#include <lemon/window/window.h>
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace lemon {
 rendering_context::rendering_context()

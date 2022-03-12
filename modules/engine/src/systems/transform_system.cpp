@@ -27,13 +27,14 @@ void transform_system::update(entity_registry& registry)
     });
     registry.view<dirty>().each([&registry](const entity_handle entity) {
         auto& trn = registry.get<transform>(entity);
+        trn.model = mat4(1.0f);
         if(trn.parent != entt::null)
         {
             trn.model = registry.get<transform>(trn.parent).model;
         }
-        trn.model = glm::translate(trn.model, trn.position);
+        trn.model = glm::translate(trn.model, vec3(trn.position, 0.0f));
         trn.model = glm::rotate(trn.model, trn.rotation, vec3(0.0f, 0.0f, 1.0f));
-        trn.model = glm::scale(trn.model, trn.scale);
+        trn.model = glm::scale(trn.model, vec3(trn.scale, 1.0f));
     });
     registry.clear<dirty>();
 }

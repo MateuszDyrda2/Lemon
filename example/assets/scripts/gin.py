@@ -12,10 +12,9 @@ class gin(scriptable_entity):
 	def create(self):
 		logger.warn('create')
 	def on_enable(self):
-		pass
+		logger.warn('name = {}'.format(self.name))
 	def update(self, delta):
-		if input.key_pressed(keycode.w):
-			self.translate(vec3(0.0, 1.0, 0.0))
+		pass
 	def late_update(self, delta):
 		pass
 	def on_disable(self):

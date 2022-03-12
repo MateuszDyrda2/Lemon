@@ -5,7 +5,7 @@
 
 namespace lemon {
 class engine;
-class window_base;
+class window;
 class clock;
 class scene_manager;
 /** Game class for accessing single instance components of the game engine */
@@ -27,19 +27,19 @@ class LEMON_PUBLIC game
      */
     static void start_game(const std::string& projFile);
     /** @return pointer to the game's main window */
-    static auto get_main_window() -> ptr<window_base> { return _window; }
+    static auto get_main_window() -> ptr<window> { return _window; }
     /** @return pointer to the game's main clock */
     static auto get_game_clock() -> ptr<clock> { return _clock; }
     /** @return pointer to the game's scene manager */
     static auto get_scene_manager() -> ptr<scene_manager> { return _sceneManager; }
     static const settings& get_settings() { return gameSettings; }
 
-    inline static void provide_window(ptr<window_base> window) { _window = window; }
+    inline static void provide_window(ptr<window> window) { _window = window; }
     inline static void provide_clock(ptr<clock> clock) { _clock = clock; }
     inline static void provide_scene_manager(ptr<scene_manager> sceneManager) { _sceneManager = sceneManager; }
 
   private:
-    static ptr<window_base> _window;
+    static ptr<window> _window;
     static ptr<clock> _clock;
     static ptr<scene_manager> _sceneManager;
 

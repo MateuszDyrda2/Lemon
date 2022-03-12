@@ -50,7 +50,7 @@ add_compile_options(
 add_subdirectory(modules/core)
 add_subdirectory(modules/threading)
 add_subdirectory(modules/events)
-add_subdirectory(modules/window)
+add_subdirectory(modules/platform)
 add_subdirectory(modules/rendering)
 add_subdirectory(modules/audio)
 add_subdirectory(modules/physics)

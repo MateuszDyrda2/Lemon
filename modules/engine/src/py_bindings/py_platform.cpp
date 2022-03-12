@@ -1,19 +1,19 @@
-#include <lemon/engine/py_bindings/py_window.h>
+#include <lemon/engine/py_bindings/py_platform.h>
 
-#include <lemon/window/window.h>
-#include <lemon/window/window_events.h>
+#include <lemon/platform/window.h>
+#include <lemon/platform/window_events.h>
 
 #include <pybind11/embed.h>
 
 namespace lemon {
-void py_init_window()
+void py_init_platform()
 {
 }
 namespace py = pybind11;
-PYBIND11_EMBEDDED_MODULE(window, m)
+PYBIND11_EMBEDDED_MODULE(platform, m)
 {
-    py::class_<window_base>(m, "window")
-        .def_property_readonly("size", &window_base::get_size);
+    py::class_<window>(m, "window")
+        .def_property_readonly("size", &window::get_size);
 
     py::class_<KeyPressed, event_base>(m, "KeyPressed")
         .def(py::init<key::keycode, int, key::action, key::keymod>())

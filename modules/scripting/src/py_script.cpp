@@ -32,6 +32,8 @@ void py_script::instantiate(entity ent)
         update     = u.cast<py::function>();
         lateUpdate = lu.cast<py::function>();
         destroy    = d.cast<py::function>();
+        onEnable   = e.cast<py::function>();
+        onDisable  = de.cast<py::function>();
     }
     catch(const py::error_already_set& err)
     {

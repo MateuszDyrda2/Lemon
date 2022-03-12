@@ -20,13 +20,13 @@
 #include <lemon/engine/py_bindings/py_audio.h>
 #include <lemon/engine/py_bindings/py_events.h>
 #include <lemon/engine/py_bindings/py_input.h>
+#include <lemon/engine/py_bindings/py_platform.h>
 #include <lemon/engine/py_bindings/py_rendering.h>
 #include <lemon/engine/py_bindings/py_scene.h>
 #include <lemon/engine/py_bindings/py_threading.h>
-#include <lemon/engine/py_bindings/py_window.h>
 
+#include <lemon/platform/window.h>
 #include <lemon/scene/scene_manager.h>
-#include <lemon/window/window_base.h>
 
 namespace lemon {
 void py_init_core()
@@ -38,7 +38,7 @@ void py_init_core()
     py_init_input();
     py_init_scene();
     py_init_threading();
-    py_init_window();
+    py_init_platform();
     py_init_rendering();
 }
 namespace py = pybind11;
@@ -73,7 +73,7 @@ PYBIND11_EMBEDDED_MODULE(core, m)
     py::class_<game>(m, "game")
         .def_static(
             "main_window",
-            static_cast<ptr<window_base> (*)()>(&game::get_main_window),
+            static_cast<ptr<window> (*)()>(&game::get_main_window),
             py::return_value_policy::reference)
         .def_static(
             "game_clock",

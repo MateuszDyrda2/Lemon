@@ -63,6 +63,10 @@ struct LEMON_PUBLIC script_component
     {
         script->instantiate(entity(&reg, h));
         script->create();
+        if(reg.any_of<enabled>(h))
+        {
+            script->onEnable();
+        }
     }
     inline void update(f32 delta)
     {

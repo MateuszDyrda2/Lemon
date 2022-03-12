@@ -22,7 +22,8 @@ class LEMON_PUBLIC basic_renderer : public renderer2d
 
   private:
     mat4 viewProj;
-    owned<vertex_array> vao;
+    u32 vao, vbo1, vbo2;
+    // owned<vertex_array> vao;
     asset<shader> _shader;
 };
 } // namespace lemon

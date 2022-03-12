@@ -6,7 +6,7 @@
 #include <lemon/scene/basic_components.h>
 #include <lemon/scene/scene.h>
 
-#include <lemon/window/window_events.h>
+#include <lemon/platform/window_events.h>
 
 namespace lemon {
 rendering_system::rendering_system(ptr<scene> s):

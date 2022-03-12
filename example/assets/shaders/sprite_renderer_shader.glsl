@@ -6,11 +6,12 @@ layout (location = 1) in vec2 texCoords;
 out vec2 TexCoords;
 
 uniform mat4 viewProj;
+uniform mat4 model;
 
 void main()
 {
     TexCoords = texCoords;
-    gl_Position = viewProj * vec4(position, 0.0, 1.0);
+    gl_Position = viewProj * model * vec4(position, 0.0, 1.0);
 }
 #endif
 #ifdef FRAGMENT_PROGRAM

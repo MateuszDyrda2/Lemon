@@ -9,15 +9,49 @@
 
 namespace lemon {
 basic_renderer::basic_renderer():
-    vao(create_owned<vertex_array>()),
+    // vao(create_owned<vertex_array>()),
     _shader(string_id("sprite_renderer_shader"))
 {
-
-    vao->add_vertex_buffer(
-           create_owned<vertex_buffer>(sizeof(float) * 24))
-        ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(float) * 4, 0)
-        ->enable_vertex_attrib(1, 2, GL_FLOAT, false, sizeof(float) * 4, sizeof(float) * 2);
-    vao->unbind();
+    /// struct vertex
+    /// {
+    ///     vec2 pos;
+    ///     vec2 texCoords;
+    /// } vertices[]{
+    ///     { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
+    ///     { { 0.5f, -0.5f }, { 1.0f, 0.0f } },
+    ///     { { 0.5f, 0.5f }, { 1.0f, 1.0f } },
+    ///     { { 0.5f, 0.5f }, { 1.0f, 1.0f } },
+    ///     { { -0.5f, 0.5f }, { 0.0f, 1.0f } },
+    ///     { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
+    /// };
+    /// vao->add_vertex_buffer(
+    ///        create_owned<vertex_buffer>(&vertices, sizeof(vertices)))
+    ///     ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(float) * 4, 0)
+    ///     ->enable_vertex_attrib(1, 2, GL_FLOAT, false, sizeof(float) * 4, sizeof(float) * 2);
+    /// vao->unbind();
+    glCreateVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    u32 buffers[2];
+    glGenBuffers(2, buffers);
+    vbo1           = buffers[0];
+    vbo2           = buffers[1];
+    f32 vertices[] = {
+        -0.5f, -0.5f,
+        0.5f, -0.5f,
+        0.5f, 0.5f,
+        0.5f, 0.5f,
+        -0.5f, 0.5f,
+        -0.5f, -0.5f
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 12, nullptr, GL_STREAM_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
 }
 void basic_renderer::start_render(const mat4& viewProj)
 {
@@ -35,51 +69,24 @@ void basic_renderer::render_sprite(const vec4& color, const vec4& texCoords, ass
     mat4 model = m;
     model      = scale(model, vec3(texture->get_size(), 1.0f));
 
-    vec4 vertices[] = {
-        { -0.5f, -0.5f, 0.0f, 0.0f },
-        { 0.5f, -0.5f, 0.0f, 0.0f },
-        { 0.5f, 0.5f, 0.0f, 0.0f },
-        { -0.5f, 0.5f, 0.0f, 0.0f }
-    };
-    vertices[0] = model * vertices[0];
-    vertices[1] = model * vertices[1];
-    vertices[2] = model * vertices[2];
-    vertices[3] = model * vertices[3];
-
-    float v[] = {
-        vertices[0].x,
-        vertices[0].y,
-        texCoords.x,
-        texCoords.y,
-        vertices[1].x,
-        vertices[1].y,
-        texCoords.x + texCoords.z,
-        texCoords.y,
-        vertices[2].x,
-        vertices[2].y,
-        texCoords.x + texCoords.z,
-        texCoords.y + texCoords.w,
-        vertices[2].x,
-        vertices[2].y,
-        texCoords.x + texCoords.z,
-        texCoords.y + texCoords.w,
-        vertices[3].x,
-        vertices[3].y,
-        texCoords.x,
-        texCoords.y + texCoords.w,
-        vertices[0].x,
-        vertices[0].y,
-        texCoords.x,
-        texCoords.y,
-    };
-
     shader->set_uniform("spriteColor", color);
+    shader->set_uniform("model", model);
 
     texture->bind();
-    vao->bind();
-    vao->get_vbo()->add_subdata(0, sizeof(v), v);
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    f32 tc[] = {
+        texCoords.x, texCoords.y,
+        texCoords.z, texCoords.y,
+        texCoords.z, texCoords.w,
+        texCoords.z, texCoords.w,
+        texCoords.x, texCoords.w,
+        texCoords.x, texCoords.y
+    };
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tc), tc);
     rendering_context::draw_arrays(GL_TRIANGLES, 0, 6);
-    vao->unbind();
+    glBindVertexArray(0);
 }
 void basic_renderer::end_render()
 {

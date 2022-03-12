@@ -9,7 +9,7 @@ namespace lemon {
 using namespace std;
 using namespace rapidjson;
 game::settings game::gameSettings;
-ptr<window_base> game::_window         = nullptr;
+ptr<window> game::_window              = nullptr;
 ptr<clock> game::_clock                = nullptr;
 ptr<scene_manager> game::_sceneManager = nullptr;
 

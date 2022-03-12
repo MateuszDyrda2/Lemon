@@ -8,8 +8,8 @@
 #include <lemon/scene/scene_manager.h>
 #include <lemon/scripting/py_engine.h>
 #include <lemon/threading/scheduler.h>
-#include <lemon/window/input.h>
-#include <lemon/window/window_base.h>
+#include <lemon/platform/input.h>
+#include <lemon/platform/window.h>
 
 #include "py_bindings/py_core.h"
 
@@ -33,7 +33,7 @@ class LEMON_PUBLIC engine
     owned<py_engine> _scriptingEngine;
     owned<scheduler> _scheduler;
     owned<event_handler> _events;
-    owned<window_base> _window;
+    owned<window> _window;
     owned<rendering_context> _renderingContext;
     owned<sound_context> _soundContext;
     owned<asset_storage> _resources;

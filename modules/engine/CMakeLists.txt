@@ -6,6 +6,7 @@ set(lemon_engine_SRC
 	src/systems/rendering_system.cpp
 	src/systems/scripting_system.cpp
 	src/systems/transform_system.cpp
+	src/systems/physics_system.cpp
 	src/py_bindings/py_core.cpp
 	src/py_bindings/py_assets.cpp
 	src/py_bindings/py_audio.cpp
@@ -13,7 +14,7 @@ set(lemon_engine_SRC
 	src/py_bindings/py_input.cpp
 	src/py_bindings/py_scene.cpp
 	src/py_bindings/py_threading.cpp
-	src/py_bindings/py_window.cpp
+	src/py_bindings/py_platform.cpp
 	src/py_bindings/py_rendering.cpp
 )
 
@@ -29,7 +30,7 @@ target_link_libraries(lemon_engine
 	lemon::window
 	lemon::rendering
 	lemon::audio
-	#lemon::physics
+	lemon::physics
 	lemon::assets
 	lemon::scene
 	lemon::scripting

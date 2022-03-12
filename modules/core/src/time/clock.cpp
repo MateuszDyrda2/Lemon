@@ -4,7 +4,8 @@
 
 namespace lemon {
 clock::clock():
-    startTime(clock_type::now()), virtualFrameTime{}, deltaTime{},
+    startTime(clock_type::now()), virtualFrameTime{},
+    realLastFrameTime{ startTime }, deltaTime{},
     realDeltaTime{}, timeScale{ 1.0f }
 {
     LOG_MESSAGE("Clock created");

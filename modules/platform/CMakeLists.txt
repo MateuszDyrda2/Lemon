@@ -1,9 +1,8 @@
 project(LemonWindow)
 
 set(lemon_window_SRC
-	src/window.cpp
-	src/window_base.cpp
-	src/input.cpp
+	src/glfw/glfw_window.cpp
+	src/glfw/glfw_input.cpp
 )
 
 add_library(lemon_window ${lemon_window_SRC})

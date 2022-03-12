@@ -2,7 +2,6 @@
 
 #include <lemon/core/game.h>
 #include <lemon/rendering/rendering_context.h>
-#include <lemon/window/window.h>
 
 namespace lemon {
 engine::engine(const std::string& workingDirectory, int, char**)

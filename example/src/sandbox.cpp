@@ -1,9 +1,10 @@
 #include <lemon/engine/entry_point.h>
 
 #include <lemon/core/game.h>
-#include <lemon/window/window.h>
+#include <lemon/platform/window.h>
 
 #include <lemon/engine/systems/audio_system.h>
+#include <lemon/engine/systems/physics_system.h>
 #include <lemon/engine/systems/rendering_system.h>
 #include <lemon/engine/systems/scripting_system.h>
 #include <lemon/engine/systems/transform_system.h>
@@ -12,9 +13,9 @@
 
 #include <thread>
 
+#include <lemon/platform/key_codes.h>
+#include <lemon/platform/window_events.h>
 #include <lemon/scripting/py_script.h>
-#include <lemon/window/key_codes.h>
-#include <lemon/window/window_events.h>
 
 using namespace lemon;
 
@@ -51,25 +52,21 @@ Sandbox::~Sandbox()
 void Sandbox::initialize()
 {
     engine::initialize();
-
-    auto scene = _sceneManager->change_scene(scene_serializer::deserialize(game::get_settings().startingScene))
-                     ->add_system<scripting_system>()
-                     ->add_system<transform_system>()
-                     ->add_system<audio_system>()
-                     ->add_system<rendering_system>();
-
-    LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
-
-    auto test = scene->add_entity(string_id("sound"));
-    test.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
-
-    audio_system::begin_play(test);
-
-    scene->get_registry().emplace<script_component>(entt::entity(0), "gin");
-    // test.add_component<script_component>("gin");
     /*
+        auto scene = _sceneManager->change_scene(scene_serializer::deserialize(game::get_settings().startingScene))
+                         ->add_system<scripting_system>()
+                         ->add_system<transform_system>()
+                         ->add_system<audio_system>()
+                         ->add_system<rendering_system>();
+
+        LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
+
+        scene->get_registry().emplace<script_component>(entt::entity(0), "gin");*/
+    // test.add_component<script_component>("gin");
+
     auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
                      ->add_system<scripting_system>()
+                     ->add_system<physics_system>()
                      ->add_system<transform_system>()
                      ->add_system<audio_system>()
                      ->add_system<rendering_system>();
@@ -77,8 +74,11 @@ void Sandbox::initialize()
     LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
 
     auto gin = scene->add_entity(string_id("gin"));
-    gin.add_component<sprite_renderer>(asset<texture>(string_id("gintoki")));
-    */
+    gin.add_component<sprite_renderer>(asset<texture>(string_id("gin2")));
+    gin.add_component<script_component>("gin");
+    gin.add_component<box_collider>();
+    gin.add_component<rigidbody>();
+
     // gin.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
     // audio_system::begin_play(gin);
     //  scene_serializer::serialize(scene);

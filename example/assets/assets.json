@@ -18,5 +18,9 @@
     {
         "name": "open-the-door",
         "path": "/home/matzix/shared/Lemon/example/assets/sounds/open-the-door.wav"
+    },
+    {
+        "name": "gin2",
+        "path": "/home/matzix/shared/Lemon/example/assets/textures/gin2.png"
     }
 ]

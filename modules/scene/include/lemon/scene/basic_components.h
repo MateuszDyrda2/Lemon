@@ -10,6 +10,7 @@
 #include <lemon/rendering/texture.h>
 
 #include <lemon/core/math/mat4.h>
+#include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec3.h>
 #include <lemon/core/math/vec4.h>
 
@@ -34,8 +35,8 @@ struct LEMON_PUBLIC play
  * scale of the entity in the game world and also relationships */
 struct LEMON_PUBLIC transform
 {
-    vec3 position{ 0.f, 0.f, 0.f };
-    vec3 scale{ 1.f, 1.f, 1.f };
+    vec2 position{ 0.f, 0.f };
+    vec2 scale{ 1.f, 1.f };
     f32 rotation{ 0.0f };
     mat4 model{ 1.f };
     entity_handle first{ entt::null };
@@ -44,7 +45,7 @@ struct LEMON_PUBLIC transform
     size_type order{};
 
     transform() = default;
-    transform(const vec3 position, const vec3 scale, f32 rotation,
+    transform(const vec2 position, const vec2 scale, f32 rotation,
               entity_handle parent, size_type order):
         position(position),
         scale(scale),
@@ -86,5 +87,17 @@ struct LEMON_PUBLIC audio_source
 struct LEMON_PUBLIC audio_listener
 {
     f32 masterGain{ 1.0f };
+};
+struct box_collider
+{
+    vec4 bounds{0.f, 0.f, 1.f, 1.f}; ///< bounds relative to the center of the entity
+};
+struct rigidbody
+{
+    vec2 velocity{};
+    f32 angularVelocity{};
+    vec2 force{};
+    f32 torque{};
+    f32 mass{1.0f};
 };
 } // namespace lemon

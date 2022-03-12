@@ -8,7 +8,7 @@ scene::scene(string_id name, entity_registry&& registry):
 {
     auto view  = this->registry.view<camera>();
     mainCamera = entity(&this->registry, view.front());
-    mainCamera.add_component<audio_listener>();
+    mainCamera.add_component<audio_listener>(); // TODO: Remove this
 }
 scene::scene(string_id name):
     name(name), registry(), mainCamera(&registry, registry.create())
@@ -39,6 +39,7 @@ entity scene::add_entity(string_id name)
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent);
     registry.emplace<dirty>(ent);
+    registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, entity parent)
@@ -47,6 +48,7 @@ entity scene::add_entity(string_id name, entity parent)
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent, parent.get_handle());
     registry.emplace<dirty>(ent);
+    registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, const vec3& position,
@@ -56,6 +58,7 @@ entity scene::add_entity(string_id name, const vec3& position,
     registry.emplace<tag>(ent, name);
     registry.emplace<transform>(ent, position, scale, rotation, entt::null, entt::null);
     registry.emplace<dirty>(ent);
+    registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
 entity scene::add_entity(string_id name, const vec3& position,
@@ -67,6 +70,7 @@ entity scene::add_entity(string_id name, const vec3& position,
     registry.emplace<transform>(ent, position, scale, rotation, parent.get_handle(),
                                 order);
     registry.emplace<dirty>(ent);
+    registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
 entity scene::clone_entity(entity ent, string_id name)

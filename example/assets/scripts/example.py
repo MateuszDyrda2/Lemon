@@ -2,7 +2,7 @@ from lemon import core
 from lemon.core import math
 from lemon.core import string_id
 from lemon.core import logger
-from lemon.window import WindowSize
+from lemon.platform import WindowSize
 from lemon.events import handler
 from lemon.events import event
 
