@@ -88,16 +88,5 @@ struct LEMON_PUBLIC audio_listener
 {
     f32 masterGain{ 1.0f };
 };
-struct box_collider
-{
-    vec4 bounds{0.f, 0.f, 1.f, 1.f}; ///< bounds relative to the center of the entity
-};
-struct rigidbody
-{
-    vec2 velocity{};
-    f32 angularVelocity{};
-    vec2 force{};
-    f32 torque{};
-    f32 mass{1.0f};
-};
+
 } // namespace lemon

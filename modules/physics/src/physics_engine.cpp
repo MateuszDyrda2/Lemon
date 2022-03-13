@@ -2,37 +2,38 @@
 
 namespace lemon {
 physics_engine::physics_engine():
-    gravity(-0.981f)
+    gravity(-9.81f)
 {
 }
 physics_engine::~physics_engine()
 {
 }
-void physics_engine::apply_gravity(vec2& force, f32 mass)
+void physics_engine::apply_gravity(rigidbody& rb)
 {
-    force.y += mass * gravity;
+    rb.force.y += rb.mass * gravity * rb.gravityScale;
 }
-void physics_engine::calculate_position(vec2 force, f32 mass,
-                                        vec2& vel, vec2& pos, f32 deltaTime)
+void physics_engine::calculate_position(rigidbody& rb, vec2& pos, f32 deltaTime)
 {
-    vec2 linAcc = force / mass;
-    vel += linAcc * deltaTime;
-    pos += vel * deltaTime;
+    rb.velocity += rb.force / rb.mass * deltaTime;
+    pos += rb.velocity * deltaTime;
+    rb.force = vec2(0);
 }
-void physics_engine::calculate_rotation(f32 torque, f32 inertia,
-                                        f32& angularVelocity, f32& rotation,
-                                        f32 deltaTime)
+void physics_engine::calculate_rotation(rigidbody& rb, f32& rotation, f32 inertia, f32 deltaTime)
 {
-    f32 angAcc = torque / inertia;
-    angularVelocity += angAcc * deltaTime;
-    rotation += angularVelocity * deltaTime;
+    rb.angularVelocity += rb.torque / inertia * deltaTime;
+    rotation += rb.angularVelocity * deltaTime;
+    rb.torque = 0.f;
 }
-f32 physics_engine::calculate_inertia(
-    f32 momentOfIntertia, f32 mass, vec4 bounds)
+f32 physics_engine::calculate_inertia(const rigidbody& rb, const box_collider& bc)
 {
-    return momentOfIntertia * mass
-           * ((bounds.z - bounds.x) * (bounds.z - bounds.x)
-              + (bounds.w - bounds.y) * (bounds.w - bounds.y));
+    // 1/12m(w^2 + h^2)
+    static constexpr f32 moi = 1.f / 12.f;
+    return moi * rb.mass * ((bc.size.x * bc.size.x) + (bc.size.y * bc.size.y));
 }
-
+f32 physics_engine::calculate_inertia(const rigidbody& rb, const circle_collider& cc)
+{
+    // 1/2mr^2
+    static constexpr f32 moi = 0.5f;
+    return moi * rb.mass * rb.mass * (cc.radius * cc.radius);
+}
 } // namespace lemon
