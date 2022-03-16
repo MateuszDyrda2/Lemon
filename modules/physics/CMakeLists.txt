@@ -2,6 +2,7 @@ project(LemonPhysics)
 
 set(lemon_physics_SRC
 	src/physics_engine.cpp
+	src/BVH_tree.cpp
 )
 
 add_library(lemon_physics ${lemon_physics_SRC})

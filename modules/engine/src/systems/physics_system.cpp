@@ -18,6 +18,58 @@ physics_system::~physics_system()
 }
 void physics_system::update(entity_registry& registry)
 {
+    // Fill all AABB's positions
+    //*************************************************
+    registry.view<transform, collider_component>().each(
+        [](const entity_handle ent, transform& trns, collider_component& coll) {
+            auto&& [min, max] = coll.collider->get_extends(trns.position);
+            coll.aabb.min     = min;
+            coll.aabb.max     = max;
+        });
+    //*************************************************
+
+    // Sort the AABB's using min extend
+    //*************************************************
+    static u32 axis = 0; // start with x axis
+    registry.sort<collider_component>([](const collider_component& lhs, const collider_component& rhs) {
+        return lhs.aabb.min[axis] < rhs.aabb.min[axis];
+    });
+    //*************************************************
+
+    // calculate max variance axis and complete broad phase
+    //*************************************************
+    vec2 centerSum;
+    vec2 centerSumSq;
+    auto&& colliderView = registry.view<collider_component>();
+    for(auto iter = colliderView.begin(); iter != std::prev(colliderView.end()); ++iter)
+    {
+        auto& collider = colliderView.get<collider_component>(*iter);
+        auto& aabb     = collider.aabb;
+        // sum the center coordinates
+        vec2 center = aabb.max - aabb.min;
+        centerSum += center;
+        centerSumSq += vec2(center.x * center.x, center.y * center.y);
+
+        for(auto iter2 = std::next(iter); iter2 != colliderView.end(); ++iter2)
+        {
+            auto& collider2 = colliderView.get<collider_component>(*iter2);
+            auto& aabb2     = collider2.aabb;
+            if(aabb.max[axis] < aabb2.min[axis]) break;
+            // A possible collision
+            // if(detect_collision(collider.collider.get(), collider2.collider.get()))
+            //{
+            //    // detected collision
+            //}
+        }
+    }
+    // calculate variance
+    centerSum /= colliderView.size();
+    centerSumSq /= colliderView.size();
+    vec2 variance = centerSumSq - (centerSum * centerSum);
+    axis          = u32(variance.x > variance.y);
+    //*************************************************
+
+    // update kinematics
     f32 deltaTime = game::get_game_clock()->delta_time();
     auto group    = registry.group<rigidbody, box_collider>(entt::get<transform>);
     for(auto&& [ent, rb, bc, tr] : group.each())
@@ -30,6 +82,7 @@ void physics_system::update(entity_registry& registry)
             rb, tr.rotation, inertia, deltaTime);
         registry.emplace_or_replace<dirty>(ent);
     }
+    // TODO:    Implement collision detection and collision resolving
 #if 0  // collision
     // COLLISIONS
     // 1. Sort on the x axis by AABB's x coordinate
