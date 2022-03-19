@@ -10,143 +10,71 @@
 #include <utility>
 
 namespace lemon {
-physics_system::physics_system(ptr<scene>)
+void physics_system::add2tree(entity_registry& registry, entity_handle ent)
 {
+    const transform& tr  = registry.get<const transform>(ent);
+    const collider& coll = registry.get<const collider>(ent);
+    pEngine.insert_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
+}
+void physics_system::remove_from_tree(entity_registry& registry, entity_handle ent)
+{
+    pEngine.remove_collider(u32(ent));
+}
+physics_system::physics_system(ptr<scene> s)
+{
+    s->get_registry()
+        .on_construct<collider>()
+        .connect<&physics_system::add2tree>(this);
+    s->get_registry()
+        .on_destroy<collider>()
+        .connect<&physics_system::remove_from_tree>(this);
 }
 physics_system::~physics_system()
 {
 }
 void physics_system::update(entity_registry& registry)
 {
-    // Fill all AABB's positions
+    // update Axis Aligned Bounding Boxes
     //*************************************************
-    registry.view<transform, collider_component>().each(
-        [](const entity_handle ent, transform& trns, collider_component& coll) {
-            auto&& [min, max] = coll.collider->get_extends(trns.position);
-            coll.aabb.min     = min;
-            coll.aabb.max     = max;
-        });
-    //*************************************************
-
-    // Sort the AABB's using min extend
-    //*************************************************
-    static u32 axis = 0; // start with x axis
-    registry.sort<collider_component>([](const collider_component& lhs, const collider_component& rhs) {
-        return lhs.aabb.min[axis] < rhs.aabb.min[axis];
+    registry.view<dirty, const transform, const collider>().each([this](const entity_handle ent, const transform& tr, const collider& coll) {
+        pEngine.update_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
     });
     //*************************************************
 
-    // calculate max variance axis and complete broad phase
+    // Broad phase
     //*************************************************
-    vec2 centerSum;
-    vec2 centerSumSq;
-    auto&& colliderView = registry.view<collider_component>();
-    for(auto iter = colliderView.begin(); iter != std::prev(colliderView.end()); ++iter)
+    auto group = registry.group<rigidbody, collider>(entt::get<transform>);
+    for(auto&& [ent, rb, coll, trns] : group.each())
     {
-        auto& collider = colliderView.get<collider_component>(*iter);
-        auto& aabb     = collider.aabb;
-        // sum the center coordinates
-        vec2 center = aabb.max - aabb.min;
-        centerSum += center;
-        centerSumSq += vec2(center.x * center.x, center.y * center.y);
-
-        for(auto iter2 = std::next(iter); iter2 != colliderView.end(); ++iter2)
+        for(const auto& other : pEngine.broad_collisions(u32(ent)))
         {
-            auto& collider2 = colliderView.get<collider_component>(*iter2);
-            auto& aabb2     = collider2.aabb;
-            if(aabb.max[axis] < aabb2.min[axis]) break;
-            // A possible collision
-            // if(detect_collision(collider.collider.get(), collider2.collider.get()))
-            //{
-            //    // detected collision
-            //}
+            // Narrow phase
+            //*****************************************
+            const auto&& [otherTrns, otherColl] = registry.get<const transform, const collider>(entity_handle(other));
+            if(pEngine.collide(coll, trns.position, otherColl, otherTrns.position))
+            {
+                // TODO: Send message on collision
+                // TODO: Resolve collision
+            }
+            //*****************************************
         }
     }
-    // calculate variance
-    centerSum /= colliderView.size();
-    centerSumSq /= colliderView.size();
-    vec2 variance = centerSumSq - (centerSum * centerSum);
-    axis          = u32(variance.x > variance.y);
-    //*************************************************
 
+    //*************************************************
     // update kinematics
     f32 deltaTime = game::get_game_clock()->delta_time();
-    auto group    = registry.group<rigidbody, box_collider>(entt::get<transform>);
-    for(auto&& [ent, rb, bc, tr] : group.each())
+    for(auto&& [ent, rb, coll, tr] : group.each())
     {
         pEngine.apply_gravity(rb);
         pEngine.calculate_position(
             rb, tr.position, deltaTime);
-        f32 inertia = pEngine.calculate_inertia(rb, bc);
+
+        f32 inertia = pEngine.calculate_inertia(rb, coll);
         pEngine.calculate_rotation(
             rb, tr.rotation, inertia, deltaTime);
         registry.emplace_or_replace<dirty>(ent);
     }
-    // TODO:    Implement collision detection and collision resolving
-#if 0  // collision
-    // COLLISIONS
-    // 1. Sort on the x axis by AABB's x coordinate
-    struct AABB
-    {
-        vec2 min, max;
-    };
-
-    registry.sort<
-        box_collider>(
-        +[](const entity_handle lhs, const entity_handle rhs, entity_registry& registry) {
-            auto& bclhs = registry.get<box_collider>(lhs);
-            auto& bcrhs = registry.get<box_collider>(rhs);
-            auto& trlhs = registry.get<transform>(lhs);
-            auto& trrhs = registry.get<transform>(rhs);
-            AABB a      = {
-                vec2(trlhs.position.x + bclhs.center.x - bclhs.size.x * 0.5f),
-                vec2(trlhs.position.y + bclhs.center.y - bclhs.size.y * 0.5f)
-            };
-            AABB b = {
-                vec2(trrhs.position.x + bcrhs.center.x - bcrhs.size.x * 0.5f),
-                vec2(trrhs.position.y + bcrhs.center.y - bcrhs.size.y * 0.5f)
-            };
-
-            return a.min.x < b.max.x;
-        },
-        entt::insertion_sort(), registry);
-
-    // 2. Create a list of ovelapped AABB's
-    using namespace std;
-    list<box_collider> potential;
-    list<pair<entity_handle, entity_handle>> overlaps;
-
-    for(auto&& [ent, bc] : registry.view<box_collider>().each())
-    {
-        for(auto iter = potential.begin(); iter != potential.end();)
-        {
-
-            if(bc.bounds.x > iter->be.y)
-            {
-                bounds.erase(iter++);
-            }
-            else
-            {
-                overlaps.push_back(
-                    make_pair(iter->handle, ent));
-                ++iter;
-            }
-        }
-        bounds.push_back(
-            cal_bounds{ vec2(bc.bounds.x, bc.bounds.z), ent });
-    }
-    // check against y axis
-    for(auto&& [lhs, rhs] : overlaps)
-    {
-        auto& bclhs = registry.get<box_collider>(lhs);
-        auto& bcrhs = registry.get<box_collider>(rhs);
-        if(bcrhs.bounds.w >= bclhs.bounds.y
-           && bclhs.bounds.w >= bcrhs.bounds.y)
-        {
-            // COLLISION DETECTED
-        }
-    }
-#endif // collision
+    //*************************************************
 }
 void physics_system::move_entity(entity ent, const vec2& to)
 {

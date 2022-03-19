@@ -76,9 +76,11 @@ void Sandbox::initialize()
     auto gin = scene->add_entity(string_id("gin"));
     gin.add_component<sprite_renderer>(asset<texture>(string_id("gin2")));
     gin.add_component<script_component>("gin");
-    gin.add_component<box_collider>();
+    gin.add_component<collider>();
     gin.add_component<rigidbody>();
 
+    auto plane = scene->add_entity(string_id("plane"));
+    plane.add_component<collider>();
     // gin.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
     // audio_system::begin_play(gin);
     //  scene_serializer::serialize(scene);

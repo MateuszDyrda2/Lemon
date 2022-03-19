@@ -40,15 +40,41 @@ BVH_tree::BVH_tree():
     }
     nextFree = nodes.size() - 1;
 }
+BVH_tree::~BVH_tree()
+{
+}
 void BVH_tree::insert_leaf(u32 entityId, const AABB& box)
 {
-    int leafIndex           = allocate_node();
-    entityNodeMap[entityId] = leafIndex;
-    auto& newNode           = nodes[leafIndex];
-    newNode.box             = box;
-    newNode.entityId        = entityId;
-    newNode.isLeaf          = true;
-    // nodes.emplace_back(box, entityId, nullIndex, nullIndex, nullIndex, true);
+    int leafIndex             = allocate_node();
+    entityNodeMap[entityId]   = leafIndex;
+    nodes[leafIndex].box      = box;
+    nodes[leafIndex].entityId = entityId;
+    nodes[leafIndex].isLeaf   = true;
+    insert_node(leafIndex);
+}
+void BVH_tree::remove_leaf(u32 entityId)
+{
+    LEMON_ASSERT(entityNodeMap.contains(entityId));
+    index_t index = entityNodeMap[entityId];
+    remove_leaf(index);
+    deallocate_node(index);
+    entityNodeMap.erase(entityId);
+}
+void BVH_tree::update_leaf(u32 entityId, const AABB& box)
+{
+    index_t index = entityNodeMap[entityId];
+
+    remove_node(index);
+
+    nodes[index].box = box;
+
+    insert_node(index);
+}
+void BVH_tree::insert_node(index_t leafIndex)
+{
+    auto& newNode   = nodes[leafIndex];
+    const auto& box = newNode.box;
+
     if(nodes.size() == 1)
     {
         rootIndex = leafIndex;
@@ -95,24 +121,22 @@ void BVH_tree::insert_leaf(u32 entityId, const AABB& box)
     index_t index = nodes[leafIndex].parentIndex;
     while(index != nullIndex)
     {
-        index      = rotate(index);
-        int child1 = nodes[index].child1;
-        int child2 = nodes[index].child2;
+        index = rotate(index);
 
-        nodes[index].box    = AABB_union(nodes[child1].box, nodes[child2].box);
-        nodes[index].height = 1 + std::max(nodes[child1].height, nodes[child2].height);
+        node& thisNode = nodes[index];
+        node& child1   = nodes[thisNode.child1];
+        node& child2   = nodes[thisNode.child2];
 
-        index = nodes[index].parentIndex;
+        thisNode.box    = AABB_union(child1.box, child2.box);
+        thisNode.height = 1 + std::max(child1.height, child2.height);
+
+        index = thisNode.parentIndex;
     }
 }
-void BVH_tree::remove_leaf(u32 entityId)
+void BVH_tree::remove_node(index_t index)
 {
-    index_t index = entityNodeMap[entityId];
-
     if(index == rootIndex)
-    {
         rootIndex = nullIndex;
-    }
     else
     {
         node& currentNode        = nodes[index];
@@ -138,11 +162,16 @@ void BVH_tree::remove_leaf(u32 entityId)
             index_t thisNodeIndex = grandparentIndex;
             while(thisNodeIndex != nullIndex)
             {
+                thisNodeIndex = rotate(thisNodeIndex);
+
                 node& thisNode = nodes[thisNodeIndex];
                 node& child1   = nodes[thisNode.child1];
                 node& child2   = nodes[thisNode.child2];
-                thisNode.box   = AABB_union(child1, child2);
-                thisNodeIndex  = thisNode.parentIndex;
+
+                thisNode.box    = AABB_union(child1.box, child2.box);
+                thisNode.height = 1 + std::max(child1.height, child2.height);
+
+                thisNodeIndex = thisNode.parentIndex;
             }
         }
         else
@@ -153,13 +182,6 @@ void BVH_tree::remove_leaf(u32 entityId)
         }
         currentNode.parentIndex = nullIndex;
     }
-
-    deallocate_node(index);
-    entityNodeMap.erase(entityId);
-}
-void BVH_tree::update_leaf(u32 entityId, const AABB& box)
-{
-    index_t index = entityNodeMap[entityId];
 }
 f32 BVH_tree::compute_cost()
 {
@@ -224,7 +246,7 @@ BVH_tree::index_t BVH_tree::rotate(index_t index)
         index_t child2child1 = nodes[child2].child1;
         index_t child2child2 = nodes[child2].child2;
 
-        nodes[child2]             = index;
+        nodes[child2].child1      = index;
         nodes[child2].parentIndex = nodes[index].parentIndex;
         nodes[index].parentIndex  = child2;
 
@@ -316,28 +338,37 @@ BVH_tree::index_t BVH_tree::rotate(index_t index)
     }
     return index;
 }
-std::list<u32> BVH_tree::query_tree(const AABB& box)
+std::list<u32> BVH_tree::query_tree(u32 entityId)
 {
     std::list<u32> entities;
-    if(!nodes.empty())
+    if(auto current = entityNodeMap.find(entityId); current != entityNodeMap.end())
     {
-        std::stack<index_t> queriedNodes;
-        queriedNodes.push(rootIndex);
-        while(!queriedNodes.empty())
+        index_t queriedIndex = current->second;
+        auto& queriedNode    = nodes[queriedIndex];
+
+        if(!nodes.empty())
         {
-            index_t current   = queriedNodes.top();
-            auto& currentNode = nodes[current];
-            queriedNodes.pop();
-            if(intersects(currentNode.box, box))
+            std::stack<index_t> queriedNodes;
+            queriedNodes.push(rootIndex);
+            while(!queriedNodes.empty())
             {
-                if(currentNode.isLeaf)
+                index_t current   = queriedNodes.top();
+                auto& currentNode = nodes[current];
+                queriedNodes.pop();
+                if(intersects(currentNode.box, queriedNode.box))
                 {
-                    entities.push_back(currentNode.entityId);
-                }
-                else
-                {
-                    queriedNodes.push(currentNode.child1);
-                    queriedNodes.push(currentNode.child2);
+                    if(currentNode.isLeaf)
+                    {
+                        if(currentNode.entityId != entityId)
+                        {
+                            entities.push_back(currentNode.entityId);
+                        }
+                    }
+                    else
+                    {
+                        queriedNodes.push(currentNode.child1);
+                        queriedNodes.push(currentNode.child2);
+                    }
                 }
             }
         }

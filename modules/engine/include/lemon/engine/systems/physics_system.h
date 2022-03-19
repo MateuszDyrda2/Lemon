@@ -21,5 +21,9 @@ class LEMON_PUBLIC physics_system : public system
 
   private:
     physics_engine pEngine;
+
+  private:
+    void add2tree(entity_registry& registry, entity_handle ent);
+    void remove_from_tree(entity_registry& registry, entity_handle ent);
 };
 } // namespace lemon

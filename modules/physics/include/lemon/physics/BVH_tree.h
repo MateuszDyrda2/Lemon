@@ -32,13 +32,28 @@ class BVH_tree
     };
 
   public:
+    /** @brief Creates a BVH tree */
     BVH_tree();
     ~BVH_tree();
 
+    /** @brief Inserts a newly created entity with AABB
+     * @param entityId id of the entity
+     * @param box Axis Aligned Bounding Box
+     */
     void insert_leaf(u32 entityId, const AABB& box);
+    /** @brief Removes previously inserted entity from the tree
+     * @param entityId id of the entity to be removed
+     */
     void remove_leaf(u32 entityId);
+    /** @brief Updates the bounding box of the entity
+     */
     void update_leaf(u32 entityId, const AABB& box);
-    std::list<u32> query_tree(const AABB& box);
+    /** @brief Check for a collision of entity in the tree
+     * (Broad phase)
+     * @param entityId id of the entity containing the AABB to be checked against
+     * @return a list of all the entities that overlap with the queried entity
+     */
+    std::list<u32> query_tree(u32 entityId);
 
   private:
     std::vector<node> nodes;
@@ -48,6 +63,9 @@ class BVH_tree
     index_t nextFree;
 
   private:
+    void insert_node(index_t node);
+    void remove_node(index_t node);
+
     index_t rotate(index_t index);
     f32 compute_cost();
     index_t find_sibling(const AABB& box);
