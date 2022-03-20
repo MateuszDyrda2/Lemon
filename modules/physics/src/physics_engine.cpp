@@ -137,14 +137,14 @@ std::optional<MTV> physics_engine::box_box_collision(
     const auto rhsCC = rhsPosition + rhs.offset;
 
     auto lhsA = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
-    auto lhsB = lhsCC + vec2(-lhs.box.hSize.x, lhs.box.hSize.y);
-    auto lhsC = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsD = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsB = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsC = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsD = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
 
     auto rhsA = rhsCC + vec2(rhs.box.hSize.x, rhs.box.hSize.y);
-    auto rhsB = rhsCC + vec2(-rhs.box.hSize.x, rhs.box.hSize.y);
-    auto rhsC = rhsCC + vec2(rhs.box.hSize.x, -rhs.box.hSize.y);
-    auto rhsD = rhsCC + vec2(-rhs.box.hSize.x, -rhs.box.hSize.y);
+    auto rhsB = rhsCC + vec2(rhs.box.hSize.x, -rhs.box.hSize.y);
+    auto rhsC = rhsCC + vec2(-rhs.box.hSize.x, -rhs.box.hSize.y);
+    auto rhsD = rhsCC + vec2(rhs.box.hSize.x, -rhs.box.hSize.y);
 
     if(int(lhsRotation) % 90 || int(rhsRotation) % 90)
     {
@@ -169,9 +169,9 @@ std::optional<MTV> physics_engine::box_circle_collision(
     const auto rhsCC = rhsPosition + rhs.offset;
 
     auto lhsA = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
-    auto lhsB = lhsCC + vec2(-lhs.box.hSize.x, lhs.box.hSize.y);
-    auto lhsC = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsD = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsB = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsC = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsD = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
 
     if((int)lhsRotation % 0)
     {

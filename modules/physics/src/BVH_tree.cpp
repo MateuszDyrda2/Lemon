@@ -32,13 +32,12 @@ bool intersects(const AABB& lhs, const AABB& rhs)
 BVH_tree::BVH_tree():
     nodes(10), entityNodeMap(), nodeCount(0), rootIndex(nullIndex), nextFree(nullIndex)
 {
-    index_t nextfree = nullIndex;
-    for(index_t i = 0; i < nodes.size(); ++i)
+    nextFree = 0;
+    for(index_t i = 0; i < nodes.size() - 1; ++i)
     {
-        nodes[i].nextFree = nextfree;
-        nextfree          = i;
+        nodes[i].nextFree = i + 1;
     }
-    nextFree = nodes.size() - 1;
+    nodes.back().nextFree = nullIndex;
 }
 BVH_tree::~BVH_tree()
 {
@@ -143,7 +142,7 @@ void BVH_tree::remove_node(index_t index)
         node& currentNode        = nodes[index];
         index_t parentIndex      = currentNode.parentIndex;
         node& parentNode         = nodes[parentIndex];
-        index_t siblingIndex     = parentNode.child1 == index ? parentNode.child1 : parentNode.child2;
+        index_t siblingIndex     = parentNode.child1 == index ? parentNode.child2 : parentNode.child1;
         node& siblingNode        = nodes[siblingIndex];
         index_t grandparentIndex = parentNode.parentIndex;
         if(grandparentIndex != nullIndex)
@@ -224,7 +223,7 @@ BVH_tree::index_t BVH_tree::find_sibling(const AABB& box)
         }
         // is it worth to explore the sub-tree of the current node
         f32 lowerBound = boxCost + inheritedCost;
-        if(lowerBound < bestCost)
+        if(lowerBound < bestCost && !nodes[current].isLeaf)
         {
             bestCandidates.push(nodes[current].child1);
             bestCandidates.push(nodes[current].child2);
@@ -396,6 +395,7 @@ BVH_tree::index_t BVH_tree::allocate_node()
     newNode.child1       = nullIndex;
     newNode.child2       = nullIndex;
     nodeCount += 1;
+    nextFree = newNode.nextFree;
     return newNodeIndex;
 }
 void BVH_tree::deallocate_node(index_t index)

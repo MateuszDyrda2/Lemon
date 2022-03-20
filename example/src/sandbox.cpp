@@ -76,12 +76,13 @@ void Sandbox::initialize()
     auto gin = scene->add_entity(string_id("gin"));
     gin.add_component<sprite_renderer>(asset<texture>(string_id("gin2")));
     gin.add_component<script_component>("gin");
-    gin.add_component<collider>(vec2(0.f, 0.f), 2.f, 2.f);
+    gin.add_component<collider>(vec2(0.f, 0.f), vec2(19.5f, 56.f));
     gin.add_component<rigidbody>();
 
-    auto plane                                = scene->add_entity(string_id("plane"));
-    auto&& collB                              = plane.add_component<collider>(vec2(0.f, 0.f), 5.f, 5.f);
-    plane.get_component<transform>().position = { 0.f, -20.f };
+    auto plane = scene->add_entity(string_id("plane"));
+    plane.add_component<sprite_renderer>(asset<texture>(string_id("plane")));
+    plane.add_component<collider>(vec2(0.f, 0.f), vec2(557.5f, 37.5f));
+    plane.patch_component<transform>([](transform& tr) { tr.position = { 0.f, -200.f }; });
     // gin.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
     // audio_system::begin_play(gin);
     //  scene_serializer::serialize(scene);

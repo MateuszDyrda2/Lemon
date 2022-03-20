@@ -66,7 +66,7 @@ inline void entity::change_component(Args&&... args)
 template<class T, class F>
 inline void entity::patch_component(F&& callable)
 {
-    registry->patch<T>(handle, callable);
+    registry->patch<T>(handle, std::forward<F>(callable));
 }
 template<class... Args>
 inline decltype(auto) entity::get_component()

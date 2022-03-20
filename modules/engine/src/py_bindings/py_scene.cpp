@@ -45,9 +45,9 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def_property(
             "transform", [](scriptable_entity& ent) { return ent.ent.get_component<transform>(); },
             [](scriptable_entity& ent) { ent.ent.change_component<transform>(); }, py::return_value_policy::copy)
-        .def("translate", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([&by](transform& t) { t.position += by; }); })
-        .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([&by](transform& t) { t.rotation += by; }); })
-        .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([&by](transform& t) { t.scale += by; }); })
+        .def("translate", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.position += by; }); })
+        .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([by](transform& t) { t.rotation += by; }); })
+        .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })
         .def_property_readonly("name", [](const scriptable_entity& e) { return e.get_tag().id.get_string(); })
         .def_property("enabled", &scriptable_entity::get_enabled, &scriptable_entity::set_enabled);
 }

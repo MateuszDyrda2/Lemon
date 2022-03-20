@@ -46,6 +46,7 @@ void physics_system::update(entity_registry& registry)
     auto group = registry.group<rigidbody, collider>(entt::get<transform>);
     for(auto&& [ent, rb, coll, trns] : group.each())
     {
+        pEngine.apply_gravity(rb);
         for(const auto& other : pEngine.broad_collisions(u32(ent)))
         {
             // Narrow phase
@@ -56,6 +57,9 @@ void physics_system::update(entity_registry& registry)
                    otherColl, otherTrns.position, otherTrns.rotation))
             {
                 // TODO: Send message on collision
+                trns.position += collision->overlap * collision->axis;
+                rb.force = { 0.f, 0.f };
+                registry.emplace_or_replace<dirty>(ent);
                 // TODO: Resolve collision
             }
             //*****************************************
@@ -67,7 +71,6 @@ void physics_system::update(entity_registry& registry)
     f32 deltaTime = game::get_game_clock()->delta_time();
     for(auto&& [ent, rb, coll, tr] : group.each())
     {
-        pEngine.apply_gravity(rb);
         pEngine.calculate_position(
             rb, tr.position, deltaTime);
 
@@ -77,13 +80,15 @@ void physics_system::update(entity_registry& registry)
         registry.emplace_or_replace<dirty>(ent);
     }
     //*************************************************
+    registry.view<dirty, const transform, const collider>().each([this](const entity_handle ent, const transform& tr, const collider& coll) {
+        pEngine.update_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
+    });
 }
 void physics_system::move_entity(entity ent, const vec2& to)
 {
     auto& trns  = ent.get_component<transform>();
     auto& rb    = ent.get_component<rigidbody>();
     rb.velocity = (to - trns.position) / game::get_game_clock()->delta_time();
-    ;
 }
 void physics_system::rotate_entity(entity ent, f32 to)
 {
