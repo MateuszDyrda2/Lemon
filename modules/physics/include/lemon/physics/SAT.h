@@ -14,6 +14,10 @@ struct MTV
     f32 overlap;
     vec2 axis;
 };
+struct rotated_t
+{ };
+struct axis_aligned_t
+{ };
 struct box_shape
 {
     vec2 vertices[4];
@@ -26,12 +30,18 @@ struct circle_shape
 class SAT
 {
   public:
-    SAT();
-    ~SAT();
+    static constexpr axis_aligned_t axis_aligned{};
+    static constexpr rotated_t rotated{};
 
+  public:
     std::optional<MTV> operator()(
         const box_shape& lhs,
-        const box_shape& rhs) const noexcept;
+        const box_shape& rhs,
+        axis_aligned_t) const noexcept;
+    std::optional<MTV> operator()(
+        const box_shape& lhs,
+        const box_shape& rhs,
+        rotated_t) const noexcept;
     std::optional<MTV> operator()(
         const circle_shape& lhs,
         const circle_shape& rhs) const noexcept;

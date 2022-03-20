@@ -30,7 +30,7 @@ bool intersects(const AABB& lhs, const AABB& rhs)
 }
 
 BVH_tree::BVH_tree():
-    nodes(10)
+    nodes(10), entityNodeMap(), nodeCount(0), rootIndex(nullIndex), nextFree(nullIndex)
 {
     index_t nextfree = nullIndex;
     for(index_t i = 0; i < nodes.size(); ++i)
@@ -75,9 +75,10 @@ void BVH_tree::insert_node(index_t leafIndex)
     auto& newNode   = nodes[leafIndex];
     const auto& box = newNode.box;
 
-    if(nodes.size() == 1)
+    if(nodeCount == 1)
     {
         rootIndex = leafIndex;
+        return;
     }
 
     // stage 1: find the best sibling for the new leaf
@@ -394,6 +395,7 @@ BVH_tree::index_t BVH_tree::allocate_node()
     newNode.parentIndex  = nullIndex;
     newNode.child1       = nullIndex;
     newNode.child2       = nullIndex;
+    nodeCount += 1;
     return newNodeIndex;
 }
 void BVH_tree::deallocate_node(index_t index)
@@ -401,5 +403,6 @@ void BVH_tree::deallocate_node(index_t index)
     auto& toDeallocate    = nodes[index];
     toDeallocate.nextFree = nextFree;
     nextFree              = index;
+    nodeCount -= 1;
 }
 } // namespace lemon

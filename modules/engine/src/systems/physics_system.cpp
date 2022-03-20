@@ -51,7 +51,9 @@ void physics_system::update(entity_registry& registry)
             // Narrow phase
             //*****************************************
             const auto&& [otherTrns, otherColl] = registry.get<const transform, const collider>(entity_handle(other));
-            if(pEngine.collide(coll, trns.position, otherColl, otherTrns.position))
+            if(auto collision = pEngine.collide(
+                   coll, trns.position, trns.rotation,
+                   otherColl, otherTrns.position, otherTrns.rotation))
             {
                 // TODO: Send message on collision
                 // TODO: Resolve collision

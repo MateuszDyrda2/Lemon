@@ -38,5 +38,16 @@ struct collider
             f32 radius{ 0.5f }, hHeight{ 0.5f };
         } capsule;
     };
+    collider() = default;
+    collider(vec2 offset, f32 radius):
+        shape(Circle), offset(offset), circle() { circle.radius = radius; }
+    collider(vec2 offset, vec2 hSize):
+        shape(Box), offset(offset), box() { box.hSize = hSize; }
+    collider(vec2 offset, f32 radius, f32 hHeight):
+        shape(Capsule), offset(offset), capsule()
+    {
+        capsule.radius  = radius;
+        capsule.hHeight = hHeight;
+    }
 };
 } // namespace lemon
