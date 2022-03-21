@@ -3,13 +3,12 @@
 #include <lemon/assets/asset_storage.h>
 #include <lemon/audio/sound_context.h>
 #include <lemon/core/time/clock.h>
-#include <lemon/events/event_handler.h>
+#include <lemon/platform/input.h>
+#include <lemon/platform/window.h>
 #include <lemon/rendering/rendering_context.h>
 #include <lemon/scene/scene_manager.h>
 #include <lemon/scripting/py_engine.h>
 #include <lemon/threading/scheduler.h>
-#include <lemon/platform/input.h>
-#include <lemon/platform/window.h>
 
 #include "py_bindings/py_core.h"
 
@@ -32,7 +31,7 @@ class LEMON_PUBLIC engine
 
     owned<py_engine> _scriptingEngine;
     owned<scheduler> _scheduler;
-    owned<event_handler> _events;
+    //    owned<event_handler> _events;
     owned<window> _window;
     owned<rendering_context> _renderingContext;
     owned<sound_context> _soundContext;

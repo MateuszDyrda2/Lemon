@@ -1,5 +1,7 @@
 #pragma once
 
+#include "window_events.h"
+
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
@@ -25,5 +27,19 @@ class LEMON_PUBLIC window
     std::string _name;
     ivec2 size;
     native_handle_t _handle;
+
+  public:
+    static event onKeyPressed;
+    static event onMouseButtonPressed;
+    static event onMouseScroll;
+    static event onWindowClose;
+    static event onWindowSize;
+    static event onFramebufferSize;
+    static event onWindowContentScale;
+    static event onWindowPos;
+    static event onWindowIconify;
+    static event onWindowMaximize;
+    static event onWindowFocused;
+    static event onWindowRefresh;
 };
 }

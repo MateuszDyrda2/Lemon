@@ -1,8 +1,10 @@
 #include <lemon/core/game.h>
 
 #include <lemon/core/file.h>
+#include <lemon/core/logger.h>
 
 #include <rapidjson/document.h>
+
 #include <vector>
 
 namespace lemon {
@@ -27,9 +29,14 @@ game::settings parse_settings(const std::string& projFile)
     vector<char> buffer;
     file.read(buffer);
     file.close();
+    buffer.push_back('\0');
 
     Document document;
-    document.ParseInsitu(buffer.data());
+    ParseResult ok = document.ParseInsitu(buffer.data());
+    if(!ok)
+    {
+        LOG_FATAL("Game json file parse error: (%u)", ok.Offset());
+    }
     auto iter = document.MemberBegin();
     game::settings settings;
     settings.workingDirectory = projFile.substr(0, projFile.find_last_of("\\/"));

@@ -44,7 +44,7 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def_readonly("entity", &scriptable_entity::ent)
         .def_property(
             "transform", [](scriptable_entity& ent) { return ent.ent.get_component<transform>(); },
-            [](scriptable_entity& ent) { ent.ent.change_component<transform>(); }, py::return_value_policy::copy)
+            [](scriptable_entity& ent) { ent.ent.change_component<transform>(); }, py::return_value_policy::reference)
         .def("translate", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.position += by; }); })
         .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([by](transform& t) { t.rotation += by; }); })
         .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })

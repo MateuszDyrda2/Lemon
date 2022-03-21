@@ -19,6 +19,7 @@ class BVH_tree
 {
     using index_t                      = i32;
     static constexpr index_t nullIndex = -1;
+    static constexpr f32 fattenBy      = 0.05f;
     struct node
     {
         AABB box;

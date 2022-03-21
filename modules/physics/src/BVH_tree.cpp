@@ -62,17 +62,24 @@ void BVH_tree::remove_leaf(u32 entityId)
 void BVH_tree::update_leaf(u32 entityId, const AABB& box)
 {
     index_t index = entityNodeMap[entityId];
+    auto& n       = nodes[index];
+    if(n.box.min.x <= box.min.x && n.box.min.y <= box.min.y
+       && n.box.max.x >= box.max.x && n.box.max.y >= box.max.y)
+    {
+        return;
+    }
 
     remove_node(index);
-
-    nodes[index].box = box;
-
+    n.box = box;
     insert_node(index);
 }
 void BVH_tree::insert_node(index_t leafIndex)
 {
-    auto& newNode   = nodes[leafIndex];
-    const auto& box = newNode.box;
+    auto& newNode      = nodes[leafIndex];
+    auto& box          = newNode.box;
+    const auto boxSize = box.max - box.min;
+    box.min -= boxSize * fattenBy;
+    box.max += boxSize * fattenBy;
 
     if(nodeCount == 1)
     {

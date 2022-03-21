@@ -11,9 +11,9 @@ physics_engine::physics_engine():
 physics_engine::~physics_engine()
 {
 }
-void physics_engine::apply_gravity(rigidbody& rb)
+void physics_engine::apply_gravity(rigidbody& rb, f32 deltaTime)
 {
-    rb.force.y += rb.mass * gravity * rb.gravityScale;
+    rb.velocity.y += (gravity * rb.gravityScale) * deltaTime;
 }
 AABB physics_engine::get_AABB(const collider& coll, const vec2& position) const noexcept
 {
@@ -33,13 +33,13 @@ AABB physics_engine::get_AABB(const collider& coll, const vec2& position) const 
 }
 void physics_engine::calculate_position(rigidbody& rb, vec2& pos, f32 deltaTime)
 {
-    rb.velocity += rb.force / rb.mass * deltaTime;
+    //   rb.velocity += rb.force / rb.mass * deltaTime;
     pos += rb.velocity * deltaTime;
     rb.force = vec2(0);
 }
 void physics_engine::calculate_rotation(rigidbody& rb, f32& rotation, f32 inertia, f32 deltaTime)
 {
-    rb.angularVelocity += rb.torque / inertia * deltaTime;
+    // rb.angularVelocity += rb.torque / inertia * deltaTime;
     rotation += rb.angularVelocity * deltaTime;
     rb.torque = 0.f;
 }
@@ -173,7 +173,7 @@ std::optional<MTV> physics_engine::box_circle_collision(
     auto lhsC = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
     auto lhsD = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
 
-    if((int)lhsRotation % 0)
+    if((int)lhsRotation % 90)
     {
         rotate_box(lhsA, lhsB, lhsC, lhsD, lhsRotation);
         box_shape lhsShape{ { lhsA, lhsB, lhsC, lhsD } };

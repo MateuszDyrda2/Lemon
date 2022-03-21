@@ -1,10 +1,10 @@
 #pragma once
 
 #include "key_codes.h"
-#include <lemon/events/event_handler.h>
+#include <lemon/events/event.h>
 
 namespace lemon {
-struct KeyPressed : public event_base
+struct KeyPressed : public event_args
 {
     KeyPressed(key::keycode keycode,
                int scancode,
@@ -19,7 +19,7 @@ struct KeyPressed : public event_base
     key::action action;
     key::keymod keymod;
 };
-struct MouseButtonPressed : public event_base
+struct MouseButtonPressed : public event_args
 {
     MouseButtonPressed(key::mouse button,
                        key::action action,
@@ -31,58 +31,58 @@ struct MouseButtonPressed : public event_base
     key::action action;
     key::keymod keymod;
 };
-struct MouseScroll : public event_base
+struct MouseScroll : public event_args
 {
     MouseScroll(double xoffset, double yoffset):
         xoffset(xoffset), yoffset(yoffset) { }
     double xoffset, yoffset;
 };
-struct WindowClose : public event_base
+struct WindowClose : public event_args
 {
 };
-struct WindowSize : public event_base
+struct WindowSize : public event_args
 {
     WindowSize(int width, int height):
         width(width), height(height) { }
     int width, height;
 };
-struct FramebufferSize : public event_base
+struct FramebufferSize : public event_args
 {
     FramebufferSize(int width, int height):
         width(width), height(height) { }
     int width, height;
 };
-struct WindowContentScale : public event_base
+struct WindowContentScale : public event_args
 {
     WindowContentScale(float xscale, float yscale):
         xscale(xscale), yscale(yscale) { }
     float xscale, yscale;
 };
-struct WindowPos : public event_base
+struct WindowPos : public event_args
 {
     WindowPos(int xpos, int ypos):
         xpos(xpos), ypos(ypos) { }
     int xpos, ypos;
 };
-struct WindowIconify : public event_base
+struct WindowIconify : public event_args
 {
     WindowIconify(int iconified):
         iconified(iconified) { }
     int iconified;
 };
-struct WindowMaximize : public event_base
+struct WindowMaximize : public event_args
 {
     WindowMaximize(int maximized):
         maximized(maximized) { }
     int maximized;
 };
-struct WindowFocused : public event_base
+struct WindowFocused : public event_args
 {
     WindowFocused(int focused):
         focused(focused) { }
     int focused;
 };
-struct WindowRefresh : public event_base
+struct WindowRefresh : public event_args
 {
 };
 

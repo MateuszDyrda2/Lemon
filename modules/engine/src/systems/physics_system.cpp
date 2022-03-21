@@ -16,7 +16,7 @@ void physics_system::add2tree(entity_registry& registry, entity_handle ent)
     const collider& coll = registry.get<const collider>(ent);
     pEngine.insert_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
 }
-void physics_system::remove_from_tree(entity_registry& registry, entity_handle ent)
+void physics_system::remove_from_tree(entity_registry&, entity_handle ent)
 {
     pEngine.remove_collider(u32(ent));
 }
@@ -34,19 +34,26 @@ physics_system::~physics_system()
 }
 void physics_system::update(entity_registry& registry)
 {
-    // update Axis Aligned Bounding Boxes
     //*************************************************
-    registry.view<dirty, const transform, const collider>().each([this](const entity_handle ent, const transform& tr, const collider& coll) {
-        pEngine.update_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
-    });
-    //*************************************************
+    // update kinematics
+    auto group    = registry.group<rigidbody, collider>(entt::get<transform>);
+    f32 deltaTime = game::get_game_clock()->delta_time();
+    for(auto&& [ent, rb, coll, tr] : group.each())
+    {
+        pEngine.apply_gravity(rb, deltaTime);
 
+        pEngine.calculate_position(rb, tr.position, deltaTime);
+
+        f32 inertia = pEngine.calculate_inertia(rb, coll);
+        pEngine.calculate_rotation(
+            rb, tr.rotation, inertia, deltaTime);
+        registry.emplace_or_replace<dirty>(ent);
+    }
+    //*************************************************
     // Broad phase
     //*************************************************
-    auto group = registry.group<rigidbody, collider>(entt::get<transform>);
     for(auto&& [ent, rb, coll, trns] : group.each())
     {
-        pEngine.apply_gravity(rb);
         for(const auto& other : pEngine.broad_collisions(u32(ent)))
         {
             // Narrow phase
@@ -57,8 +64,13 @@ void physics_system::update(entity_registry& registry)
                    otherColl, otherTrns.position, otherTrns.rotation))
             {
                 // TODO: Send message on collision
-                trns.position += collision->overlap * collision->axis;
-                rb.force = { 0.f, 0.f };
+                //                trns.position += collision->overlap * collision->axis;
+                //                rb.velocity = { 0.f, 0.f };
+                auto nv = dot(rb.velocity, collision->axis);
+                auto vj = -(1 + 0.8f) * nv;
+                auto j  = vj * rb.mass;
+                rb.velocity += j / rb.mass * collision->axis;
+
                 registry.emplace_or_replace<dirty>(ent);
                 // TODO: Resolve collision
             }
@@ -66,23 +78,12 @@ void physics_system::update(entity_registry& registry)
         }
     }
 
-    //*************************************************
-    // update kinematics
-    f32 deltaTime = game::get_game_clock()->delta_time();
-    for(auto&& [ent, rb, coll, tr] : group.each())
-    {
-        pEngine.calculate_position(
-            rb, tr.position, deltaTime);
-
-        f32 inertia = pEngine.calculate_inertia(rb, coll);
-        pEngine.calculate_rotation(
-            rb, tr.rotation, inertia, deltaTime);
-        registry.emplace_or_replace<dirty>(ent);
-    }
+    // update Axis Aligned Bounding Boxes
     //*************************************************
     registry.view<dirty, const transform, const collider>().each([this](const entity_handle ent, const transform& tr, const collider& coll) {
         pEngine.update_collider(u32(ent), pEngine.get_AABB(coll, tr.position));
     });
+    //*************************************************
 }
 void physics_system::move_entity(entity ent, const vec2& to)
 {

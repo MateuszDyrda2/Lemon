@@ -5,16 +5,35 @@
 #include <lemon/core/math/vec2.h>
 
 namespace lemon {
+struct LEMON_PUBLIC physics_changed
+{ };
+
 struct LEMON_PUBLIC rigidbody
 {
+    enum class collision_detection
+    {
+        Discrete,
+        Continuous
+    };
+    enum class body_type
+    {
+        Dynamic,
+        Kinematic
+    };
+
     vec2 velocity{};
     f32 angularVelocity{};
     vec2 force{};
     f32 torque{};
+    f32 linearDrag{};
+    f32 angularDrag{};
     f32 mass{ 1.0f };
     f32 gravityScale{ 10.f };
+    bool freezeRotation{};
+    body_type bodyType{};
+    collision_detection collisionDetection{};
 };
-struct collider
+struct LEMON_PUBLIC collider
 {
     enum collision_shape : byte
     {
