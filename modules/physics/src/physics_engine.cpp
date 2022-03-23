@@ -15,6 +15,11 @@ void physics_engine::apply_gravity(rigidbody& rb, f32 deltaTime)
 {
     rb.velocity.y += (gravity * rb.gravityScale) * deltaTime;
 }
+void physics_engine::apply_drag(rigidbody& rb, f32 deltaTime)
+{
+    rb.velocity *= clamp(1.f - rb.linearDrag * deltaTime, 0.f, 1.f);
+    rb.angularVelocity *= clamp(1.f - rb.angularDrag * deltaTime, 0.f, 1.f);
+}
 AABB physics_engine::get_AABB(const collider& coll, const vec2& position) const noexcept
 {
     const auto realPos = position + coll.offset;
@@ -35,13 +40,11 @@ void physics_engine::calculate_position(rigidbody& rb, vec2& pos, f32 deltaTime)
 {
     //   rb.velocity += rb.force / rb.mass * deltaTime;
     pos += rb.velocity * deltaTime;
-    rb.force = vec2(0);
 }
 void physics_engine::calculate_rotation(rigidbody& rb, f32& rotation, f32 inertia, f32 deltaTime)
 {
     // rb.angularVelocity += rb.torque / inertia * deltaTime;
     rotation += rb.angularVelocity * deltaTime;
-    rb.torque = 0.f;
 }
 f32 physics_engine::calculate_inertia(const rigidbody& rb, const collider& coll)
 {
@@ -136,15 +139,15 @@ std::optional<MTV> physics_engine::box_box_collision(
     const auto lhsCC = lhsPosition + lhs.offset;
     const auto rhsCC = rhsPosition + rhs.offset;
 
-    auto lhsA = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
+    auto lhsA = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
     auto lhsB = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsC = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsD = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsC = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
+    auto lhsD = lhsCC + vec2(-lhs.box.hSize.x, lhs.box.hSize.y);
 
-    auto rhsA = rhsCC + vec2(rhs.box.hSize.x, rhs.box.hSize.y);
+    auto rhsA = rhsCC + vec2(-rhs.box.hSize.x, -rhs.box.hSize.y);
     auto rhsB = rhsCC + vec2(rhs.box.hSize.x, -rhs.box.hSize.y);
-    auto rhsC = rhsCC + vec2(-rhs.box.hSize.x, -rhs.box.hSize.y);
-    auto rhsD = rhsCC + vec2(rhs.box.hSize.x, -rhs.box.hSize.y);
+    auto rhsC = rhsCC + vec2(rhs.box.hSize.x, rhs.box.hSize.y);
+    auto rhsD = rhsCC + vec2(-rhs.box.hSize.x, rhs.box.hSize.y);
 
     if(int(lhsRotation) % 90 || int(rhsRotation) % 90)
     {
@@ -163,15 +166,15 @@ std::optional<MTV> physics_engine::box_box_collision(
 }
 std::optional<MTV> physics_engine::box_circle_collision(
     const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-    const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) const noexcept
+    const collider& rhs, const vec2& rhsPosition, f32) const noexcept
 {
     const auto lhsCC = lhsPosition + lhs.offset;
     const auto rhsCC = rhsPosition + rhs.offset;
 
-    auto lhsA = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
+    auto lhsA = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
     auto lhsB = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsC = lhsCC + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
-    auto lhsD = lhsCC + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
+    auto lhsC = lhsCC + vec2(lhs.box.hSize.x, lhs.box.hSize.y);
+    auto lhsD = lhsCC + vec2(-lhs.box.hSize.x, lhs.box.hSize.y);
 
     if((int)lhsRotation % 90)
     {
@@ -194,8 +197,8 @@ std::optional<MTV> physics_engine::box_capsule_collision(
     return {};
 }
 std::optional<MTV> physics_engine::circle_circle_collision(
-    const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-    const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) const noexcept
+    const collider& lhs, const vec2& lhsPosition, f32,
+    const collider& rhs, const vec2& rhsPosition, f32) const noexcept
 {
     const auto lhsCC = lhsPosition + lhs.offset;
     const auto rhsCC = rhsPosition + rhs.offset;

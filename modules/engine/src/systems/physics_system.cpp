@@ -34,22 +34,16 @@ physics_system::~physics_system()
 }
 void physics_system::update(entity_registry& registry)
 {
-    //*************************************************
-    // update kinematics
-    auto group    = registry.group<rigidbody, collider>(entt::get<transform>);
     f32 deltaTime = game::get_game_clock()->delta_time();
-    for(auto&& [ent, rb, coll, tr] : group.each())
+    for(auto&& [ent, rb] : registry.view<rigidbody>().each())
     {
-        pEngine.apply_gravity(rb, deltaTime);
-
-        pEngine.calculate_position(rb, tr.position, deltaTime);
-
-        f32 inertia = pEngine.calculate_inertia(rb, coll);
-        pEngine.calculate_rotation(
-            rb, tr.rotation, inertia, deltaTime);
-        registry.emplace_or_replace<dirty>(ent);
+        if(rb.bodyType == rigidbody::body_type::Dynamic)
+        {
+            pEngine.apply_gravity(rb, deltaTime);
+        }
     }
-    //*************************************************
+
+    auto group = registry.group<rigidbody, collider>(entt::get<transform>);
     // Broad phase
     //*************************************************
     for(auto&& [ent, rb, coll, trns] : group.each())
@@ -66,17 +60,35 @@ void physics_system::update(entity_registry& registry)
                 // TODO: Send message on collision
                 //                trns.position += collision->overlap * collision->axis;
                 //                rb.velocity = { 0.f, 0.f };
-                auto nv = dot(rb.velocity, collision->axis);
-                auto vj = -(1 + 0.8f) * nv;
-                auto j  = vj * rb.mass;
-                rb.velocity += j / rb.mass * collision->axis;
 
-                registry.emplace_or_replace<dirty>(ent);
+                if(rb.bodyType == rigidbody::body_type::Dynamic)
+                {
+                    auto bounciness = std::min(coll.bounciness, otherColl.bounciness);
+                    auto vj         = -(1 + bounciness) * dot(rb.velocity, collision->axis);
+                    auto j          = vj;
+                    rb.velocity += j * collision->axis;
+                    registry.emplace_or_replace<dirty>(ent);
+                }
                 // TODO: Resolve collision
             }
             //*****************************************
         }
     }
+    //*************************************************
+    // update kinematics
+    for(auto&& [ent, rb, coll, tr] : group.each())
+    {
+        pEngine.apply_drag(rb, deltaTime);
+        pEngine.calculate_position(rb, tr.position, deltaTime);
+        if(!rb.freezeRotation)
+        {
+            f32 inertia = pEngine.calculate_inertia(rb, coll);
+            pEngine.calculate_rotation(
+                rb, tr.rotation, inertia, deltaTime);
+        }
+        registry.emplace_or_replace<dirty>(ent);
+    }
+    //*************************************************
 
     // update Axis Aligned Bounding Boxes
     //*************************************************
@@ -100,11 +112,9 @@ void physics_system::rotate_entity(entity ent, f32 to)
 void physics_system::add_force(entity ent, const vec2& amount)
 {
     auto& rb = ent.get_component<rigidbody>();
-    rb.force += amount;
 }
 void physics_system::add_torque(entity ent, f32 amount)
 {
     auto& rb = ent.get_component<rigidbody>();
-    rb.torque += amount;
 }
 } // namespace lemon

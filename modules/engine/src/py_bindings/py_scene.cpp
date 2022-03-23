@@ -1,5 +1,6 @@
 #include <lemon/engine/py_bindings/py_scene.h>
 
+#include <lemon/engine/systems/physics_system.h>
 #include <lemon/scene/basic_components.h>
 #include <lemon/scene/entity.h>
 #include <lemon/scene/scene_manager.h>
@@ -49,6 +50,7 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([by](transform& t) { t.rotation += by; }); })
         .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })
         .def_property_readonly("name", [](const scriptable_entity& e) { return e.get_tag().id.get_string(); })
-        .def_property("enabled", &scriptable_entity::get_enabled, &scriptable_entity::set_enabled);
+        .def_property("enabled", &scriptable_entity::get_enabled, &scriptable_entity::set_enabled)
+        .def("move_position", [](scriptable_entity& ent, const vec2& pos) { physics_system::move_entity(ent.ent, pos); });
 }
 } // namespace lemon

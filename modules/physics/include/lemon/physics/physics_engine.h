@@ -16,6 +16,7 @@ class LEMON_PUBLIC physics_engine
     physics_engine();
     ~physics_engine();
     void apply_gravity(rigidbody& rb, f32 deltaTime);
+	void apply_drag(rigidbody& rb, f32 deltaTime);
     void calculate_position(rigidbody& rb, vec2& pos, f32 deltaTime);
     void calculate_rotation(rigidbody& rb, f32& rotation, f32 inertia, f32 deltaTime);
     f32 calculate_inertia(const rigidbody& rb, const collider& coll);

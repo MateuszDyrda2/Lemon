@@ -5,9 +5,6 @@
 #include <lemon/core/math/vec2.h>
 
 namespace lemon {
-struct LEMON_PUBLIC physics_changed
-{ };
-
 struct LEMON_PUBLIC rigidbody
 {
     enum class collision_detection
@@ -23,8 +20,6 @@ struct LEMON_PUBLIC rigidbody
 
     vec2 velocity{};
     f32 angularVelocity{};
-    vec2 force{};
-    f32 torque{};
     f32 linearDrag{};
     f32 angularDrag{};
     f32 mass{ 1.0f };
@@ -57,6 +52,8 @@ struct LEMON_PUBLIC collider
             f32 radius{ 0.5f }, hHeight{ 0.5f };
         } capsule;
     };
+    f32 bounciness{};
+    f32 friction{};
     collider() = default;
     collider(vec2 offset, f32 radius):
         shape(Circle), offset(offset), circle() { circle.radius = radius; }
