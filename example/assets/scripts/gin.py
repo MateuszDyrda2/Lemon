@@ -18,6 +18,8 @@ class gin(scriptable_entity):
 			#self.move_position(self.transform.position + vec2(100.0, 0.0) * delta)
 			self.translate(vec2(200.0, 0.0) * delta)
 		if input.key_pressed(keycode.a):
+			tr = self.get_component('transform')
+			logger.warn('{}'.format(tr.position))
 			#self.move_position(self.transform.position + vec2(-100.0, 0.0) * delta)
 			self.translate(vec2(-200.0, 0.0) * delta)
 		

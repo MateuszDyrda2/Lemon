@@ -22,22 +22,23 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def("pop_scene", &scene_manager::pop_scene)
         .def("get_current_scene", &scene_manager::get_current_scene,
              py::return_value_policy::reference);
-    py::class_<transform>(m, "transform")
+    py::class_<component>(m, "component");
+    py::class_<transform, component>(m, "transform")
         .def_readwrite("position", &transform::position)
         .def_readwrite("scale", &transform::scale)
         .def_readwrite("rotation", &transform::rotation);
-    py::class_<camera>(m, "camera")
+    py::class_<camera, component>(m, "camera")
         .def_readonly("viewport", &camera::viewport);
-    py::class_<sprite_renderer>(m, "sprite_renderer")
+    py::class_<sprite_renderer, component>(m, "sprite_renderer")
         .def_readwrite("color", &sprite_renderer::color)
         .def_readwrite("texCoords", &sprite_renderer::texCoords)
         .def_readwrite("texture", &sprite_renderer::text);
-    py::class_<audio_source>(m, "audio_source")
+    py::class_<audio_source, component>(m, "audio_source")
         .def_readwrite("clip", &audio_source::clip)
         .def_readwrite("pitch", &audio_source::pitch)
         .def_readwrite("gain", &audio_source::gain)
         .def_readwrite("loop", &audio_source::loop);
-    py::class_<audio_listener>(m, "audio_listener")
+    py::class_<audio_listener, component>(m, "audio_listener")
         .def_readwrite("masterGain", &audio_listener::masterGain);
     py::class_<entity>(m, "entity");
     py::class_<scriptable_entity>(m, "scriptable_entity")
@@ -51,6 +52,11 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })
         .def_property_readonly("name", [](const scriptable_entity& e) { return e.get_tag().id.get_string(); })
         .def_property("enabled", &scriptable_entity::get_enabled, &scriptable_entity::set_enabled)
-        .def("move_position", [](scriptable_entity& ent, const vec2& pos) { physics_system::move_entity(ent.ent, pos); });
+        .def("move_position", [](scriptable_entity& ent, const vec2& pos) { physics_system::move_entity(ent.ent, pos); })
+        .def(
+            "get_component", [](scriptable_entity& ent, const std::string& str) {
+                return reflection::get_registeredComponents()[str].get_component_f(ent.ent);
+            },
+            py::return_value_policy::reference);
 }
 } // namespace lemon

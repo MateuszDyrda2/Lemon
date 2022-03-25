@@ -4,6 +4,7 @@ set(lemon_scene_SRC
 	src/entity.cpp
 	src/scene.cpp
 	src/scene_manager.cpp
+	src/reflection.cpp
 )
 
 add_library(lemon_scene ${lemon_scene_SRC})
