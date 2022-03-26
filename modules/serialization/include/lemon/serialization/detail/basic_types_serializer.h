@@ -2,6 +2,7 @@
 
 #include <lemon/assets/asset.h>
 #include <lemon/core/basic_types.h>
+#include <lemon/core/math/color.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec3.h>
@@ -44,6 +45,7 @@ inline void serialize(const asset<T>& value, rapidjson::Writer<rapidjson::String
 {
     serialize(value.get_id(), writer);
 }
+void serialize(const color& col, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
 void deserialize(i32& value, const rapidjson::Value& iter);
 void deserialize(i64& value, const rapidjson::Value& iter);
@@ -76,5 +78,6 @@ inline void deserialize(asset<T>& value, const rapidjson::Value& iter)
     deserialize(value_id, iter);
     value = asset<T>(value_id);
 }
+void deserialize(color& value, const rapidjson::Value& iter);
 }
 } // namespace lemon

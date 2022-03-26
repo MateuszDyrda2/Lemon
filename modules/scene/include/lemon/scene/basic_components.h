@@ -9,6 +9,7 @@
 #include <lemon/core/basic_types.h>
 #include <lemon/rendering/texture.h>
 
+#include <lemon/core/math/color.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec3.h>
@@ -20,13 +21,15 @@ namespace lemon {
 /** Id of the entity the component is attached to */
 struct LEMON_PUBLIC tag : public component
 {
+
     string_id id;
     tag() = default;
     tag(string_id id):
         id(id) { }
     ~tag() = default;
+
+    LEMON_REFLECT(tag, id);
 };
-REFLECT_COMPONENT(tag);
 /** Attached to the entity with transform component
  * whose model needs to be recalculated */
 struct LEMON_PUBLIC dirty
@@ -42,7 +45,7 @@ struct LEMON_PUBLIC play
  * scale of the entity in the game world and also relationships */
 struct LEMON_PUBLIC transform : public component
 {
-    // LCOMPONENT(transform);
+
     vec2 position{ 0.f, 0.f };
     vec2 scale{ 1.f, 1.f };
     f32 rotation{ 0.0f };
@@ -62,12 +65,13 @@ struct LEMON_PUBLIC transform : public component
     transform(entity_handle parent):
         parent(parent) { }
     ~transform() = default;
+
+    LEMON_REFLECT(transform, position, scale, rotation,
+                  first, next, parent, order);
 };
-REFLECT_COMPONENT(transform);
 /** Camera component */
 struct LEMON_PUBLIC camera : public component
 {
-    // LCOMPONENT(camera);
     vec4 viewport{};
     mat4 projection{ 1.0f };
     camera() = default;
@@ -76,13 +80,13 @@ struct LEMON_PUBLIC camera : public component
     camera(vec4 vp, const mat4& proj):
         viewport(vp), projection(proj) { }
     ~camera() = default;
+
+    LEMON_REFLECT(camera, viewport);
 };
-REFLECT_COMPONENT(camera);
 /* Component for rendering 2D sprites */
 struct LEMON_PUBLIC sprite_renderer : public component
 {
-    // LCOMPONENT(sprite_renderer);
-    vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+    color col{ 1.0f, 1.0f, 1.0f, 1.0f };
     vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
     asset<texture> text{};
     sprite_renderer() = default;
@@ -94,12 +98,12 @@ struct LEMON_PUBLIC sprite_renderer : public component
         color(color),
         texCoords(texCoords), text(tex) { }
     ~sprite_renderer() = default;
+
+    LEMON_REFLECT(sprite_renderer, color, texCoords, text);
 };
-REFLECT_COMPONENT(sprite_renderer);
 /* Sound source in the game world */
 struct LEMON_PUBLIC audio_source : public component
 {
-    // LCOMPONENT(audio_source);
     sound_source source;
     asset<sound> clip{};
     f32 pitch{ 1.0f };
@@ -113,17 +117,18 @@ struct LEMON_PUBLIC audio_source : public component
     audio_source(audio_source&&) noexcept        = default;
     audio_source& operator=(audio_source&&) noexcept = default;
     ~audio_source()                                  = default;
+
+    // LEMON_REFLECT(audio_source, source, clip, pitch, gain, loop);
 };
-// REFLECT_COMPONENT(audio_source);
 /* Sound listener in the game world (One must be available in the scene) */
 struct LEMON_PUBLIC audio_listener : public component
 {
-    // LCOMPONENT(audio_listener);
     f32 masterGain{ 1.0f };
     audio_listener() = default;
     audio_listener(f32 master):
         masterGain(master) { }
     ~audio_listener() = default;
+
+    LEMON_REFLECT(audio_listener, masterGain);
 };
-REFLECT_COMPONENT(audio_listener);
 } // namespace lemon

@@ -80,7 +80,10 @@ void serialize(const entity_handle& value, Writer<StringBuffer>& writer)
 {
     serialize((u32)value, writer);
 }
-
+void serialize(const color& col, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    serialize(col.rgba, writer);
+}
 void deserialize(i32& value, const Value& iter)
 {
     value = iter.GetInt();
@@ -147,6 +150,12 @@ void deserialize(string_id& value, const Value& iter)
 void deserialize(entity_handle& value, const Value& iter)
 {
     value = entity_handle(iter.GetUint());
+}
+void deserialize(color& value, const rapidjson::Value& iter)
+{
+    vec4 rgba;
+    deserialize(rgba, iter);
+    value = color(rgba);
 }
 }
 }

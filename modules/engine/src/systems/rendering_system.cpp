@@ -43,7 +43,7 @@ void rendering_system::update(entity_registry& registry)
     for(auto&& [ent, sprite, tran] : group.each())
     {
         spriteRenderer->render_sprite(
-            sprite.color, sprite.texCoords, sprite.text, tran.model);
+            sprite.col.rgba, sprite.texCoords, sprite.text, tran.model);
     }
     spriteRenderer->end_render();
 }

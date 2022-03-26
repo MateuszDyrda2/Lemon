@@ -111,7 +111,7 @@ void deserialize_component(T& component, rapidjson::Value::ConstMemberIterator& 
 REGISTER_COMPONENT(tag, id);
 REGISTER_COMPONENT(transform, position, scale, rotation, first, next, parent, order);
 REGISTER_COMPONENT(camera, viewport);
-REGISTER_COMPONENT(sprite_renderer, color, texCoords, text);
+REGISTER_COMPONENT(sprite_renderer, col, texCoords, text);
 }
 /*
 namespace lemon {

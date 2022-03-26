@@ -44,9 +44,6 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
     py::class_<scriptable_entity>(m, "scriptable_entity")
         .def(py::init<entity>())
         .def_readonly("entity", &scriptable_entity::ent)
-        .def_property(
-            "transform", [](scriptable_entity& ent) { return ent.ent.get_component<transform>(); },
-            [](scriptable_entity& ent) { ent.ent.change_component<transform>(); }, py::return_value_policy::reference)
         .def("translate", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.position += by; }); })
         .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([by](transform& t) { t.rotation += by; }); })
         .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })
@@ -57,6 +54,12 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
             "get_component", [](scriptable_entity& ent, const std::string& str) {
                 return reflection::get_registeredComponents()[str].get_component_f(ent.ent);
             },
-            py::return_value_policy::reference);
+            py::return_value_policy::reference)
+        .def("add_component", [](scriptable_entity& ent, const std::string& str, const component& c) {
+            reflection::get_registeredComponents()[str].add_component_f(ent.ent, c);
+        })
+        .def("has_component", [](scriptable_entity& ent, const std::string& str) {
+            return reflection::get_registeredComponents()[str].has_component_f(ent.ent);
+        });
 }
 } // namespace lemon
