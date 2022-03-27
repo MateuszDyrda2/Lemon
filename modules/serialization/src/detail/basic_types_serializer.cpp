@@ -151,7 +151,7 @@ void deserialize(entity_handle& value, const Value& iter)
 {
     value = entity_handle(iter.GetUint());
 }
-void deserialize(color& value, const rapidjson::Value& iter)
+void deserialize(color& value, const Value& iter)
 {
     vec4 rgba;
     deserialize(rgba, iter);

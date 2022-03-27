@@ -2,7 +2,6 @@
 
 #include <entt/entt.hpp>
 #include <lemon/core/game.h>
-#include <lemon/scene/basic_components.h>
 #include <lemon/scene/scene.h>
 #include <lemon/scripting/py_script.h>
 

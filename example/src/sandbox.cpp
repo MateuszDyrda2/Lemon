@@ -9,6 +9,12 @@
 #include <lemon/engine/systems/scripting_system.h>
 #include <lemon/engine/systems/transform_system.h>
 
+#include <lemon/scene/components/audio_components.h>
+#include <lemon/scene/components/physics_components.h>
+#include <lemon/scene/components/rendering_components.h>
+#include <lemon/scene/components/scripting_components.h>
+#include <lemon/scene/components/transform_components.h>
+
 #include <lemon/serialization/scene_serializer.h>
 
 #include <thread>
@@ -30,9 +36,9 @@ class Sandbox : public engine
 Sandbox::Sandbox(int argc, char** argv):
     engine(std::string(EXAMPLE_ROOT_DIR) + "/lemon.json", argc, argv)
 {
-    _scriptingEngine  = create_owned<py_engine>();
-    _scheduler        = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
-//    _events           = create_owned<event_handler>();
+    _scriptingEngine = create_owned<py_engine>();
+    _scheduler       = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
+    //    _events           = create_owned<event_handler>();
     _clock            = create_owned<lemon::clock>();
     _window           = create_owned<window>(1920, 1080);
     _input            = create_owned<input>(_window.get());
@@ -83,8 +89,9 @@ void Sandbox::initialize()
     plane.add_component<sprite_renderer>(asset<texture>(string_id("plane")));
     plane.add_component<collider>(vec2(0.f, 0.f), vec2(557.5f, 37.5f));
     plane.patch_component<transform>([](transform& tr) { tr.position = { 0.f, -200.f }; });
+
     // gin.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
     // audio_system::begin_play(gin);
-    //  scene_serializer::serialize(scene);
+    // scene_serializer::serialize(scene);
 }
 GAME_RUN(Sandbox);

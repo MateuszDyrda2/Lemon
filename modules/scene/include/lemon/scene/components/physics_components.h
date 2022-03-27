@@ -4,8 +4,10 @@
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
 
+#include <lemon/scene/reflection.h>
+
 namespace lemon {
-struct LEMON_PUBLIC rigidbody
+struct LEMON_PUBLIC rigidbody : public component
 {
     enum class collision_detection
     {
@@ -27,8 +29,14 @@ struct LEMON_PUBLIC rigidbody
     bool freezeRotation{};
     body_type bodyType{};
     collision_detection collisionDetection{};
+
+    rigidbody()  = default;
+    ~rigidbody() = default;
+
+    LEMON_REFLECT(rigidbody, velocity, angularVelocity, linearDrag, angularDrag,
+                  mass, gravityScale, freezeRotation, bodyType, collisionDetection);
 };
-struct LEMON_PUBLIC collider
+struct LEMON_PUBLIC collider : public component
 {
     enum collision_shape : byte
     {
@@ -65,5 +73,8 @@ struct LEMON_PUBLIC collider
         capsule.radius  = radius;
         capsule.hHeight = hHeight;
     }
+    ~collider() = default;
+    LEMON_REFLECT(collider, shape, bounciness, friction);
 };
+
 } // namespace lemon

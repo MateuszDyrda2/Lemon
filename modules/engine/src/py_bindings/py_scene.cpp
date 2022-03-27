@@ -1,7 +1,13 @@
 #include <lemon/engine/py_bindings/py_scene.h>
 
 #include <lemon/engine/systems/physics_system.h>
-#include <lemon/scene/basic_components.h>
+
+#include <lemon/scene/components/audio_components.h>
+#include <lemon/scene/components/physics_components.h>
+#include <lemon/scene/components/rendering_components.h>
+#include <lemon/scene/components/scripting_components.h>
+#include <lemon/scene/components/transform_components.h>
+
 #include <lemon/scene/entity.h>
 #include <lemon/scene/scene_manager.h>
 
@@ -30,7 +36,7 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
     py::class_<camera, component>(m, "camera")
         .def_readonly("viewport", &camera::viewport);
     py::class_<sprite_renderer, component>(m, "sprite_renderer")
-        .def_readwrite("color", &sprite_renderer::color)
+        .def_readwrite("color", &sprite_renderer::col)
         .def_readwrite("texCoords", &sprite_renderer::texCoords)
         .def_readwrite("texture", &sprite_renderer::text);
     py::class_<audio_source, component>(m, "audio_source")

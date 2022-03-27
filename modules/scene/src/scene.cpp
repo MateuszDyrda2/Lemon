@@ -1,6 +1,8 @@
 #include <lemon/scene/scene.h>
 
-#include <lemon/scene/basic_components.h>
+#include <lemon/scene/components/audio_components.h>
+#include <lemon/scene/components/rendering_components.h>
+#include <lemon/scene/components/transform_components.h>
 
 namespace lemon {
 scene::scene(string_id name, entity_registry&& registry):

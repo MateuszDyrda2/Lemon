@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lemon/scene/basic_components.h>
+#include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/entity.h>
 
 namespace lemon {

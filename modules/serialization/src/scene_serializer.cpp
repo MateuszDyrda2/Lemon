@@ -4,6 +4,12 @@
 #include <lemon/core/game.h>
 #include <lemon/serialization/detail/component_serializer.h>
 
+#include <lemon/scene/components/audio_components.h>
+#include <lemon/scene/components/physics_components.h>
+#include <lemon/scene/components/rendering_components.h>
+#include <lemon/scene/components/scripting_components.h>
+#include <lemon/scene/components/transform_components.h>
+
 #include <entt/entt.hpp>
 
 namespace lemon {

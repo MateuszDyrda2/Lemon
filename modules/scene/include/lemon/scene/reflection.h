@@ -3,13 +3,14 @@
 #include <lemon/scene/entity.h>
 
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #define CONCAT_IMPL(_a1, _a2) _a1##_a2
 #define CONCAT(_a1, _a2)      CONCAT_IMPL(_a1, _a2)
 #define GET_ARG_COUNT(...) \
-    _INTERNAL_GET_ARG_COUNT(0, __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1, 0)
-#define _INTERNAL_GET_ARG_COUNT(_0, _1, _2, _3, _4, _5, _6, _7, _count, ...) _count
+    _INTERNAL_GET_ARG_COUNT(0, __VA_ARGS__, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define _INTERNAL_GET_ARG_COUNT(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _count, ...) _count
 
 #define LEMON_REFLECT(_class, ...)                                                   \
   private:                                                                           \
@@ -46,8 +47,8 @@
     struct field<T, _i>                           \
     {                                             \
         using field_t = decltype(_class::_field); \
-        _class& inst;                             \
-        field(_class& c): inst(c) { }             \
+        T& inst;                                  \
+        field(T& c): inst(c) { }                  \
         inline static const char* name()          \
         {                                         \
             return #_field;                       \
@@ -62,10 +63,10 @@
         }                                         \
     };
 
-#define REFL_N(_comp, ...)                                                                    \
-    GET_REFL(_0, __VA_ARGS__, REFL_7, REFL_6, REFL_5, REFL_4, REFL_3, REFL_2, REFL_1, REFL_0) \
+#define REFL_N(_comp, ...)                                                                                                      \
+    GET_REFL(_0, __VA_ARGS__, REFL_11, REFL_10, REFL_9, REFL_8, REFL_7, REFL_6, REFL_5, REFL_4, REFL_3, REFL_2, REFL_1, REFL_0) \
     (_comp, __VA_ARGS__)
-#define GET_REFL(_0, _1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define GET_REFL(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, NAME, ...) NAME
 #define REFL_0(_comp)
 #define REFL_1(_comp, _1) \
     REFL_FIELD(_comp, _1, 0)
@@ -92,6 +93,22 @@
 #define REFL_7(_comp, _1, _2, _3, _4, _5, _6, _7) \
     REFL_FIELD(_comp, _7, 6);                     \
     REFL_6(_comp, _1, _2, _3, _4, _5, _6)
+
+#define REFL_8(_comp, _1, _2, _3, _4, _5, _6, _7, _8) \
+    REFL_FIELD(_comp, _8, 7);                         \
+    REFL_7(_comp, _1, _2, _3, _4, _5, _6, _7)
+
+#define REFL_9(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9) \
+    REFL_FIELD(_comp, _9, 8);                             \
+    REFL_8(_comp, _1, _2, _3, _4, _5, _6, _7, _8)
+
+#define REFL_10(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10) \
+    REFL_FIELD(_comp, _10, 9);                                  \
+    REFL_9(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+
+#define REFL_11(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11) \
+    REFL_FIELD(_comp, _11, 10);                                      \
+    REFL_10(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10)
 
 namespace lemon {
 struct component
@@ -123,10 +140,38 @@ class reflection
     {
         return T::field_n::value;
     }
-    template<class T, std::size_t I>
+    template<std::size_t I, class T>
     static constexpr decltype(auto) get_field(T& comp)
     {
-        return typename T::field<T, I>(comp);
+        using field = typename T::field<T, I>;
+        field f(comp);
+        return f.get();
     }
+    template<std::size_t I, class T>
+    static constexpr decltype(auto) get_field(const T& comp)
+    {
+        using field = typename T::field<const T, I>;
+        const field f(comp);
+        return f.get();
+    }
+
+    template<class T, class F, std::size_t I = 0>
+    static void for_each(T& comp, F&& callable) requires(I < T::field_n::value)
+    {
+        callable(get_field<I, T>(comp));
+        for_each<T, F, I + 1>(comp, std::forward<F>(callable));
+    }
+    template<class T, class F, std::size_t I = 0>
+    static void for_each(T&, F&&) requires(I == T::field_n::value)
+    { }
+
+    template<class T, class F, std::size_t I = 0>
+    static void for_each(const T& comp, F&& callable) requires(I < T::field_n::value)
+    {
+        callable(get_field<I, T>(comp));
+        for_each<T, F, I + 1>(comp, std::forward<F>(callable));
+    }
+    template<class T, class F, std::size_t I = 0>
+    static void for_each(const T&, F&&) requires(I == T::field_n::value) { }
 };
 } // namespace lemon

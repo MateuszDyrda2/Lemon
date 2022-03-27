@@ -2,8 +2,8 @@
 
 #include "basic_types_serializer.h"
 
-#include <lemon/scene/basic_components.h>
-
+#include <lemon/scene/reflection.h>
+/*
 #define STRINGIZE(arg)  STRINGIZE1(arg)
 #define STRINGIZE1(arg) STRINGIZE2(arg)
 #define STRINGIZE2(arg) #arg
@@ -96,8 +96,9 @@
 #define DESERIALIZE_N(__obj, __iter, ...)                                                                                                                \
     GET_MACRO(_0, __VA_ARGS__, DESERIALIZE_7, DESERIALIZE_6, DESERIALIZE_5, DESERIALIZE_4, DESERIALIZE_3, DESERIALIZE_2, DESERIALIZE_1, DESERIALIZE_0, ) \
     (__obj, __iter, __VA_ARGS__)
-
+*/
 namespace lemon {
+/*
 template<class T>
 void serialize_component(const T& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
@@ -112,53 +113,23 @@ REGISTER_COMPONENT(tag, id);
 REGISTER_COMPONENT(transform, position, scale, rotation, first, next, parent, order);
 REGISTER_COMPONENT(camera, viewport);
 REGISTER_COMPONENT(sprite_renderer, col, texCoords, text);
-}
-/*
-namespace lemon {
+*/
 template<class T>
 void serialize_component(const T& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.StartObject();
+    {
+        reflection::for_each(component, [&](const auto& field) {
+            internal::serialize(field, writer);
+        });
+    }
     writer.EndObject();
 }
-template<>
-inline void serialize_component<tag>(const tag& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+template<class T>
+void deserialize_component(T& component, rapidjson::Value::ConstMemberIterator& iter)
 {
-    writer.StartObject();
-    internal::serialize(component.id, writer);
-    writer.EndObject();
+    reflection::for_each(component, [&](auto& field) {
+        internal::deserialize(field, iter->value);
+    });
 }
-template<>
-inline void serialize_component<transform>(const transform& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
-{
-    writer.StartObject();
-    internal::serialize(component.position, writer);
-    internal::serialize(component.scale, writer);
-    internal::serialize(component.rotation, writer);
-    internal::serialize(component.model, writer);
-    internal::serialize(component.first, writer);
-    internal::serialize(component.next, writer);
-    internal::serialize(component.parent, writer);
-    internal::serialize(component.order, writer);
-    writer.EndObject();
 }
-template<>
-inline void serialize_component<camera>(const camera& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
-{
-    writer.StartObject();
-    internal::serialize(component.viewport, writer);
-    internal::serialize(component.projection, writer);
-    writer.EndObject();
-}
-template<>
-inline void
-serialize_component<sprite_renderer>(const sprite_renderer& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
-{
-    writer.StartObject();
-    internal::serialize(component.color, writer);
-    internal::serialize(component.texCoords, writer);
-    internal::serialize(component.text, writer);
-    writer.EndObject();
-}
-} // namespace lemon
-*/

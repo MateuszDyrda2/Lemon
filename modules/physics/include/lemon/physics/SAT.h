@@ -1,7 +1,5 @@
 #pragma once
 
-#include "physics_components.h"
-
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>

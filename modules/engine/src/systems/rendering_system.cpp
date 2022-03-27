@@ -3,7 +3,8 @@
 #include <lemon/core/game.h>
 #include <lemon/rendering/basic_renderer.h>
 #include <lemon/rendering/batch_renderer.h>
-#include <lemon/scene/basic_components.h>
+#include <lemon/scene/components/rendering_components.h>
+#include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/scene.h>
 
 #include <lemon/platform/window.h>

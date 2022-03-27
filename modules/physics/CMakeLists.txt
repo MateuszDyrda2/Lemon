@@ -1,7 +1,6 @@
 project(LemonPhysics)
 
 set(lemon_physics_SRC
-	src/physics_engine.cpp
 	src/BVH_tree.cpp
 	src/SAT.cpp
 )

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <lemon/scene/basic_components.h>
+#include <lemon/scene/components/audio_components.h>
+#include <lemon/scene/components/transform_components.h>
+
 #include <lemon/scene/system.h>
 
 #include <lemon/assets/asset.h>
