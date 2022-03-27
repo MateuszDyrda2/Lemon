@@ -4,6 +4,7 @@
 #include <lemon/platform/window.h>
 
 #include <lemon/engine/systems/audio_system.h>
+#include <lemon/engine/systems/debug_system.h>
 #include <lemon/engine/systems/physics_system.h>
 #include <lemon/engine/systems/rendering_system.h>
 #include <lemon/engine/systems/scripting_system.h>
@@ -75,7 +76,8 @@ void Sandbox::initialize()
                      ->add_system<physics_system>()
                      ->add_system<transform_system>()
                      ->add_system<audio_system>()
-                     ->add_system<rendering_system>();
+                     ->add_system<rendering_system>()
+                     ->add_system<debug_system>();
 
     LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
 

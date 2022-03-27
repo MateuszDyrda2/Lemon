@@ -7,6 +7,7 @@ set(lemon_engine_SRC
 	src/systems/scripting_system.cpp
 	src/systems/transform_system.cpp
 	src/systems/physics_system.cpp
+	src/systems/debug_system.cpp
 	src/py_bindings/py_core.cpp
 	src/py_bindings/py_assets.cpp
 	src/py_bindings/py_audio.cpp
@@ -34,4 +35,5 @@ target_link_libraries(lemon_engine
 	lemon::assets
 	lemon::scene
 	lemon::scripting
+	imgui
 )

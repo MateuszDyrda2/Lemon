@@ -15,8 +15,6 @@ class gin(scriptable_entity):
 		logger.warn('name = {}'.format(self.name))
 	def update(self, delta):
 		if input.key_pressed(keycode.d):
-			if self.has_component('transform'):
-				logger.warn('w');
 			#self.move_position(self.transform.position + vec2(100.0, 0.0) * delta)
 			self.translate(vec2(200.0, 0.0) * delta)
 		if input.key_pressed(keycode.a):
