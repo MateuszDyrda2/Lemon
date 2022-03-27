@@ -87,10 +87,11 @@ void Sandbox::initialize()
     gin.add_component<collider>(vec2(0.f, 0.f), vec2(19.5f, 56.f));
     gin.add_component<rigidbody>();
 
-    auto plane = scene->add_entity(string_id("plane"));
+    // auto plane = scene->add_entity(string_id("plane"));
+    auto plane = scene->add_entity(string_id("plane"), { 0.f, -200.f }, { 1.f, 1.f }, 0.f);
     plane.add_component<sprite_renderer>(asset<texture>(string_id("plane")));
     plane.add_component<collider>(vec2(0.f, 0.f), vec2(557.5f, 37.5f));
-    plane.patch_component<transform>([](transform& tr) { tr.position = { 0.f, -200.f }; });
+    // plane.patch_component<transform>([](transform& tr) { tr.position = { 0.f, -200.f }; });
 
     // gin.add_component<audio_source>(asset<sound>(string_id("open-the-door")));
     // audio_system::begin_play(gin);

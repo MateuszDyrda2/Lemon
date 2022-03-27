@@ -39,7 +39,7 @@ window::window(size_type width, size_type height):
         LOG_FATAL("Window or OpenGL context creation failed");
     }
     glfwMakeContextCurrent((GLFWwindow*)_handle);
-    glfwSwapInterval(1);
+    glfwSwapInterval(1); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
     setup_callbacks((GLFWwindow*)_handle);

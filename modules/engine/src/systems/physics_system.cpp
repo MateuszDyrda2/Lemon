@@ -46,24 +46,15 @@ void physics_system::update(entity_registry& registry)
         }
     }
 
-    auto group = registry.group<rigidbody, collider>(entt::get<transform>);
-    // Broad phase
+    auto fullGroup = registry.group<transform, collider, rigidbody>();
+    //  Broad phase
     //*************************************************
-    for(auto&& [ent, rb, coll, trns] : group.each())
-    {
-        for(const auto& other : broad_collisions(u32(ent)))
+    fullGroup.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
+        for(const auto& other : this->broad_collisions(u32(ent)))
         {
-            // Narrow phase
-            //*****************************************
-            const auto&& [otherTrns, otherColl] = registry.get<const transform, const collider>(entity_handle(other));
-            if(auto collision = collide(
-                   coll, trns.position, trns.rotation,
-                   otherColl, otherTrns.position, otherTrns.rotation))
+            const auto&& [otherTr, otherColl] = registry.get<transform, collider>(entity_handle(other));
+            if(auto collision = this->collide(coll, tr, otherColl, otherTr))
             {
-                // TODO: Send message on collision
-                //                trns.position += collision->overlap * collision->axis;
-                //                rb.velocity = { 0.f, 0.f };
-
                 if(rb.bodyType == rigidbody::body_type::Dynamic)
                 {
                     auto bounciness = std::min(coll.bounciness, otherColl.bounciness);
@@ -72,15 +63,12 @@ void physics_system::update(entity_registry& registry)
                     rb.velocity += j * collision->axis;
                     registry.emplace_or_replace<dirty>(ent);
                 }
-                // TODO: Resolve collision
             }
-            //*****************************************
         }
-    }
+    });
     //*************************************************
     // update kinematics
-    for(auto&& [ent, rb, coll, tr] : group.each())
-    {
+    fullGroup.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
         apply_drag(rb, deltaTime);
         calculate_position(rb, tr, deltaTime);
         if(!rb.freezeRotation)
@@ -89,7 +77,7 @@ void physics_system::update(entity_registry& registry)
             calculate_rotation(rb, tr, inertia, deltaTime);
         }
         registry.emplace_or_replace<dirty>(ent);
-    }
+    });
     //*************************************************
 
     // update Axis Aligned Bounding Boxes
@@ -176,56 +164,56 @@ std::list<u32> physics_system::broad_collisions(u32 entityId)
     return tree.query_tree(entityId);
 }
 std::optional<MTV> physics_system::collide(
-    const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-    const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) const noexcept
+    const collider& lhs, const transform& lhsTr,
+    const collider& rhs, const transform& rhsTr) const noexcept
 {
     switch((lhs.shape << 4) | rhs.shape)
     {
     // Box on box collision
     case(collider::Box << 4) | (collider::Box):
         return box_box_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
     // Box on circle collision
     case(collider::Box << 4) | (collider::Circle):
         return box_circle_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
     // Box on capsule collision
     case(collider::Box << 4) | (collider::Capsule):
         return box_capsule_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
-    // Circle on box collision
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
+        // Circle on box collision
     case(collider::Circle << 4) | (collider::Box):
         return box_circle_collision(
-            rhs, rhsPosition, lhsRotation,
-            lhs, lhsPosition, rhsRotation);
-    // Circle on circle collision
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
+        // Circle on circle collision
     case(collider::Circle << 4) | (collider::Circle):
         return circle_circle_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
     // Circle on capsule collision
     case(collider::Circle << 4) | (collider::Capsule):
         return circle_capsule_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
-    // Capsule on box collison
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
+        // Capsule on box collison
     case(collider::Capsule << 4) | (collider::Box):
         return box_capsule_collision(
-            rhs, rhsPosition, lhsRotation,
-            lhs, lhsPosition, rhsRotation);
-    // Capsule on circle collison
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
+        // Capsule on circle collison
     case(collider::Capsule << 4) | (collider::Circle):
         return circle_capsule_collision(
-            rhs, rhsPosition, lhsRotation,
-            lhs, lhsPosition, rhsRotation);
-    // Capsule on capsule collison
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
+        // Capsule on capsule collison
     case(collider::Capsule << 4) | (collider::Capsule):
         return capsule_capsule_collision(
-            lhs, lhsPosition, lhsRotation,
-            rhs, rhsPosition, rhsRotation);
+            lhs, lhsTr.position, lhsTr.rotation,
+            rhs, rhsTr.position, rhsTr.rotation);
     }
 }
 std::optional<MTV> physics_system::box_box_collision(

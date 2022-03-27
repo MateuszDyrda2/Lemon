@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "system.h"
 
-#include <lemon/core/math/vec3.h>
+#include <lemon/core/math/vec2.h>
 
 #include <vector>
 
@@ -28,10 +28,10 @@ class LEMON_PUBLIC scene
 
     entity add_entity(string_id name);
     entity add_entity(string_id name, entity parent);
-    entity add_entity(string_id name, const vec3& position,
-                      const vec3& scale, f32 rotation);
-    entity add_entity(string_id name, const vec3& position,
-                      const vec3& scale, f32 rotation, entity parent);
+    entity add_entity(string_id name, const vec2& position,
+                      const vec2& scale, f32 rotation);
+    entity add_entity(string_id name, const vec2& position,
+                      const vec2& scale, f32 rotation, entity parent);
     entity clone_entity(entity ent, string_id name);
     void remove_entity(entity& ent);
     entity_registry& get_registry() { return registry; }

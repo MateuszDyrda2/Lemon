@@ -41,8 +41,8 @@ class LEMON_PUBLIC physics_system : public system
 
     std::list<u32> broad_collisions(u32 entityId);
     std::optional<MTV> collide(
-        const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-        const collider& rhs, const vec2& rhsPosition, f32 rhsRotation)
+        const collider& lhs, const transform& lhsTr,
+        const collider& rhs, const transform& otherTr)
         const noexcept;
     std::optional<MTV> box_box_collision(
         const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,

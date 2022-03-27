@@ -2,6 +2,7 @@
 
 #include <glm/gtx/transform.hpp>
 #include <lemon/core/math/math.h>
+#include <lemon/core/math/vec3.h>
 #include <lemon/scene/scene.h>
 
 namespace lemon {

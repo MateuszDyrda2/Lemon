@@ -53,8 +53,8 @@ entity scene::add_entity(string_id name, entity parent)
     registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
-entity scene::add_entity(string_id name, const vec3& position,
-                         const vec3& scale, f32 rotation)
+entity scene::add_entity(string_id name, const vec2& position,
+                         const vec2& scale, f32 rotation)
 {
     auto ent = registry.create();
     registry.emplace<tag>(ent, name);
@@ -63,8 +63,8 @@ entity scene::add_entity(string_id name, const vec3& position,
     registry.emplace<enabled>(ent);
     return entity(&registry, ent);
 }
-entity scene::add_entity(string_id name, const vec3& position,
-                         const vec3& scale, f32 rotation, entity parent)
+entity scene::add_entity(string_id name, const vec2& position,
+                         const vec2& scale, f32 rotation, entity parent)
 {
     auto ent   = registry.create();
     auto order = parent.get_component<transform>().order + 1;

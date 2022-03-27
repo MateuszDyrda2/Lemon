@@ -57,13 +57,11 @@ void debug_system::update(entity_registry& registry)
         ImGui::End();
         if(showColliders)
         {
-            auto windowSize = ImGui::GetWindowSize();
+            auto windowSize = game::get_main_window()->get_size();
             auto back       = ImGui::GetBackgroundDrawList();
-            ImU32 color     = 0xFF0000FF;
-            f32 thickness   = 1.f;
-            ImGui::Begin("Wind");
-            for(auto&& [ent, coll, tr] : registry.view<collider, transform>().each())
-            {
+            ImU32 color     = 0xFF00FF00;
+            f32 thickness   = 1.5f;
+            registry.group<transform, collider>().each([&, this](auto, const auto& tr, const auto& coll) {
                 vec2 center      = tr.position + coll.offset;
                 vec2 debugCenter = { windowSize.x * 0.5 + center.x,
                                      windowSize.y * 0.5 - center.y };
@@ -72,14 +70,15 @@ void debug_system::update(entity_registry& registry)
                 ImVec2 ru(debugCenter.x + coll.box.hSize.x, debugCenter.y + coll.box.hSize.y);
                 ImVec2 lu(debugCenter.x - coll.box.hSize.x, debugCenter.y + coll.box.hSize.y);
                 back->AddQuad(ld, rd, ru, lu, color, thickness);
-            }
-            ImGui::End();
+            });
         }
         if(showFPS)
         {
-            ImGui::Begin("FPS");
+            ImGui::SetNextWindowPos(ImVec2(0.f, 0.f));
+            ImGui::Begin("FPS", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
             {
-                ImGui::Text("%.0f", ImGui::GetIO().Framerate);
+                ImGui::SetWindowFontScale(2.f);
+                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "%.2f", ImGui::GetIO().Framerate);
             }
             ImGui::End();
         }
