@@ -23,6 +23,7 @@
 #include <lemon/engine/py_bindings/py_platform.h>
 #include <lemon/engine/py_bindings/py_rendering.h>
 #include <lemon/engine/py_bindings/py_scene.h>
+#include <lemon/engine/py_bindings/py_systems.h>
 #include <lemon/engine/py_bindings/py_threading.h>
 
 #include <lemon/platform/window.h>
@@ -39,6 +40,7 @@ void py_init_core()
     py_init_scene();
     py_init_threading();
     py_init_platform();
+    py_init_systems();
     py_init_rendering();
 }
 namespace py = pybind11;

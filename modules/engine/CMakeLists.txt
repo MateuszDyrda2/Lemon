@@ -17,6 +17,7 @@ set(lemon_engine_SRC
 	src/py_bindings/py_threading.cpp
 	src/py_bindings/py_platform.cpp
 	src/py_bindings/py_rendering.cpp
+	src/py_bindings/py_systems.cpp
 )
 
 add_library(lemon_engine ${lemon_engine_SRC})

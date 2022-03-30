@@ -83,9 +83,9 @@ void Sandbox::initialize()
 
     auto gin = scene->add_entity(string_id("gin"));
     gin.add_component<sprite_renderer>(asset<texture>(string_id("gin2")));
-    gin.add_component<script_component>("gin");
     gin.add_component<collider>(vec2(0.f, 0.f), vec2(19.5f, 56.f));
     gin.add_component<rigidbody>();
+    gin.add_component<script_component>("gin");
 
     // auto plane = scene->add_entity(string_id("plane"));
     auto plane = scene->add_entity(string_id("plane"), { 0.f, -200.f }, { 1.f, 1.f }, 0.f);

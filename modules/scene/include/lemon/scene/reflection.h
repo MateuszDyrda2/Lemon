@@ -20,8 +20,8 @@
         _refl_impl()                                                                 \
         {                                                                            \
             detail::_component_def def;                                              \
-            def.get_component_f = +[](entity& e) -> component& {                     \
-                return static_cast<component&>(e.get_component<_class>());           \
+            def.get_component_f = +[](entity& e) -> component* {                     \
+                return static_cast<component*>(&e.get_component<_class>());          \
             };                                                                       \
             def.add_component_f = +[](entity& e, const component& c) {               \
                 e.add_component<_class>(static_cast<const _class&>(c));              \
@@ -118,7 +118,7 @@ struct component
 namespace detail {
 struct _component_def
 {
-    using b_component = component&;
+    using b_component = component*;
     b_component (*get_component_f)(entity&);
     void (*add_component_f)(entity&, const component&);
     bool (*has_component_f)(entity&);

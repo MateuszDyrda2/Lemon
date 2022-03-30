@@ -19,6 +19,19 @@ transform_system::transform_system(ptr<scene> s)
 transform_system::~transform_system()
 {
 }
+void transform_system::translate(entity ent, const vec2& by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.position += by; });
+}
+void transform_system::rotate(entity ent, f32 by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.rotation += by; });
+}
+void transform_system::scale(entity ent, const vec2& by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.scale += by; });
+}
+
 void transform_system::update(entity_registry& registry)
 {
     registry.sort<dirty>([&registry](const entity_handle lhs, const entity_handle rhs) {

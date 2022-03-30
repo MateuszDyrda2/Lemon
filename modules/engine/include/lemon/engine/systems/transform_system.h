@@ -1,10 +1,13 @@
 #pragma once
 
-#include <concepts>
-#include <entt/entt.hpp>
 #include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/scene.h>
 #include <lemon/scene/system.h>
+
+#include <entt/entt.hpp>
+
+#include <concepts>
+#include <list>
 #include <type_traits>
 
 namespace lemon {
@@ -19,6 +22,10 @@ class LEMON_PUBLIC transform_system : public system
     static void for_each_child_r(entity ent, F&& callable) requires(
         std::is_invocable_v<F, entity>);
 
+    static void translate(entity ent, const vec2& by);
+    static void rotate(entity ent, f32 by);
+    static void scale(entity ent, const vec2& by);
+
     transform_system(ptr<scene> s);
     ~transform_system();
     void update(entity_registry& registry) override;
@@ -32,7 +39,7 @@ void transform_system::for_each_child(entity ent, F&& callable) requires(
     auto child    = ent.get_component<transform>().first;
     while(child != entt::null)
     {
-        entity c(registry, child, false);
+        entity c(registry, child);
         callable(c);
         child = c.get_component<transform>().next;
     }
@@ -45,7 +52,7 @@ void transform_system::for_each_child_r(entity ent, F&& callable) requires(
     auto child    = ent.get_component<transform>().first;
     while(child != entt::null)
     {
-        entity c(registry, child, false);
+        entity c(registry, child);
         callable(c);
         for_each_child_r(c, callable);
         child = c.get_component<transform>().next;

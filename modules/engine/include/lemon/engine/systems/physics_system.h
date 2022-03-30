@@ -20,6 +20,7 @@ class LEMON_PUBLIC physics_system : public system
     static void move_entity(entity ent, const vec2& to);
     static void rotate_entity(entity ent, f32 to);
     static void add_force(entity ent, const vec2& amount);
+    static void add_impulse(entity ent, const vec2& amount);
     static void add_torque(entity ent, f32 amount);
 
   private:

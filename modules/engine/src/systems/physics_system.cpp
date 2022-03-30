@@ -103,6 +103,10 @@ void physics_system::add_force(entity ent, const vec2& amount)
 {
     auto& rb = ent.get_component<rigidbody>();
 }
+void physics_system::add_impulse(entity ent, const vec2& amount)
+{
+    auto& rb = ent.get_component<rigidbody>();
+}
 void physics_system::add_torque(entity ent, f32 amount)
 {
     auto& rb = ent.get_component<rigidbody>();

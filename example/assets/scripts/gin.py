@@ -4,6 +4,7 @@ from input import input
 from input.key import keycode
 from core.math import *
 from scene import *
+from transform import Transform
 
 class gin(scriptable_entity):
 	def __init__(self, ent):
@@ -11,15 +12,15 @@ class gin(scriptable_entity):
 		logger.warn('entity constructor')
 	def create(self):
 		logger.warn('create')
+		self.transform = self.get_component('transform');
+		self.rigidbody = self.get_component('rigidbody');
 	def on_enable(self):
 		logger.warn('name = {}'.format(self.name))
 	def update(self, delta):
 		if input.key_pressed(keycode.d):
-			#self.move_position(self.transform.position + vec2(100.0, 0.0) * delta)
-			self.translate(vec2(200.0, 0.0) * delta)
+			self.rigidbody.velocity = vec2(80, self.rigidbody.velocity.y)
 		if input.key_pressed(keycode.a):
-			#self.move_position(self.transform.position + vec2(-100.0, 0.0) * delta)
-			self.translate(vec2(-200.0, 0.0) * delta)
+			self.rigidbody.velocity = vec2(-80, self.rigidbody.velocity.y)
 		
 	def late_update(self, delta):
 		pass

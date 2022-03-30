@@ -46,16 +46,20 @@ PYBIND11_EMBEDDED_MODULE(scene, m)
         .def_readwrite("loop", &audio_source::loop);
     py::class_<audio_listener, component>(m, "audio_listener")
         .def_readwrite("masterGain", &audio_listener::masterGain);
+    py::class_<rigidbody, component>(m, "rigidbody")
+        .def_readwrite("velocity", &rigidbody::velocity)
+        .def_readwrite("angularVelocity", &rigidbody::angularVelocity)
+        .def_readwrite("linearDrag", &rigidbody::linearDrag)
+        .def_readwrite("angularDrag", &rigidbody::angularDrag)
+        .def_readwrite("mass", &rigidbody::mass)
+        .def_readwrite("gravityScale", &rigidbody::gravityScale)
+        .def_readwrite("freezeRotation", &rigidbody::freezeRotation);
     py::class_<entity>(m, "entity");
     py::class_<scriptable_entity>(m, "scriptable_entity")
         .def(py::init<entity>())
         .def_readonly("entity", &scriptable_entity::ent)
-        .def("translate", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.position += by; }); })
-        .def("rotate", [](scriptable_entity& ent, f32 by) { ent.ent.patch_component<transform>([by](transform& t) { t.rotation += by; }); })
-        .def("scale", [](scriptable_entity& ent, const vec2& by) { ent.ent.patch_component<transform>([by](transform& t) { t.scale += by; }); })
         .def_property_readonly("name", [](const scriptable_entity& e) { return e.get_tag().id.get_string(); })
         .def_property("enabled", &scriptable_entity::get_enabled, &scriptable_entity::set_enabled)
-        .def("move_position", [](scriptable_entity& ent, const vec2& pos) { physics_system::move_entity(ent.ent, pos); })
         .def(
             "get_component", [](scriptable_entity& ent, const std::string& str) {
                 return reflection::get_registeredComponents()[str].get_component_f(ent.ent);
