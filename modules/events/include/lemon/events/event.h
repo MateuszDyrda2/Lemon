@@ -10,8 +10,7 @@
 
 namespace lemon {
 struct LEMON_PUBLIC event_args
-{
-};
+{ };
 class LEMON_PUBLIC event
 {
   public:

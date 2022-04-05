@@ -3,6 +3,7 @@
 #include <lemon/core/game.h>
 #include <lemon/platform/key_codes.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/platform/window_events.h>
 
 #define GLFW_INCLUDE_NONE
@@ -39,7 +40,7 @@ window::window(size_type width, size_type height):
         LOG_FATAL("Window or OpenGL context creation failed");
     }
     glfwMakeContextCurrent((GLFWwindow*)_handle);
-    glfwSwapInterval(1); // fps locked to 60
+    glfwSwapInterval(0); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
     setup_callbacks((GLFWwindow*)_handle);
@@ -63,6 +64,7 @@ window::~window()
 }
 bool window::end_frame()
 {
+    LEMON_PROFILE_FUNCTION();
     glfwSwapBuffers((GLFWwindow*)_handle);
     glfwPollEvents();
     return !!glfwWindowShouldClose((GLFWwindow*)_handle);

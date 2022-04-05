@@ -7,6 +7,7 @@
 #include <lemon/core/game.h>
 #include <lemon/platform/window.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/scene/components/physics_components.h>
 #include <lemon/scene/components/transform_components.h>
 
@@ -44,6 +45,7 @@ debug_system::~debug_system()
 }
 void debug_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     if(enabled)
     {
         ImGui_ImplOpenGL3_NewFrame();

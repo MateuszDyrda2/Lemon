@@ -1,6 +1,7 @@
 #include <lemon/engine/systems/rendering_system.h>
 
 #include <lemon/core/game.h>
+#include <lemon/core/instrumentor.h>
 #include <lemon/rendering/basic_renderer.h>
 #include <lemon/rendering/batch_renderer.h>
 #include <lemon/scene/components/rendering_components.h>
@@ -32,6 +33,7 @@ rendering_system::~rendering_system()
 }
 void rendering_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     auto [cameraComponent, cameraTransform] =
         mainCamera.get_component<camera, transform>();
 

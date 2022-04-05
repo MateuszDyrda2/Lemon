@@ -2,6 +2,7 @@
 
 #include <lemon/core/assert.h>
 #include <lemon/core/game.h>
+#include <lemon/core/instrumentor.h>
 #include <lemon/core/math/math.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/time/clock.h>
@@ -37,6 +38,7 @@ physics_system::~physics_system()
 }
 void physics_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     f32 deltaTime = game::get_game_clock()->delta_time();
     for(auto&& [ent, rb] : registry.view<rigidbody>().each())
     {

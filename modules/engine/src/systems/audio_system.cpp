@@ -1,5 +1,6 @@
 #include <lemon/engine/systems/audio_system.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/scene/scene.h>
 
 namespace lemon {
@@ -12,6 +13,7 @@ audio_system::~audio_system()
 }
 void audio_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     auto [listenerComponent, listenerTransform] =
         listener.get_component<audio_listener, transform>();
 

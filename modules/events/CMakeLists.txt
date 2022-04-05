@@ -1,7 +1,6 @@
 project(LemonEvents)
 
 set(lemon_events_SRC
-#	src/event_handler.cpp
 	src/event.cpp
 )
 

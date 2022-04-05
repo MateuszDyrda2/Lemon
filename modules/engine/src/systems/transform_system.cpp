@@ -1,6 +1,7 @@
 #include <lemon/engine/systems/transform_system.h>
 
 #include <glm/gtx/transform.hpp>
+#include <lemon/core/instrumentor.h>
 #include <lemon/core/math/math.h>
 #include <lemon/core/math/vec3.h>
 #include <lemon/scene/scene.h>
@@ -34,6 +35,7 @@ void transform_system::scale(entity ent, const vec2& by)
 
 void transform_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     registry.sort<dirty>([&registry](const entity_handle lhs, const entity_handle rhs) {
         const auto& clhs = registry.get<transform>(lhs);
         const auto& crhs = registry.get<transform>(rhs);

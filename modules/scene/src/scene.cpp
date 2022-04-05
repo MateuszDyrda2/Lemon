@@ -1,5 +1,6 @@
 #include <lemon/scene/scene.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/scene/components/audio_components.h>
 #include <lemon/scene/components/rendering_components.h>
 #include <lemon/scene/components/transform_components.h>
@@ -32,6 +33,7 @@ void scene::begin()
 }
 void scene::update()
 {
+    LEMON_PROFILE_FUNCTION();
     for(auto& s : systems)
         s->update(registry);
 }

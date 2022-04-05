@@ -2,6 +2,7 @@
 
 #include <entt/entt.hpp>
 #include <lemon/core/game.h>
+#include <lemon/core/instrumentor.h>
 #include <lemon/scene/scene.h>
 #include <lemon/scripting/py_script.h>
 
@@ -22,6 +23,7 @@ scripting_system::~scripting_system()
 }
 void scripting_system::update(entity_registry& registry)
 {
+    LEMON_PROFILE_FUNCTION();
     float deltaTime = clk->delta_time();
     auto view       = registry.view<script_component>();
     for(auto&& [ent, script] : view.each())
