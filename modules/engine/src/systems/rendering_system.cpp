@@ -8,28 +8,29 @@
 #include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/scene.h>
 
-#include <lemon/platform/window.h>
+#include <lemon/platform/window_events.h>
 
 namespace lemon {
-rendering_system::rendering_system(ptr<scene> s):
+rendering_system::rendering_system(ptr<scene> s,
+                                   event_bus& ebus):
     spriteRenderer(create_owned<basic_renderer>()),
-    mainCamera(s->get_main_camera())
+    mainCamera(s->get_main_camera()), ebus(ebus)
 {
-    window::onFramebufferSize.register_observer(
-        [this](event_args* a) {
-            auto f = static_cast<FramebufferSize*>(a);
-            mainCamera.change_component<camera>(
-                glm::vec4{ 0.0f, 0.0f, f->width, f->height },
-                glm::ortho(
-                    (-1.f) * (f->width >> 1), (float)(f->width >> 1),
-                    (-1.f) * (f->height >> 1), (float)(f->height >> 1)));
-        },
-        string_id("rendering_system::onFramebufferSize"));
-
+    ebus.sink(string_id("FramebufferSize")) += this;
     rendering_context::enable_blending();
 }
 rendering_system::~rendering_system()
 {
+    ebus.sink(string_id("FramebufferSize")) -= this;
+}
+void rendering_system::on_event(event* e)
+{
+    auto f = static_cast<FramebufferSize*>(e);
+    mainCamera.change_component<camera>(
+        glm::vec4{ 0.0f, 0.0f, f->width, f->height },
+        glm::ortho(
+            (-1.f) * (f->width >> 1), (float)(f->width >> 1),
+            (-1.f) * (f->height >> 1), (float)(f->height >> 1)));
 }
 void rendering_system::update(entity_registry& registry)
 {

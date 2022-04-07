@@ -11,12 +11,13 @@ class scheduler_test : public ::testing::Test
   protected:
     static void SetUpTestSuite()
     {
-        scheduler::create(std::thread::hardware_concurrency() - 1);
+        sch = new scheduler(std::thread::hardware_concurrency() - 1);
     }
     static void TearDownTestSuite()
     {
-        scheduler::dispose();
+        delete sch;
     }
+    static inline scheduler* sch;
 };
 
 TEST_F(scheduler_test, RunOneJob)
@@ -26,8 +27,8 @@ TEST_F(scheduler_test, RunOneJob)
     job j = [&] {
         w += 1;
     };
-    scheduler::run(&j, 1, &s);
-    scheduler::wait(&s);
+    sch->run(&j, 1, &s);
+    sch->wait(&s);
     ASSERT_EQ(w, 3);
 }
 TEST_F(scheduler_test, RunMultiple)
@@ -47,8 +48,8 @@ TEST_F(scheduler_test, RunMultiple)
         ++w;
     };
     waitable sig;
-    scheduler::run(jobs, 4, &sig);
-    scheduler::wait(&sig);
+    sch->run(jobs, 4, &sig);
+    sch->wait(&sig);
     ASSERT_EQ(x, 2) << "not the same value";
     ASSERT_EQ(y, 3) << "not the same value";
     ASSERT_EQ(z, 4) << "not the same value";
@@ -71,14 +72,14 @@ TEST_F(scheduler_test, RunConsecutive)
         z -= 2;
     };
     waitable sig;
-    scheduler::run(&jobs[0], 1, &sig);
-    scheduler::wait(&sig);
-    scheduler::run(&jobs[1], 1, &sig);
-    scheduler::wait(&sig);
-    scheduler::run(&jobs[2], 1, &sig);
-    scheduler::wait(&sig);
-    scheduler::run(&jobs[3], 1, &sig);
-    scheduler::wait(&sig);
+    sch->run(&jobs[0], 1, &sig);
+    sch->wait(&sig);
+    sch->run(&jobs[1], 1, &sig);
+    sch->wait(&sig);
+    sch->run(&jobs[2], 1, &sig);
+    sch->wait(&sig);
+    sch->run(&jobs[3], 1, &sig);
+    sch->wait(&sig);
     ASSERT_EQ(z, 22) << "not equal";
 }
 TEST_F(scheduler_test, ParrarelForBig)
@@ -88,7 +89,7 @@ TEST_F(scheduler_test, ParrarelForBig)
     {
         arr[i] = i;
     }
-    scheduler::for_each(arr, arr + 256, [](int& i) {
+    sch->for_each(arr, arr + 256, [](int& i) {
         i = 3;
     });
     for(auto& a : arr)
@@ -99,7 +100,7 @@ TEST_F(scheduler_test, ParrarelForBig)
 TEST_F(scheduler_test, ParrarelForSmall)
 {
     int arr[3] = { 0, 1, 2 };
-    scheduler::for_each(arr, arr + 3, [](int& i) {
+    sch->for_each(arr, arr + 3, [](int& i) {
         i += 1;
     });
     ASSERT_EQ(arr[0], 1);
@@ -118,11 +119,11 @@ TEST_F(scheduler_test, NestedJobs)
         w.callable = [&] {
             z += 4;
         };
-        scheduler::run(&w, 1, &s);
-        scheduler::wait(&s);
+        sch->run(&w, 1, &s);
+        sch->wait(&s);
     };
-    scheduler::run(&j, 1, &sig);
-    scheduler::wait(&sig);
+    sch->run(&j, 1, &sig);
+    sch->wait(&sig);
     ASSERT_EQ(z, 9);
 }
 TEST_F(scheduler_test, ChoosenThread)
@@ -130,11 +131,11 @@ TEST_F(scheduler_test, ChoosenThread)
     job j;
     size_type threadIndex;
     j.callable = [&] {
-        threadIndex = scheduler::get_thread_index();
+        threadIndex = sch->get_thread_index();
     };
     waitable sig;
-    scheduler::run(&j, 1, &sig, 2);
-    scheduler::wait(&sig);
+    sch->run(&j, 1, &sig, 2);
+    sch->wait(&sig);
     ASSERT_EQ(threadIndex, 2);
 }
 TEST_F(scheduler_test, MultipleJobs)
@@ -157,12 +158,12 @@ TEST_F(scheduler_test, MultipleJobs)
         run[4] = true;
     };
     waitable w;
-    scheduler::run(jobs, 1, &w);
-    scheduler::run(jobs + 1, 1, &w);
-    scheduler::run(jobs + 2, 1, &w);
-    scheduler::run(jobs + 3, 1, &w);
-    scheduler::run(jobs + 4, 1, &w);
-    scheduler::wait(&w);
+    sch->run(jobs, 1, &w);
+    sch->run(jobs + 1, 1, &w);
+    sch->run(jobs + 2, 1, &w);
+    sch->run(jobs + 3, 1, &w);
+    sch->run(jobs + 4, 1, &w);
+    sch->wait(&w);
     for(auto& r : run)
         EXPECT_TRUE(r);
 }

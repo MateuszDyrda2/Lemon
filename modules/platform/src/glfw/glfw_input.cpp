@@ -6,28 +6,34 @@
 #include <GLFW/glfw3.h>
 
 namespace lemon {
-ptr<window> input::win = nullptr;
-input::input(ptr<window> window)
+ptr<input> input::inputHandler = nullptr;
+input::input(window& window):
+    win(window)
 {
-    input::win = window;
+    LEMON_ASSERT(!inputHandler);
+    inputHandler = this;
+}
+input::~input()
+{
+    inputHandler = nullptr;
 }
 bool input::is_key_pressed(key::keycode key) noexcept
 {
     return glfwGetKey(
-               (GLFWwindow*)win->get_handle(), key)
+               (GLFWwindow*)win.get_handle(), key)
            & (GLFW_PRESS | GLFW_REPEAT);
 }
 bool input::is_mouse_pressed(key::mouse button) noexcept
 {
     return glfwGetMouseButton(
-               (GLFWwindow*)win->get_handle(), button)
+               (GLFWwindow*)win.get_handle(), button)
            == GLFW_PRESS;
 }
 vec2 input::get_mouse_pos() noexcept
 {
     double posx, posy;
     glfwGetCursorPos(
-        (GLFWwindow*)win->get_handle(), &posx, &posy);
+        (GLFWwindow*)win.get_handle(), &posx, &posy);
     return vec2(f32(posx), f32(posy));
 }
 f32 input::get_horizontal() noexcept

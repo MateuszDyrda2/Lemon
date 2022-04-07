@@ -15,9 +15,9 @@
 
 namespace lemon {
 
-debug_system::debug_system(ptr<scene> s):
+debug_system::debug_system(ptr<scene>, event_bus& ebus):
     enabled(false), showColliders(false),
-    showFPS(false)
+    showFPS(false), ebus(ebus)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -26,22 +26,23 @@ debug_system::debug_system(ptr<scene> s):
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)game::get_main_window()->get_handle(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    window::onKeyPressed.register_observer(
-        [this](event_args* a) {
-            auto s = (KeyPressed*)a;
-            if(s->keycode == key::keycode::f2
-               && s->action == key::action::down)
-            {
-                this->enabled ^= 1;
-            }
-        },
-        string_id("debug_system::onKeyPressed"));
+    ebus.sink(string_id("KeyPressed")) += this;
 }
 debug_system::~debug_system()
 {
+    ebus.sink(string_id("KeyPressed")) -= this;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+void debug_system::on_event(event* e)
+{
+    auto s = static_cast<KeyPressed*>(e);
+    if(s->keycode == key::keycode::f2
+       && s->action == key::action::down)
+    {
+        this->enabled ^= 1;
+    }
 }
 void debug_system::update(entity_registry& registry)
 {

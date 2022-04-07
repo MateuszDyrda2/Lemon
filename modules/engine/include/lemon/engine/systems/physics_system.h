@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lemon/core/math/vec4.h>
+#include <lemon/core/time/clock.h>
 #include <lemon/physics/BVH_tree.h>
 #include <lemon/physics/SAT.h>
 #include <lemon/scene/components/physics_components.h>
@@ -12,7 +13,7 @@ class scene;
 class LEMON_PUBLIC physics_system : public system
 {
   public:
-    physics_system(ptr<scene> s);
+    physics_system(ptr<scene> s, clock& clk);
     ~physics_system();
 
     void update(entity_registry& registry) override;
@@ -27,6 +28,7 @@ class LEMON_PUBLIC physics_system : public system
     f32 gravity;
     BVH_tree tree;
     SAT npAlgorithm;
+    clock& clk;
 
   private:
     void add2tree(entity_registry& registry, entity_handle ent);

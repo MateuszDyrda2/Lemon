@@ -6,15 +6,7 @@
 
 namespace lemon {
 size_type thread_local scheduler::threadIndex;
-std::vector<std::thread> scheduler::workers;
-size_type scheduler::nbWorkers;
-std::atomic_bool scheduler::shouldEnd = false;
-std::vector<scheduler::concurrent_queue<job*>> scheduler::localQueues;
-std::vector<scheduler::concurrent_queue<job*>> scheduler::globalQueues;
-std::vector<owned<std::mutex>> scheduler::localMtxs;
-std::vector<owned<std::condition_variable>> scheduler::localCvars;
-
-void scheduler::create(size_type threadCount)
+scheduler::scheduler(size_type threadCount)
 {
     std::srand((unsigned int)time(NULL));
     nbWorkers = threadCount;
@@ -67,7 +59,7 @@ void scheduler::create(size_type threadCount)
         scheduler::threadIndex = nbWorkers;
     }
 }
-void scheduler::dispose()
+scheduler::~scheduler()
 {
     shouldEnd.store(true);
     for(size_type i = 0; i < nbWorkers; ++i)

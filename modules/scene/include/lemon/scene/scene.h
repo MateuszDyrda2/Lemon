@@ -14,10 +14,10 @@ class LEMON_PUBLIC scene
     scene(string_id name, entity_registry&& registry);
     scene(string_id name);
     ~scene();
-    template<class T>
-    inline ptr<scene> add_system()
+    template<class T, class... Args>
+    inline ptr<scene> add_system(Args&&... args)
     {
-        systems.push_back(create_owned<T>(this));
+        systems.push_back(create_owned<T>(this, std::forward<Args>(args)...));
         return this;
     }
     void initialize();

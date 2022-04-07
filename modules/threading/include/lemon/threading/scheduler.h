@@ -37,28 +37,26 @@ class LEMON_PUBLIC scheduler
     /** @brief Creates a scheduler
      * @param threadCount number of workers to create
      */
-    static void create(size_type threadCount);
-    /** @brief Destroys the scheduler
-     */
-    static void dispose();
+    scheduler(size_type threadCount);
+    ~scheduler();
     /** @brief Run jobs in another thread
      * @param jobs jobs that are to be scheduled
      * @param sig object to be waited on
      */
-    static void run(job* jobs, size_type count = 1, waitable* sig = nullptr);
+    void run(job* jobs, size_type count = 1, waitable* sig = nullptr);
     /** @brief Run jobs on a choosen thread
      * @param jobs jobs that are to be scheduled
      * @param sig object to be waited on
      * @param threadIndex index of the thread
      */
-    static void run(job* jobs, size_type count, waitable* sig, size_type threadIndex);
+    void run(job* jobs, size_type count, waitable* sig, size_type threadIndex);
     /** @brief Wait untill the results of the jobs waited on
      * become available
      * @param sig waitable object
      */
-    static void wait(waitable* sig);
+    void wait(waitable* sig);
     /** @returns index of the calling thread */
-    static size_type get_thread_index();
+    size_type get_thread_index();
     /** @brief Executes an unary function on each element in range
      * on multiple workers
      * @param beg iterator to the beggining of the range
@@ -66,21 +64,21 @@ class LEMON_PUBLIC scheduler
      * @param callable a callable object to be executed for each element
      */
     template<class Iter, class F>
-    static void for_each(Iter beg, Iter end, F callable);
+    void for_each(Iter beg, Iter end, F callable);
 
   private:
-    static std::vector<std::thread> workers;
-    static size_type nbWorkers;
-    static std::vector<concurrent_queue<job*>> localQueues;
-    static std::vector<concurrent_queue<job*>> globalQueues;
-    static std::vector<owned<std::mutex>> localMtxs;
-    static std::vector<owned<std::condition_variable>> localCvars;
+    std::vector<std::thread> workers;
+    size_type nbWorkers;
+    std::vector<concurrent_queue<job*>> localQueues;
+    std::vector<concurrent_queue<job*>> globalQueues;
+    std::vector<owned<std::mutex>> localMtxs;
+    std::vector<owned<std::condition_variable>> localCvars;
 
-    static std::atomic_bool shouldEnd;
+    std::atomic_bool shouldEnd;
     static thread_local size_type threadIndex;
 
   private:
-    static void job_finished(job* j);
+    void job_finished(job* j);
 };
 template<class Iter, class F>
 void scheduler::for_each(Iter beg, Iter end, F callable)

@@ -9,14 +9,15 @@
 #include <string>
 
 namespace lemon {
-class LEMON_PUBLIC window
+class LEMON_PUBLIC window : public listener
 {
   public:
     using native_handle_t = void*;
 
   public:
-    window(size_type width, size_type height);
+    window(size_type width, size_type height, event_bus& ebus);
     ~window();
+    void on_event(event* e) override;
 
     bool end_frame();
     ivec2 get_size() const { return size; }
@@ -24,22 +25,12 @@ class LEMON_PUBLIC window
     native_handle_t get_handle() { return (void*)_handle; }
 
   private:
+    event_bus& ebus;
     std::string _name;
     ivec2 size;
     native_handle_t _handle;
 
-  public:
-    static event onKeyPressed;
-    static event onMouseButtonPressed;
-    static event onMouseScroll;
-    static event onWindowClose;
-    static event onWindowSize;
-    static event onFramebufferSize;
-    static event onWindowContentScale;
-    static event onWindowPos;
-    static event onWindowIconify;
-    static event onWindowMaximize;
-    static event onWindowFocused;
-    static event onWindowRefresh;
+  private:
+    static void setup_callbacks(native_handle_t handle);
 };
 }

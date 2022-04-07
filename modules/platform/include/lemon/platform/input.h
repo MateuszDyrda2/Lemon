@@ -10,14 +10,17 @@ namespace lemon {
 class LEMON_PUBLIC input
 {
   public:
-    input(ptr<window> window);
-    [[nodiscard]] static bool is_key_pressed(key::keycode key) noexcept;
-    [[nodiscard]] static bool is_mouse_pressed(key::mouse button) noexcept;
-    [[nodiscard]] static vec2 get_mouse_pos() noexcept;
-    [[nodiscard]] static f32 get_horizontal() noexcept;
-    [[nodiscard]] static f32 get_vertical() noexcept;
+    input(window& window);
+    ~input();
+    bool is_key_pressed(key::keycode key) noexcept;
+    bool is_mouse_pressed(key::mouse button) noexcept;
+    vec2 get_mouse_pos() noexcept;
+    f32 get_horizontal() noexcept;
+    f32 get_vertical() noexcept;
 
   private:
-    static ptr<window> win;
+    window& win;
+    static ptr<input> inputHandler;
+    friend struct input_component;
 };
 } // namespace lemon

@@ -1,7 +1,9 @@
 #include <lemon/engine/entry_point.h>
 
 #include <lemon/core/game.h>
+#include <lemon/events/event_bus.h>
 #include <lemon/platform/window.h>
+#include <lemon/threading/scheduler.h>
 
 #include <lemon/engine/systems/audio_system.h>
 #include <lemon/engine/systems/debug_system.h>
@@ -18,10 +20,7 @@
 
 #include <lemon/serialization/scene_serializer.h>
 
-#include <thread>
-
 #include <lemon/platform/key_codes.h>
-#include <lemon/platform/window_events.h>
 #include <lemon/scripting/py_script.h>
 
 using namespace lemon;
@@ -40,9 +39,11 @@ Sandbox::Sandbox(int argc, char** argv):
     _scriptingEngine = create_owned<py_engine>();
     //_scheduler       = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
     //    _events           = create_owned<event_handler>();
+    _scheduler        = create_owned<scheduler>(std::thread::hardware_concurrency() - 1);
+    _eventBus         = create_owned<event_bus>();
     _clock            = create_owned<lemon::clock>();
-    _window           = create_owned<window>(1920, 1080);
-    _input            = create_owned<input>(_window.get());
+    _window           = create_owned<window>(1920, 1080, *_eventBus);
+    _input            = create_owned<input>(*_window);
     _renderingContext = create_owned<rendering_context>();
     _soundContext     = create_owned<sound_context>();
     _resources        = create_owned<asset_storage>();
@@ -72,12 +73,12 @@ void Sandbox::initialize()
     // test.add_component<script_component>("gin");
 
     auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
-                     ->add_system<scripting_system>()
-                     ->add_system<physics_system>()
+                     ->add_system<scripting_system>(*_clock)
+                     ->add_system<physics_system>(*_clock)
                      ->add_system<transform_system>()
                      ->add_system<audio_system>()
-                     ->add_system<rendering_system>()
-                     ->add_system<debug_system>();
+                     ->add_system<rendering_system>(*_eventBus)
+                     ->add_system<debug_system>(*_eventBus);
 
     LOG_MESSAGE("Initialized %s", scene->get_id().get_string());
 

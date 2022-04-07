@@ -23,8 +23,8 @@ void physics_system::remove_from_tree(entity_registry&, entity_handle ent)
 {
     tree.remove_leaf(u32(ent));
 }
-physics_system::physics_system(ptr<scene> s):
-    gravity(-9.81f)
+physics_system::physics_system(ptr<scene> s, clock& clk):
+    gravity(-9.81f), clk(clk)
 {
     s->get_registry()
         .on_construct<collider>()
@@ -39,7 +39,7 @@ physics_system::~physics_system()
 void physics_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
-    f32 deltaTime = game::get_game_clock()->delta_time();
+    f32 deltaTime = clk.delta_time();
     for(auto&& [ent, rb] : registry.view<rigidbody>().each())
     {
         if(rb.bodyType == rigidbody::body_type::Dynamic)

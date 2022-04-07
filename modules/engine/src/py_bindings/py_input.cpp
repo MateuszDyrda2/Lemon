@@ -12,12 +12,14 @@ void py_init_input()
 namespace py = pybind11;
 PYBIND11_EMBEDDED_MODULE(input, m)
 {
+#if 0
     py::class_<input>(m, "input")
         .def_static("key_pressed", &input::is_key_pressed)
         .def_static("mouse_pressed", &input::is_mouse_pressed)
         .def_property_readonly_static("mousePosition", &input::get_mouse_pos)
         .def_static("get_horizontal", &input::get_horizontal)
         .def_static("get_vertical", &input::get_vertical);
+#endif
     auto key = m.def_submodule("key");
     {
         py::enum_<key::action>(key, "action")
