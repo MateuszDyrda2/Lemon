@@ -13,7 +13,6 @@ std::optional<MTV> SAT::operator()(
     rotated_t) const noexcept
 {
     // get the normals
-    // note: for boxes they are just the walls
     vec2 axis[4] = {
         normalize(lhs.vertices[1] - lhs.vertices[0]),
         normalize(lhs.vertices[2] - lhs.vertices[1]),

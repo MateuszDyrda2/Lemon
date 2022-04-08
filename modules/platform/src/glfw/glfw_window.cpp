@@ -11,7 +11,7 @@
 
 namespace lemon {
 void setup_callbacks(GLFWwindow* _handle);
-window::window(size_type width, size_type height, event_bus& ebus):
+window::window(size_type width, size_type height, event_bus& ebus, scheduler& sch):
     ebus(ebus), _name(game::get_settings().gameName), size(width, height)
 {
     if(!glfwInit())
@@ -26,7 +26,12 @@ window::window(size_type width, size_type height, event_bus& ebus):
     {
         LOG_FATAL("Window or OpenGL context creation failed");
     }
-    glfwMakeContextCurrent((GLFWwindow*)_handle);
+    // Set the thread with index 0 as the rendering thread
+    job j = [&] {
+        glfwMakeContextCurrent((GLFWwindow*)_handle);
+    };
+    waitable w;
+    sch.run(&j, 1, &w, 0);
     glfwSwapInterval(0); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
@@ -35,6 +40,8 @@ window::window(size_type width, size_type height, event_bus& ebus):
     glfwSetErrorCallback([](int /* error */, const char* description) {
         LOG_ERROR("GLFWError: %s", description);
     });
+    sch.wait(&w);
+
     LOG_MESSAGE("Window created %dx%d", width, height);
 }
 window::~window()

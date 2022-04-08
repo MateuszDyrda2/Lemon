@@ -32,7 +32,6 @@ void transform_system::scale(entity ent, const vec2& by)
 {
     ent.patch_component<transform>([&](auto& t) { t.scale += by; });
 }
-
 void transform_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
@@ -42,15 +41,16 @@ void transform_system::update(entity_registry& registry)
         return clhs.order < crhs.order;
     });
     registry.view<dirty>().each([&registry](const entity_handle entity) {
-        auto& trn = registry.get<transform>(entity);
-        trn.model = mat4(1.0f);
+        auto& trn          = registry.get<transform>(entity);
+        auto& modelMatrix  = registry.get<model>(entity);
+        modelMatrix.matrix = mat4(1.0f);
         if(trn.parent != entt::null)
         {
-            trn.model = registry.get<transform>(trn.parent).model;
+            modelMatrix.matrix = registry.get<model>(trn.parent).matrix;
         }
-        trn.model = glm::translate(trn.model, vec3(trn.position, 0.0f));
-        trn.model = glm::rotate(trn.model, trn.rotation, vec3(0.0f, 0.0f, 1.0f));
-        trn.model = glm::scale(trn.model, vec3(trn.scale, 1.0f));
+        modelMatrix.matrix = glm::translate(modelMatrix.matrix, vec3(trn.position, 0.0f));
+        modelMatrix.matrix = glm::rotate(modelMatrix.matrix, trn.rotation, vec3(0.0f, 0.0f, 1.0f));
+        modelMatrix.matrix = glm::scale(modelMatrix.matrix, vec3(trn.scale, 1.0f));
     });
     registry.clear<dirty>();
 }

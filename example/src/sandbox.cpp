@@ -74,8 +74,8 @@ void Sandbox::initialize()
 
     auto scene = _sceneManager->change_scene(string_id("SandboxScene"))
                      ->add_system<scripting_system>(*_clock)
-                     ->add_system<physics_system>(*_clock)
-                     ->add_system<transform_system>()
+                     ->add_system<physics_system>(*_clock, *_scheduler)
+                     ->add_system<transform_system>(*_scheduler)
                      ->add_system<audio_system>()
                      ->add_system<rendering_system>(*_eventBus)
                      ->add_system<debug_system>(*_eventBus);

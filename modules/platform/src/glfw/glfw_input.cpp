@@ -6,17 +6,11 @@
 #include <GLFW/glfw3.h>
 
 namespace lemon {
-ptr<input> input::inputHandler = nullptr;
 input::input(window& window):
     win(window)
-{
-    LEMON_ASSERT(!inputHandler);
-    inputHandler = this;
-}
+{ }
 input::~input()
-{
-    inputHandler = nullptr;
-}
+{ }
 bool input::is_key_pressed(key::keycode key) noexcept
 {
     return glfwGetKey(

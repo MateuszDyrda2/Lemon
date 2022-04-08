@@ -20,7 +20,5 @@ class LEMON_PUBLIC input
 
   private:
     window& win;
-    static ptr<input> inputHandler;
-    friend struct input_component;
 };
 } // namespace lemon

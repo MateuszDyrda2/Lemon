@@ -35,19 +35,19 @@ void rendering_system::on_event(event* e)
 void rendering_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
-    auto [cameraComponent, cameraTransform] =
-        mainCamera.get_component<camera, transform>();
+    auto [cameraComponent, cameraModel] =
+        mainCamera.get_component<camera, model>();
 
     rendering_context::set_viewport(cameraComponent.viewport);
     rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
-    glm::mat4 viewProj = cameraComponent.projection * cameraTransform.model;
+    glm::mat4 viewProj = cameraComponent.projection * cameraModel.matrix;
 
-    auto group = registry.group<sprite_renderer>(entt::get<transform>);
+    auto group = registry.group<sprite_renderer, model>();
     spriteRenderer->start_render(viewProj);
-    for(auto&& [ent, sprite, tran] : group.each())
+    for(auto&& [ent, sprite, mod] : group.each())
     {
         spriteRenderer->render_sprite(
-            sprite.col.rgba, sprite.texCoords, sprite.text, tran.model);
+            sprite.col.rgba, sprite.texCoords, sprite.text, mod.matrix);
     }
     spriteRenderer->end_render();
 }

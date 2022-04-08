@@ -7,6 +7,7 @@ set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_
 
 set(lemon_DESC "2D game engine written in C++")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 project(Lemon DESCRIPTION ${lemon_DESC} VERSION ${lemon_VERSION} LANGUAGES C CXX)
 
 # - ENTT, GLAD, STB, RAPIDJSON, AudioFile
@@ -21,6 +22,7 @@ find_package(glfw3 3.3 REQUIRED)
 # --------------- GLM -----------------
 find_package(glm REQUIRED)
 # -------------------------------------
+
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

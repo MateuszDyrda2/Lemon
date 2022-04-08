@@ -4,8 +4,12 @@ set(lemon_engine_SRC
 	src/engine.cpp
 	src/systems/audio_system.cpp
 	src/systems/rendering_system.cpp
+	src/systems/movement_system.cpp
+	src/systems/collision_system.cpp
 	src/systems/scripting_system.cpp
+	src/systems/gravity_system.cpp
 	src/systems/transform_system.cpp
+	src/systems/player_system.cpp
 	src/systems/physics_system.cpp
 	src/systems/debug_system.cpp
 	src/py_bindings/py_core.cpp

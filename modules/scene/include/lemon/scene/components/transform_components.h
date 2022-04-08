@@ -39,7 +39,6 @@ struct LEMON_PUBLIC transform : public component
     vec2 position{ 0.f, 0.f };
     vec2 scale{ 1.f, 1.f };
     f32 rotation{ 0.0f };
-    mat4 model{ 1.f };
     entity_handle first{ entt::null };
     entity_handle next{ entt::null };
     entity_handle parent{ entt::null };
@@ -58,6 +57,15 @@ struct LEMON_PUBLIC transform : public component
 
     LEMON_REFLECT(transform, position, scale, rotation,
                   first, next, parent, order);
+};
+struct LEMON_PUBLIC model : public component
+{
+    mat4 matrix{ 1.f };
+    model() = default;
+    model(const mat4& matrix):
+        matrix(matrix) { }
+
+    LEMON_REFLECT(model, matrix);
 };
 /** Camera component */
 struct LEMON_PUBLIC camera : public component

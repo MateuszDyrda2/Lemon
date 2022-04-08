@@ -5,6 +5,7 @@
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
+#include <lemon/threading/scheduler.h>
 
 #include <string>
 
@@ -15,7 +16,7 @@ class LEMON_PUBLIC window : public listener
     using native_handle_t = void*;
 
   public:
-    window(size_type width, size_type height, event_bus& ebus);
+    window(size_type width, size_type height, event_bus& ebus, scheduler& sch);
     ~window();
     void on_event(event* e) override;
 
