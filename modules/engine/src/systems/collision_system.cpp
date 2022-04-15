@@ -8,7 +8,19 @@
 
 namespace lemon {
 AABB calculate_AABB(const collider& col, const transform& tr);
-collision_system::collision_system(ptr<scene> s, clock& clk, scheduler& sch):
+std::optional<MTV> collide(SAT& sat,
+                           const collider& lhs, const transform& lhsTr,
+                           const collider& rhs, const transform& rhsTr) noexcept;
+std::optional<MTV> box_box_collision(SAT& sat,
+                                     const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
+                                     const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept;
+std::optional<MTV> box_circle_collision(SAT& sat,
+                                        const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
+                                        const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept;
+std::optional<MTV> circle_circle_collision(SAT& sat,
+                                           const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
+                                           const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept;
+collision_system::collision_system(ptr<scene> /*s*/, clock& clk, scheduler& sch):
     clk(clk), sch(sch)
 {
 }
@@ -18,29 +30,32 @@ collision_system::~collision_system()
 void collision_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
-    // TODO: use different tag / store aabbs somewhere
+
     registry.view<dirty, const transform, const collider>().each(
         [this](auto ent, auto& tr, auto& coll) {
             tree.update_leaf(u32(ent), calculate_AABB(coll, tr));
         });
 
-    auto deltaTime = clk.delta_time();
-
     auto group = registry.group<transform, collider, rigidbody>();
-    sch.for_each(group.begin(), group.end(),
-                 [&, this](auto ent, auto& tr, auto& coll, auto& rb) {
-                     for(const auto& other : tree.query_tree(ent))
-                     {
-                         const auto&& [otherTr, otherColl] = registry.get<transform, collider>(entity_handle(other));
-                         if(auto collision = this->collide(coll, tr, otherColl, otherTr))
-                         {
-                             auto bounciness = std::min(coll.bounciness, otherColl.bounciness);
-                             auto vj         = -(1 + bounciness) * dot(rb.velocity, collision->axis);
-                             auto j          = vj;
-                             rb.velocity += j * collision->axis;
-                         }
-                     }
-                 });
+    group.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
+        for(const auto& other : tree.query_tree(ent))
+        {
+            const auto otherEnt = entity_handle(other);
+            const auto&& [otherTr, otherColl] =
+                registry.get<const transform, const collider>(otherEnt);
+            if(auto collis = collide(npAlgorithm, coll, tr, otherColl, otherTr))
+            {
+                if(registry.all_of<is_trigger_t>(otherEnt))
+                {
+                    registry.emplace<trigger_m>(registry.create(), ent, otherEnt);
+                }
+                else
+                {
+                    registry.emplace<collision_m>(registry.create(), ent, otherEnt, collis.value());
+                }
+            }
+        }
+    });
 }
 AABB calculate_AABB(const collider& col, const transform& tr)
 {
@@ -58,9 +73,9 @@ AABB calculate_AABB(const collider& col, const transform& tr)
         LEMON_ASSERT(0);
     }
 }
-std::optional<MTV> collision_system::collide(
-    const collider& lhs, const transform& lhsTr,
-    const collider& rhs, const transform& rhsTr) noexcept
+std::optional<MTV> collide(SAT& sat,
+                           const collider& lhs, const transform& lhsTr,
+                           const collider& rhs, const transform& rhsTr) noexcept
 {
     static constexpr size_type boxBoxCollision       = (collider::Box << 4) | (collider::Box);
     static constexpr size_type boxCircleCollision    = (collider::Box << 4) | (collider::Circle);
@@ -78,21 +93,25 @@ std::optional<MTV> collision_system::collide(
     // Box on box collision
     case boxBoxCollision:
         return box_box_collision(
+            sat,
             lhs, aCenter, aRotation,
             rhs, bCenter, bRotation);
     // Box on circle collision
     case boxCircleCollision:
         return box_circle_collision(
+            sat,
             lhs, aCenter, aRotation,
             rhs, bCenter, bRotation);
         // Circle on box collision
     case circleBoxCollision:
         return box_circle_collision(
+            sat,
             rhs, bCenter, bRotation,
             lhs, aCenter, aRotation);
         // Circle on circle collision
     case circleCircleCollision:
         return circle_circle_collision(
+            sat,
             lhs, aCenter, aRotation,
             rhs, bCenter, bRotation);
     }
@@ -112,9 +131,9 @@ void rotate_box(vec2& a, vec2& b, vec2& c, vec2& d, f32 degrees) noexcept
     d = { ccos * d.x - csin * d.y,
           csin * d.x + ccos * d.y };
 }
-std::optional<MTV> collision_system::box_box_collision(
-    const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-    const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept
+std::optional<MTV> box_box_collision(SAT& sat,
+                                     const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
+                                     const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept
 {
     auto lhsA = lhsPosition + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
     auto lhsB = lhsPosition + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
@@ -132,26 +151,26 @@ std::optional<MTV> collision_system::box_box_collision(
         rotate_box(rhsA, rhsB, rhsC, rhsD, rhsRotation);
         const box_shape lhsShape = { { lhsA, lhsB, lhsC, lhsD } };
         const box_shape rhsShape = { { rhsA, rhsB, rhsC, rhsD } };
-        return npAlgorithm(lhsShape, rhsShape, SAT::rotated);
+        return sat(lhsShape, rhsShape, SAT::rotated);
     }
     else
     {
         const box_shape lhsShape = { { lhsA, lhsB, lhsC, lhsD } };
         const box_shape rhsShape = { { rhsA, rhsB, rhsC, rhsD } };
-        return npAlgorithm(lhsShape, rhsShape, SAT::axis_aligned);
+        return sat(lhsShape, rhsShape, SAT::axis_aligned);
     }
 }
-std::optional<MTV> collision_system::circle_circle_collision(
-    const collider& lhs, const vec2& lhsPosition, f32,
-    const collider& rhs, const vec2& rhsPosition, f32) noexcept
+std::optional<MTV> circle_circle_collision(SAT& sat,
+                                           const collider& lhs, const vec2& lhsPosition, f32,
+                                           const collider& rhs, const vec2& rhsPosition, f32) noexcept
 {
     const circle_shape lhsShape{ lhsPosition, lhs.circle.radius };
     const circle_shape rhsShape{ rhsPosition, rhs.circle.radius };
-    return npAlgorithm(lhsShape, rhsShape);
+    return sat(lhsShape, rhsShape);
 }
-std::optional<MTV> collision_system::box_circle_collision(
-    const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
-    const collider& rhs, const vec2& rhsPosition, f32) noexcept
+std::optional<MTV> box_circle_collision(SAT& sat,
+                                        const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
+                                        const collider& rhs, const vec2& rhsPosition, f32) noexcept
 {
     auto lhsA = lhsPosition + vec2(-lhs.box.hSize.x, -lhs.box.hSize.y);
     auto lhsB = lhsPosition + vec2(lhs.box.hSize.x, -lhs.box.hSize.y);
@@ -163,13 +182,13 @@ std::optional<MTV> collision_system::box_circle_collision(
         rotate_box(lhsA, lhsB, lhsC, lhsD, lhsRotation);
         box_shape lhsShape{ { lhsA, lhsB, lhsC, lhsD } };
         circle_shape rhsShape{ rhsPosition, rhs.circle.radius };
-        return npAlgorithm(lhsShape, rhsShape);
+        return sat(lhsShape, rhsShape);
     }
     else
     {
         box_shape lhsShape{ { lhsA, lhsB, lhsC, lhsD } };
         circle_shape rhsShape{ rhsPosition, rhs.circle.radius };
-        return npAlgorithm(lhsShape, rhsShape);
+        return sat(lhsShape, rhsShape);
     }
 }
 } // lemon

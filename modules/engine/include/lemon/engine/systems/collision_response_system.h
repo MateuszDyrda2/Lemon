@@ -1,21 +1,19 @@
 #pragma once
 
-#include <lemon/core/time/clock.h>
 #include <lemon/scene/system.h>
 #include <lemon/threading/scheduler.h>
 
 namespace lemon {
 class scene;
-class physics_system : public system
+class collision_response_system : public system
 {
   public:
-    physics_system(ptr<scene> s, clock& clk, scheduler& sch);
-    ~physics_system();
+    collision_response_system(ptr<scene> s, scheduler& sch);
+    ~collision_response_system();
+
     void update(entity_registry& registry) override;
 
   private:
-    clock& clk;
     scheduler& sch;
 };
-}
-
+} // namespace lemon

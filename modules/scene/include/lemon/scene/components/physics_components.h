@@ -3,8 +3,12 @@
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
+#include <lemon/physics/SAT.h>
 
 #include <lemon/scene/reflection.h>
+
+#include <utility>
+#include <vector>
 
 namespace lemon {
 struct LEMON_PUBLIC rigidbody : public component
@@ -76,5 +80,31 @@ struct LEMON_PUBLIC collider : public component
     ~collider() = default;
     LEMON_REFLECT(collider, shape, bounciness, friction);
 };
-
+struct LEMON_PUBLIC collided
+{
+    std::vector<std::pair<entity_handle, MTV>> with;
+};
+struct LEMON_PUBLIC collision_m
+{
+    entity_handle A;
+    entity_handle B;
+    MTV mtv;
+};
+struct LEMON_PUBLIC trigger_m
+{
+    entity_handle A;
+    entity_handle B;
+};
+struct LEMON_PUBLIC is_trigger_t
+{ };
+struct LEMON_PUBLIC collision_enter_m
+{
+    entity_handle A{ entt::null };
+    entity_handle B{ entt::null };
+};
+struct LEMON_PUBLIC collision_leave_m
+{
+    entity_handle A{ entt::null };
+    entity_handle B{ entt::null };
+};
 } // namespace lemon

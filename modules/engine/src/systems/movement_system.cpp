@@ -7,8 +7,8 @@
 #include <lemon/scene/scene.h>
 
 namespace lemon {
-movement_system::movement_system(ptr<scene> s, clock& clk, scheduler& sch):
-    clk(clk), sch(sch)
+movement_system::movement_system(ptr<scene>, clock& clk, scheduler& sch):
+   sch(sch), clk(clk)
 {
 }
 movement_system::~movement_system()
@@ -21,14 +21,15 @@ void movement_system::update(entity_registry& registry)
 
     auto view = registry.view<rigidbody>();
     sch.for_each(view.begin(), view.end(),
-                 [&, this](auto ent, auto& rb) {
+                 [&](auto, auto& rb) {
                      rb.velocity *= clamp(1.f - rb.linearDrag * deltaTime, 0.f, 1.f);
                      rb.angularVelocity *= clamp(1.f - rb.angularDrag * deltaTime, 0.f, 1.f);
                  });
 
-    auto group = registry.group<transform, collider, rigidbody>();
-    sch.for_each(group.begin(), group.end(),
-                 [&, this](auto ent, auto& tr, auto& coll, auto& rb) {
+    // auto group = registry.group<transform, collider, rigidbody>();
+	auto trrb = registry.view<transform, rigidbody>();
+    sch.for_each(trrb.begin(), trrb.end(),
+                 [&](auto , auto& tr, auto& , auto& rb) {
                      tr.position += rb.velocity * deltaTime;
                      tr.rotation += rb.angularVelocity * deltaTime;
                  });

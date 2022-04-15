@@ -9,7 +9,10 @@ set(lemon_engine_SRC
 	src/systems/scripting_system.cpp
 	src/systems/gravity_system.cpp
 	src/systems/transform_system.cpp
-	src/systems/player_system.cpp
+	src/systems/input_system.cpp
+	src/systems/entity_system.cpp
+	src/systems/input_system.cpp
+	src/systems/collision_response_system.cpp
 	src/systems/physics_system.cpp
 	src/systems/debug_system.cpp
 	src/py_bindings/py_core.cpp

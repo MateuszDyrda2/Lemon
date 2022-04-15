@@ -27,12 +27,12 @@ class LEMON_PUBLIC clock
     }
     duration_type elapsed_from_start(const time_point& tp) const noexcept;
     void update() noexcept;
-    void set_timescale(float timeScale) noexcept;
-    [[nodiscard]] float delta_time() const noexcept
+    void set_timescale(f32 timeScale) noexcept;
+    [[nodiscard]] f32 delta_time() const noexcept
     {
         return deltaTime;
     }
-    [[nodiscard]] float read_delta_time() const noexcept
+    [[nodiscard]] f32 read_delta_time() const noexcept
     {
         return realDeltaTime;
     }
@@ -41,8 +41,8 @@ class LEMON_PUBLIC clock
     time_point startTime;
     time_point virtualFrameTime;
     time_point realLastFrameTime;
-    float deltaTime;
-    float realDeltaTime;
-    float timeScale;
+    f32 deltaTime;
+    f32 realDeltaTime;
+    f32 timeScale;
 };
 } // namespace lemon

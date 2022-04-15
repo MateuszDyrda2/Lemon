@@ -14,3 +14,5 @@ CMakeSettings.json
 out
 # qtcreator cmake
 CMakeLists.txt.user
+# clangd cache
+.cache/

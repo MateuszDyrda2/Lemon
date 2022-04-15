@@ -1,36 +1,30 @@
 #include <lemon/engine/systems/physics_system.h>
 
-#include <lemon/core/assert.h>
 #include <lemon/core/instrumentor.h>
-#include <lemon/core/math/math.h>
-#include <lemon/core/math/vec2.h>
 #include <lemon/scene/components/physics_components.h>
+#include <lemon/scene/components/player_components.h>
 #include <lemon/scene/components/transform_components.h>
-#include <lemon/scene/scene.h>
-
-#include <list>
-#include <utility>
 
 namespace lemon {
-physics_system::physics_system(ptr<scene> s, clock& clk, scheduler& sch):
+physics_system::physics_system(ptr<scene> /*s*/, clock& clk, scheduler& sch):
     clk(clk), sch(sch)
-{
-}
+{ }
 physics_system::~physics_system()
-{
-}
+{ }
 void physics_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     auto deltaTime = clk.delta_time();
 
-    auto view = registry.view<rigidbody>();
-    sch.for_each(view.begin(), view.end(),
-                 [&, this](auto ent, auto& rb) {
-                     rb.velocity *= clamp(1.f - rb.linearDrag * deltaTime, 0.f, 1.f);
-                     rb.angularVelocity *= clamp(1.f - rb.angularDrag * deltaTime, 0.f, 1.f);
-                 });
+    auto view = registry.view<rigidbody, entity_controller, move_m>();
+    sch.for_each(
+        view.begin(), view.end(),
+        [&](auto /*ent*/, auto& rb, auto& ec, auto& mm) {
+            auto vel = mm.direction * ec.speed;
+            rb.velocity += vel * deltaTime;
+        });
 }
+
 #if 0 // not needed at the moment
 f32 physics_system::calculate_inertia(const rigidbody& rb, const collider& coll)
 {
@@ -50,4 +44,5 @@ f32 physics_system::calculate_inertia(const rigidbody& rb, const collider& coll)
     }
 }
 #endif
-} // namespace lemon
+
+}
