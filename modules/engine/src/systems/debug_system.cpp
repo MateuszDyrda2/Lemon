@@ -8,7 +8,7 @@
 #include <lemon/platform/window.h>
 
 #include <lemon/core/instrumentor.h>
-#include <lemon/scene/components/physics_components.h>
+#include <lemon/physics/components/physics_components.h>
 #include <lemon/scene/components/transform_components.h>
 
 #include <GLFW/glfw3.h>

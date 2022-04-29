@@ -1,7 +1,8 @@
 #pragma once
 
-#include <lemon/rendering/renderer2d.h>
+#include "../renderer2d.h"
 
+#include <lemon/core/math/vec2.h>
 #include <lemon/core/string_id.h>
 #include <lemon/events/event_bus.h>
 #include <lemon/scene/system.h>
@@ -18,7 +19,7 @@ class LEMON_PUBLIC rendering_system : public system, listener
 
   private:
     owned<renderer2d> spriteRenderer;
-    entity mainCamera;
+    ivec2 viewport;
     event_bus& ebus;
 };
 } // namespace lemon

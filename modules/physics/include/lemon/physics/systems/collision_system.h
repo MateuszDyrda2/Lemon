@@ -1,11 +1,10 @@
 #pragma once
 
-#include <lemon/core/time/clock.h>
+#include "../BVH_tree.h"
+#include "../SAT.h"
+
 #include <lemon/scene/system.h>
 #include <lemon/threading/scheduler.h>
-
-#include <lemon/physics/BVH_tree.h>
-#include <lemon/physics/SAT.h>
 
 // TODO: Implement sleeping when velocity is ~= 0 for more than a frame
 // TODO: Implement collision caching to send correct collisionEnter/Leave events
@@ -16,15 +15,18 @@ class scene;
 class LEMON_PUBLIC collision_system : public system
 {
   public:
-    collision_system(ptr<scene> s, clock& clk, scheduler& sch);
+    collision_system(ptr<scene> s, scheduler& sch);
     ~collision_system();
 
     void update(entity_registry& registry) override;
 
   private:
-    clock& clk;
     scheduler& sch;
     BVH_tree tree;
     SAT npAlgorithm;
+
+  private:
+    void add2tree(entity_registry& registry, entity_handle ent);
+    void remove_from_tree(entity_registry& registy, entity_handle ent);
 };
 } // namespace lemon

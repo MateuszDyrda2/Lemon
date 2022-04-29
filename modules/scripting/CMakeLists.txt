@@ -4,6 +4,7 @@ set(lemon_scripting_SRC
 	src/py_engine.cpp
 	src/py_script.cpp
 	src/scriptable_entity.cpp
+	src/systems/scripting_system.cpp
 )
 
 add_library(lemon_scripting ${lemon_scripting_SRC})

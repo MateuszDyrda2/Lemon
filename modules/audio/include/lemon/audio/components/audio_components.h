@@ -1,12 +1,12 @@
 #pragma once
 
+#include "../sound.h"
+#include "../sound_source.h"
+
+#include <lemon/assets/asset.h>
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/scene/reflection.h>
-
-#include <lemon/assets/asset.h>
-#include <lemon/audio/sound.h>
-#include <lemon/audio/sound_source.h>
 
 namespace lemon {
 /* Play tag attached to the entity with audio_source

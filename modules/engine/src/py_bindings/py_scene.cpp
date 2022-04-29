@@ -1,12 +1,12 @@
 #include <lemon/engine/py_bindings/py_scene.h>
 
-#include <lemon/engine/systems/physics_system.h>
+#include <lemon/physics/systems/physics_system.h>
 
-#include <lemon/scene/components/audio_components.h>
-#include <lemon/scene/components/physics_components.h>
-#include <lemon/scene/components/rendering_components.h>
-#include <lemon/scene/components/scripting_components.h>
+#include <lemon/audio/components/audio_components.h>
+#include <lemon/physics/components/physics_components.h>
+#include <lemon/rendering/components/rendering_components.h>
 #include <lemon/scene/components/transform_components.h>
+#include <lemon/scripting/components/scripting_components.h>
 
 #include <lemon/scene/entity.h>
 #include <lemon/scene/scene_manager.h>

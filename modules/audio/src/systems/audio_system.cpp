@@ -1,4 +1,7 @@
-#include <lemon/engine/systems/audio_system.h>
+#include <lemon/audio/systems/audio_system.h>
+
+#include <lemon/audio/components/audio_components.h>
+#include <lemon/scene/components/transform_components.h>
 
 #include <lemon/core/instrumentor.h>
 #include <lemon/scene/scene.h>

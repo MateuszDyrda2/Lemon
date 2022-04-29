@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../SAT.h"
+
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
-#include <lemon/physics/SAT.h>
-
 #include <lemon/scene/reflection.h>
 
 #include <utility>

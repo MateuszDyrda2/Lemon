@@ -5,7 +5,6 @@
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec4.h>
-#include <lemon/core/string_id.h>
 
 #include <lemon/scene/entity.h>
 #include <lemon/scene/reflection.h>
@@ -13,23 +12,8 @@
 namespace lemon {
 /** Attached to the entity with transform component
  * whose model needs to be recalculated */
-struct LEMON_PUBLIC dirty
+struct LEMON_PUBLIC dirty_t
 { };
-/** Attached when entity is enabled */
-struct LEMON_PUBLIC enabled
-{ };
-/** Id of the entity the component is attached to */
-struct LEMON_PUBLIC tag : public component
-{
-
-    string_id id;
-    tag() = default;
-    tag(string_id id):
-        id(id) { }
-    ~tag() = default;
-
-    LEMON_REFLECT(tag, id);
-};
 
 /** Transform component containing the position, rotation and
  * scale of the entity in the game world and also relationships */
@@ -67,16 +51,15 @@ struct LEMON_PUBLIC model : public component
 
     LEMON_REFLECT(model, matrix);
 };
+struct LEMON_PUBLIC main_camera_t
+{ };
 /** Camera component */
 struct LEMON_PUBLIC camera : public component
 {
-    vec4 viewport{};
-    mat4 projection{ 1.0f };
+    vec4 viewport{0.f, 0.f, 1.f, 1.f};
     camera() = default;
     camera(vec4 vp):
         viewport(vp){};
-    camera(vec4 vp, const mat4& proj):
-        viewport(vp), projection(proj) { }
     ~camera() = default;
 
     LEMON_REFLECT(camera, viewport);

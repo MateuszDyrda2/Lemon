@@ -1,8 +1,8 @@
-#include <lemon/engine/systems/collision_system.h>
+#include <lemon/physics/systems/collision_system.h>
 
 #include <lemon/core/instrumentor.h>
 #include <lemon/core/math/math.h>
-#include <lemon/scene/components/physics_components.h>
+#include <lemon/physics/components/physics_components.h>
 #include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/scene.h>
 
@@ -20,9 +20,25 @@ std::optional<MTV> box_circle_collision(SAT& sat,
 std::optional<MTV> circle_circle_collision(SAT& sat,
                                            const collider& lhs, const vec2& lhsPosition, f32 lhsRotation,
                                            const collider& rhs, const vec2& rhsPosition, f32 rhsRotation) noexcept;
-collision_system::collision_system(ptr<scene> /*s*/, clock& clk, scheduler& sch):
-    clk(clk), sch(sch)
+
+void collision_system::add2tree(entity_registry& registry, entity_handle ent)
 {
+    const auto&& [tr, coll] = registry.get<transform, collider>(ent);
+    tree.insert_leaf(u32(ent), calculate_AABB(coll, tr));
+}
+void collision_system::remove_from_tree(entity_registry& /* registy*/, entity_handle ent)
+{
+    tree.remove_leaf(u32(ent));
+}
+collision_system::collision_system(ptr<scene> s, scheduler& sch):
+    sch(sch)
+{
+    s->get_registry()
+        .on_construct<collider>()
+        .connect<&collision_system::add2tree>(this);
+    s->get_registry()
+        .on_destroy<collider>()
+        .connect<&collision_system::remove_from_tree>(this);
 }
 collision_system::~collision_system()
 {
@@ -31,14 +47,14 @@ void collision_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
 
-    registry.view<dirty, const transform, const collider>().each(
+    registry.view<dirty_t, const transform, const collider>().each(
         [this](auto ent, auto& tr, auto& coll) {
             tree.update_leaf(u32(ent), calculate_AABB(coll, tr));
         });
 
     auto group = registry.group<transform, collider, rigidbody>();
     group.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
-        for(const auto& other : tree.query_tree(ent))
+        for(const auto& other : tree.query_tree(u32(ent)))
         {
             const auto otherEnt = entity_handle(other);
             const auto&& [otherTr, otherColl] =

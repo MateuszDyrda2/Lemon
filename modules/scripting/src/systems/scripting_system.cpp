@@ -1,4 +1,4 @@
-#include <lemon/engine/systems/scripting_system.h>
+#include <lemon/scripting/systems/scripting_system.h>
 
 #include <entt/entt.hpp>
 #include <lemon/core/game.h>
@@ -22,13 +22,7 @@ void scripting_system::update(entity_registry& registry)
     LEMON_PROFILE_FUNCTION();
     float deltaTime = clk.delta_time();
     auto view       = registry.view<script_component>();
-    for(auto&& [ent, script] : view.each())
-    {
-        script.update(deltaTime);
-    }
-    for(auto&& [ent, script] : view.each())
-    {
-        script.late_update(deltaTime);
-    }
+    (void)deltaTime;
+    (void)view;
 }
 } // namespace lemon

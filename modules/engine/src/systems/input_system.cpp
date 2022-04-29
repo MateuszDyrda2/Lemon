@@ -33,7 +33,7 @@ void input_system::update(entity_registry& registry)
         {
             moveBy.x += 1.f;
         }
-        registry.emplace<move_by_m>(ent, moveBy);
+        registry.emplace<move_m>(ent, moveBy);
     });
 }
 } // namespace lemon

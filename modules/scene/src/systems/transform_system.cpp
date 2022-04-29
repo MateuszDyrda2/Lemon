@@ -1,4 +1,4 @@
-#include <lemon/engine/systems/transform_system.h>
+#include <lemon/scene/systems/transform_system.h>
 
 #include <glm/gtx/transform.hpp>
 #include <lemon/core/instrumentor.h>
@@ -9,7 +9,7 @@
 namespace lemon {
 static void dirty_on_update(entity_registry& registry, entity_handle ent)
 {
-    registry.emplace_or_replace<dirty>(ent);
+    registry.emplace_or_replace<dirty_t>(ent);
 }
 transform_system::transform_system(ptr<scene> s)
 {
@@ -35,23 +35,22 @@ void transform_system::scale(entity ent, const vec2& by)
 void transform_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
-    registry.sort<dirty>([&registry](const entity_handle lhs, const entity_handle rhs) {
+    registry.sort<dirty_t>([&registry](const entity_handle lhs, const entity_handle rhs) {
         const auto& clhs = registry.get<transform>(lhs);
         const auto& crhs = registry.get<transform>(rhs);
         return clhs.order < crhs.order;
     });
-    registry.view<dirty>().each([&registry](const entity_handle entity) {
-        auto& trn          = registry.get<transform>(entity);
-        auto& modelMatrix  = registry.get<model>(entity);
-        modelMatrix.matrix = mat4(1.0f);
+    registry.view<dirty_t>().each([&registry](const entity_handle ent) {
+        auto&& [trn, mdl] = registry.get<transform, model>(ent);
+        mdl.matrix        = mat4(1.0f);
         if(trn.parent != entt::null)
         {
-            modelMatrix.matrix = registry.get<model>(trn.parent).matrix;
+            mdl.matrix = registry.get<model>(trn.parent).matrix;
         }
-        modelMatrix.matrix = glm::translate(modelMatrix.matrix, vec3(trn.position, 0.0f));
-        modelMatrix.matrix = glm::rotate(modelMatrix.matrix, trn.rotation, vec3(0.0f, 0.0f, 1.0f));
-        modelMatrix.matrix = glm::scale(modelMatrix.matrix, vec3(trn.scale, 1.0f));
+        mdl.matrix = glm::translate(mdl.matrix, vec3(trn.position, 0.0f));
+        mdl.matrix = glm::rotate(mdl.matrix, trn.rotation, vec3(0.0f, 0.0f, 1.0f));
+        mdl.matrix = glm::scale(mdl.matrix, vec3(trn.scale, 1.0f));
     });
-    registry.clear<dirty>();
+    registry.clear<dirty_t>();
 }
 } // namespace lemon

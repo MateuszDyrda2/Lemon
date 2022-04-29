@@ -15,14 +15,11 @@ class LEMON_PUBLIC scene
     scene(string_id name);
     ~scene();
     template<class T, class... Args>
-    inline ptr<scene> add_system(Args&&... args)
-    {
-        systems.push_back(create_owned<T>(this, std::forward<Args>(args)...));
-        return this;
-    }
+    ptr<scene> add_system(Args&&... args);
     void initialize();
     void update();
     void begin();
+    void set_main_camera(entity mc);
 
     const string_id& get_id() const { return name; }
 
@@ -43,4 +40,10 @@ class LEMON_PUBLIC scene
     entity mainCamera;
     std::vector<owned<system>> systems;
 };
+template<class T, class... Args>
+inline ptr<scene> scene::add_system(Args&&... args)
+{
+    systems.push_back(create_owned<T>(this, std::forward<Args>(args)...));
+    return this;
+}
 } // namespace lemon

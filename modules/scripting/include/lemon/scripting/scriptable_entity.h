@@ -1,5 +1,6 @@
 #pragma once
 
+#include <lemon/scene/components/entity_components.h>
 #include <lemon/scene/components/transform_components.h>
 #include <lemon/scene/entity.h>
 

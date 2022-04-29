@@ -9,6 +9,7 @@ set(lemon_rendering_SRC
 	src/texture.cpp
 	src/vertex_array.cpp
 	src/vertex_buffer.cpp
+	src/systems/rendering_system.cpp
 )
 add_library(lemon_rendering ${lemon_rendering_SRC})
 add_library(lemon::rendering ALIAS lemon_rendering)
@@ -18,8 +19,9 @@ target_link_libraries(lemon_rendering
 	PUBLIC
 	lemon::core
 	lemon::assets
-	lemon::window
+	lemon::platform
 	lemon::events
+	lemon::scene
 	glad
 	PRIVATE
 	stb

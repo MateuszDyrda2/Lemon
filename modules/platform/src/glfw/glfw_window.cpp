@@ -26,12 +26,9 @@ window::window(size_type width, size_type height, event_bus& ebus, scheduler& sc
     {
         LOG_FATAL("Window or OpenGL context creation failed");
     }
-    // Set the thread with index 0 as the rendering thread
-    job j = [&] {
-        glfwMakeContextCurrent((GLFWwindow*)_handle);
-    };
-    waitable w;
-    sch.run(&j, 1, &w, 0);
+    // TODO: Set the thread with index 0 as the rendering thread
+    glfwMakeContextCurrent((GLFWwindow*)_handle);
+
     glfwSwapInterval(0); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
@@ -40,7 +37,6 @@ window::window(size_type width, size_type height, event_bus& ebus, scheduler& sc
     glfwSetErrorCallback([](int /* error */, const char* description) {
         LOG_ERROR("GLFWError: %s", description);
     });
-    sch.wait(&w);
 
     LOG_MESSAGE("Window created %dx%d", width, height);
 }

@@ -1,12 +1,9 @@
 #pragma once
 
-#include <lemon/scene/components/audio_components.h>
-#include <lemon/scene/components/transform_components.h>
-
-#include <lemon/scene/system.h>
+#include "../audio_player.h"
 
 #include <lemon/assets/asset.h>
-#include <lemon/audio/audio_player.h>
+#include <lemon/scene/system.h>
 
 namespace lemon {
 class scene;

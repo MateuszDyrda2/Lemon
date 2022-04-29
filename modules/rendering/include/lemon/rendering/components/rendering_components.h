@@ -1,13 +1,13 @@
 #pragma once
 
-#include <lemon/core/basic_types.h>
-#include <lemon/core/defines.h>
-#include <lemon/scene/reflection.h>
+#include "../texture.h"
 
 #include <lemon/assets/asset.h>
+#include <lemon/core/basic_types.h>
+#include <lemon/core/defines.h>
 #include <lemon/core/math/color.h>
 #include <lemon/core/math/vec4.h>
-#include <lemon/rendering/texture.h>
+#include <lemon/scene/reflection.h>
 
 namespace lemon {
 /* Component for rendering 2D sprites */

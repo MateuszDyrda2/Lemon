@@ -1,7 +1,7 @@
-#include <lemon/engine/systems/physics_system.h>
+#include <lemon/physics/systems/physics_system.h>
 
 #include <lemon/core/instrumentor.h>
-#include <lemon/scene/components/physics_components.h>
+#include <lemon/physics/components/physics_components.h>
 #include <lemon/scene/components/player_components.h>
 #include <lemon/scene/components/transform_components.h>
 
@@ -19,8 +19,9 @@ void physics_system::update(entity_registry& registry)
     auto view = registry.view<rigidbody, entity_controller, move_m>();
     sch.for_each(
         view.begin(), view.end(),
-        [&](auto /*ent*/, auto& rb, auto& ec, auto& mm) {
-            auto vel = mm.direction * ec.speed;
+        [&](auto ent) {
+            auto&& [rb, ec, mm] = view.get(ent);
+            const auto vel      = mm.direction * ec.speed;
             rb.velocity += vel * deltaTime;
         });
 }
