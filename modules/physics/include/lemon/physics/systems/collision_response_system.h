@@ -1,8 +1,10 @@
 #pragma once
 
+#include <lemon/core/time/clock.h>
 #include <lemon/scene/system.h>
 #include <lemon/threading/scheduler.h>
-#include <lemon/core/time/clock.h>
+
+#include <unordered_set>
 
 namespace lemon {
 class scene;
@@ -15,7 +17,9 @@ class collision_response_system : public system
     void update(entity_registry& registry) override;
 
   private:
-	clock& clk;
+    clock& clk;
     scheduler& sch;
+    std::unordered_set<u64> cachedCollisions;
+    std::unordered_set<u64> cachedTriggers;
 };
 } // namespace lemon

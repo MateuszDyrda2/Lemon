@@ -60,19 +60,30 @@ void debug_system::update(entity_registry& registry)
         ImGui::End();
         if(showColliders)
         {
-            auto windowSize = game::get_main_window()->get_size();
-            auto back       = ImGui::GetBackgroundDrawList();
-            ImU32 color     = 0xFF00FF00;
-            f32 thickness   = 1.5f;
+            auto mainCamera          = registry.view<main_camera_t>().front();
+            auto&& [cCamera, cModel] = registry.get<camera, model>(mainCamera);
+
+            auto windowSize        = game::get_main_window()->get_size();
+            auto back              = ImGui::GetBackgroundDrawList();
+            ImU32 color            = 0xFF00FF00;
+            f32 thickness          = 1.5f;
+            const f32 inResolution = windowSize.y / f32(windowSize.x);
+            //            vec2 scaler          = { windowSize.x / (resolution * cCamera.size), windowSize.y / cCamera.size };
+            vec2 scaler = { inResolution * windowSize.x / cCamera.size,
+                            windowSize.y / cCamera.size };
+
             registry.group<transform, collider>().each([&, this](auto, const auto& tr, const auto& coll) {
-                vec2 center      = tr.position + coll.offset;
+                vec2 center      = (tr.position + coll.offset) * scaler;
                 vec2 debugCenter = { windowSize.x * 0.5 + center.x,
                                      windowSize.y * 0.5 - center.y };
-                ImVec2 ld(debugCenter.x - coll.box.hSize.x, debugCenter.y - coll.box.hSize.y);
-                ImVec2 rd(debugCenter.x + coll.box.hSize.x, debugCenter.y - coll.box.hSize.y);
-                ImVec2 ru(debugCenter.x + coll.box.hSize.x, debugCenter.y + coll.box.hSize.y);
-                ImVec2 lu(debugCenter.x - coll.box.hSize.x, debugCenter.y + coll.box.hSize.y);
+                vec2 boxSize     = coll.box.hSize * scaler;
+                ImGui::Text("%fx%f", scaler.x, scaler.y);
+                ImVec2 ld(debugCenter.x - boxSize.x, debugCenter.y - boxSize.y);
+                ImVec2 rd(debugCenter.x + boxSize.x, debugCenter.y - boxSize.y);
+                ImVec2 ru(debugCenter.x + boxSize.x, debugCenter.y + boxSize.y);
+                ImVec2 lu(debugCenter.x - boxSize.x, debugCenter.y + boxSize.y);
                 back->AddQuad(ld, rd, ru, lu, color, thickness);
+                // back->AddRect(ld, ru, color, thickness);
             });
         }
         if(showFPS)

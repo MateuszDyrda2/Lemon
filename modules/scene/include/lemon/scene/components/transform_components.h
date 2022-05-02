@@ -56,7 +56,8 @@ struct LEMON_PUBLIC main_camera_t
 /** Camera component */
 struct LEMON_PUBLIC camera : public component
 {
-    vec4 viewport{0.f, 0.f, 1.f, 1.f};
+    vec4 viewport{ 0.f, 0.f, 1.f, 1.f };
+    f32 size{ 10.f };
     camera() = default;
     camera(vec4 vp):
         viewport(vp){};

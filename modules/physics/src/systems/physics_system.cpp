@@ -2,7 +2,6 @@
 
 #include <lemon/core/instrumentor.h>
 #include <lemon/physics/components/physics_components.h>
-#include <lemon/scene/components/player_components.h>
 #include <lemon/scene/components/transform_components.h>
 
 namespace lemon {
@@ -16,14 +15,27 @@ void physics_system::update(entity_registry& registry)
     LEMON_PROFILE_FUNCTION();
     auto deltaTime = clk.delta_time();
 
-    auto view = registry.view<rigidbody, entity_controller, move_m>();
+    auto view = registry.view<rigidbody>();
+    sch.for_each(view.begin(), view.end(),
+                 [&](auto ent) {
+                     auto&& [rb] = view.get(ent);
+                     rb.velocity *= glm::clamp(1.f - rb.linearDrag * deltaTime, 0.f, 1.f);
+                     rb.angularVelocity *= glm::clamp(1.f - rb.angularDrag * deltaTime, 0.f, 1.f);
+                 });
+
+    // auto group = registry.group<transform, collider, rigidbody>();
+    auto trrb = registry.view<transform, rigidbody>();
     sch.for_each(
-        view.begin(), view.end(),
+        trrb.begin(), trrb.end(),
         [&](auto ent) {
-            auto&& [rb, ec, mm] = view.get(ent);
-            const auto vel      = mm.direction * ec.speed;
-            rb.velocity += vel * deltaTime;
+            auto&& [tr, rb] = trrb.get(ent);
+            tr.position += rb.velocity * deltaTime;
+            tr.rotation += rb.angularVelocity * deltaTime;
         });
+    for(auto&& [ent, rb] : view.each())
+    {
+        registry.emplace_or_replace<dirty_t>(ent);
+    }
 }
 
 #if 0 // not needed at the moment

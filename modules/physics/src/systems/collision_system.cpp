@@ -47,12 +47,13 @@ void collision_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
 
-    registry.view<dirty_t, const transform, const collider>().each(
-        [this](auto ent, auto& tr, auto& coll) {
-            tree.update_leaf(u32(ent), calculate_AABB(coll, tr));
-        });
+    registry.clear<collision_m, trigger_m>();
 
     auto group = registry.group<transform, collider, rigidbody>();
+    group.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
+        tree.update_leaf(u32(ent), calculate_AABB(coll, tr));
+    });
+
     group.each([&, this](auto ent, auto& tr, auto& coll, auto& rb) {
         for(const auto& other : tree.query_tree(u32(ent)))
         {

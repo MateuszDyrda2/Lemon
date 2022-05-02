@@ -33,6 +33,8 @@ void rendering_system::on_event(event* e)
 void rendering_system::update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
+    glm::mat4 projection;
+    glm::mat4 modelMatrix;
 
     auto&& mainCamera        = registry.view<main_camera_t>().front();
     auto&& [cCamera, cModel] = registry.get<camera, model>(mainCamera);
@@ -44,10 +46,14 @@ void rendering_system::update(entity_registry& registry)
 
     rendering_context::set_viewport(newVp);
     rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
-    auto projection = glm::ortho((-1.f) * (viewport.x >> 1), (float)(viewport.x >> 1),
-                                 (-1.f) * (viewport.y >> 1), (float)(viewport.y >> 1));
 
-    glm::mat4 viewProj = projection * cModel.matrix;
+    const auto resolution = newVp.z / newVp.w;
+    const auto w          = resolution * cCamera.size / 2.f;
+    const auto h          = cCamera.size / 2.f;
+    projection            = glm::ortho((-1.f) * w, w, -1.f * h, h);
+    modelMatrix           = cModel.matrix;
+
+    glm::mat4 viewProj = projection * modelMatrix;
 
     auto group = registry.group<sprite_renderer, model>();
     spriteRenderer->start_render(viewProj);

@@ -29,7 +29,7 @@ window::window(size_type width, size_type height, event_bus& ebus, scheduler& sc
     // TODO: Set the thread with index 0 as the rendering thread
     glfwMakeContextCurrent((GLFWwindow*)_handle);
 
-    glfwSwapInterval(0); // fps locked to 60
+    glfwSwapInterval(1); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
     setup_callbacks(_handle);

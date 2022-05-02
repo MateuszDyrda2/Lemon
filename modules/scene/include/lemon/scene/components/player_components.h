@@ -21,7 +21,11 @@ struct LEMON_PUBLIC player_input
     player_input(key::keycode moveUp,
                  key::keycode moveDown,
                  key::keycode moveLeft,
-                 key::keycode moveRight);
+                 key::keycode moveRight):
+        moveUp(moveUp),
+        moveDown(moveDown),
+        moveLeft(moveLeft),
+        moveRight(moveRight) { }
 };
 struct LEMON_PUBLIC entity_controller
 {
