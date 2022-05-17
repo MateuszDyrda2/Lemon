@@ -5,6 +5,7 @@
 #include <lemon/scene/components/transform_components.h>
 
 namespace lemon {
+using namespace std;
 scene::scene(string_id name, entity_registry&& registry):
     name(name), registry(std::move(registry))
 {
@@ -28,6 +29,62 @@ scene::scene(string_id name):
 scene::~scene()
 {
 }
+void scene::scene_load(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& s : systems)
+    {
+        s->on_scene_load();
+    }
+}
+void scene::frame_begin(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& [_, s] : onFrameBeginUpdate)
+    {
+        s->update(sregistry, registry);
+    }
+}
+void scene::physics_begin(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& [_, s] : onPhysicsBeginUpdate)
+    {
+        s->update(sregistry, registry);
+    }
+}
+void scene::physics(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& [_, s] : onPhysicsUpdate)
+    {
+        s->update(sregistry, registry);
+    }
+}
+void scene::physics_end(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& [_, s] : onPhysicsEndUpdate)
+    {
+        s->update(sregistry, registry);
+    }
+}
+void scene::frame_end(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& [_, s] : onFrameEndUpdate)
+    {
+        s->update(sregistry, registry);
+    }
+}
+void scene::scene_unload(system_registry& sregistry)
+{
+    LEMON_PROFILE_FUNCTION();
+    for(auto& s : systems)
+    {
+        s->on_scene_unload();
+    }
+}
 void scene::set_main_camera(entity mc)
 {
 }
@@ -37,11 +94,14 @@ void scene::initialize()
 void scene::begin()
 {
 }
-void scene::update()
+void scene::update(system_registry& sregistry)
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& s : systems)
-        s->update(registry);
+    frame_begin(sregistry);
+    physics_begin(sregistry);
+    physics(sregistry);
+    physics_end(sregistry);
+    frame_end(sregistry);
 }
 entity scene::add_entity(string_id name)
 {
@@ -101,5 +161,25 @@ entity scene::clone_entity(entity ent, string_id name)
 void scene::remove_entity(entity& ent)
 {
     registry.destroy(ent.get_handle());
+}
+void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::frame_begin_t)
+{
+    onFrameBeginUpdate.emplace(make_pair(updateOrder, s));
+}
+void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_begin_t)
+{
+    onPhysicsBeginUpdate.emplace(make_pair(updateOrder, s));
+}
+void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_t)
+{
+    onPhysicsUpdate.emplace(make_pair(updateOrder, s));
+}
+void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_end_t)
+{
+    onPhysicsEndUpdate.emplace(make_pair(updateOrder, s));
+}
+void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::frame_end_t)
+{
+    onFrameEndUpdate.emplace(make_pair(updateOrder, s));
 }
 } // namespace lemon
