@@ -10,8 +10,10 @@
 
 namespace lemon {
 using namespace std;
-collision_response_system::collision_response_system(ptr<scene> /*s*/, clock& clk, scheduler& sch):
-    clk(clk), sch(sch)
+collision_response_system::collision_response_system(service_registry& globalRegistry):
+    system(globalRegistry),
+    clk(globalRegistry.get_service<game_clock>()),
+    sch(globalRegistry.get_service<scheduler>())
 { }
 collision_response_system::~collision_response_system()
 { }
@@ -20,7 +22,7 @@ static u64 hash_collision(u32 a, u32 b)
     auto [low, high] = minmax(a, b);
     return (u64(high) << 32) | low;
 }
-void collision_response_system::update(entity_registry& registry)
+void collision_response_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     // TODO: send on collision

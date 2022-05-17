@@ -6,17 +6,12 @@
 
 namespace lemon {
 using namespace std;
-scene::scene(string_id name, entity_registry&& registry):
-    name(name), registry(std::move(registry))
+scene::scene(string_id name, service_registry& globalRegistry, entity_registry&& registry):
+    name(name), registry(std::move(registry)), globalRegistry(globalRegistry)
 {
-    auto view  = this->registry.view<camera>();
-    mainCamera = entity(&this->registry, view.front());
-    /*
-    mainCamera.add_component<audio_listener>(); // TODO: Remove this
-    */
 }
-scene::scene(string_id name):
-    name(name), registry(), mainCamera(&registry, registry.create())
+scene::scene(string_id name, service_registry& globalRegistry):
+    name(name), registry(), globalRegistry(globalRegistry)
 {
     /*
     mainCamera.add_component<tag>(string_id("MainCamera"));
@@ -29,80 +24,63 @@ scene::scene(string_id name):
 scene::~scene()
 {
 }
-void scene::scene_load(system_registry& sregistry)
+void scene::scene_load()
 {
     LEMON_PROFILE_FUNCTION();
     for(auto& s : systems)
     {
-        s->on_scene_load();
+        s->on_scene_load(registry);
     }
 }
-void scene::frame_begin(system_registry& sregistry)
+void scene::frame_begin()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onFrameBeginUpdate)
+    for(auto& [_, s] : onFrameBeginMap)
     {
-        s->update(sregistry, registry);
+        s->on_update(registry);
     }
 }
-void scene::physics_begin(system_registry& sregistry)
+void scene::update_begin()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onPhysicsBeginUpdate)
+    for(auto& [_, s] : onUpdateBeginMap)
     {
-        s->update(sregistry, registry);
+        s->on_update(registry);
     }
 }
-void scene::physics(system_registry& sregistry)
+void scene::physics_update()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onPhysicsUpdate)
+    for(auto& [_, s] : onPhysicsMap)
     {
-        s->update(sregistry, registry);
+        s->on_update(registry);
     }
 }
-void scene::physics_end(system_registry& sregistry)
+void scene::update_end()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onPhysicsEndUpdate)
+    for(auto& [_, s] : onUpdateEndMap)
     {
-        s->update(sregistry, registry);
+        s->on_update(registry);
     }
 }
-void scene::frame_end(system_registry& sregistry)
+void scene::frame_end()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onFrameEndUpdate)
+    for(auto& [_, s] : onFrameEndMap)
     {
-        s->update(sregistry, registry);
+        s->on_update(registry);
     }
 }
-void scene::scene_unload(system_registry& sregistry)
+void scene::scene_unload()
 {
     LEMON_PROFILE_FUNCTION();
     for(auto& s : systems)
     {
-        s->on_scene_unload();
+        s->on_scene_unload(registry);
     }
 }
-void scene::set_main_camera(entity mc)
-{
-}
-void scene::initialize()
-{
-}
-void scene::begin()
-{
-}
-void scene::update(system_registry& sregistry)
-{
-    LEMON_PROFILE_FUNCTION();
-    frame_begin(sregistry);
-    physics_begin(sregistry);
-    physics(sregistry);
-    physics_end(sregistry);
-    frame_end(sregistry);
-}
+/*
 entity scene::add_entity(string_id name)
 {
     auto ent = registry.create();
@@ -162,24 +140,25 @@ void scene::remove_entity(entity& ent)
 {
     registry.destroy(ent.get_handle());
 }
-void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::frame_begin_t)
+*/
+void scene::push2map(ptr<system> s, update_stage::frame_begin_t, size_type order)
 {
-    onFrameBeginUpdate.emplace(make_pair(updateOrder, s));
+    onFrameBeginMap[order] = s;
 }
-void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_begin_t)
+void scene::push2map(ptr<system> s, update_stage::update_begin_t, size_type order)
 {
-    onPhysicsBeginUpdate.emplace(make_pair(updateOrder, s));
+    onUpdateBeginMap[order] = s;
 }
-void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_t)
+void scene::push2map(ptr<system> s, update_stage::physics_t, size_type order)
 {
-    onPhysicsUpdate.emplace(make_pair(updateOrder, s));
+    onPhysicsMap[order] = s;
 }
-void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::physics_end_t)
+void scene::push2map(ptr<system> s, update_stage::update_end_t, size_type order)
 {
-    onPhysicsEndUpdate.emplace(make_pair(updateOrder, s));
+    onUpdateEndMap[order] = s;
 }
-void scene::push2map(ptr<system> s, size_type updateOrder, update_stage::frame_end_t)
+void scene::push2map(ptr<system> s, update_stage::frame_end_t, size_type order)
 {
-    onFrameEndUpdate.emplace(make_pair(updateOrder, s));
+    onFrameEndMap[order] = s;
 }
 } // namespace lemon

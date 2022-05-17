@@ -13,8 +13,11 @@ namespace lemon {
 class LEMON_PUBLIC rendering_context
 {
   public:
-    rendering_context();
-    ~rendering_context();
+    /** @brief Initializes the rendering context */
+    static void create();
+    /** @brief Destroys the rendering context */
+    static void drop();
+
     /** @brief Enable blending and set the blend function */
     static void enable_blending();
     /** @brief Set new viewport
@@ -55,11 +58,5 @@ class LEMON_PUBLIC rendering_context
      */
     static void draw_elements_instanced(GLenum mode, size_type count, GLenum type,
                                         const void* indices, size_type instanceCount);
-
-  private:
-    /** @brief Initializes the rendering context */
-    static void create();
-    /** @brief Destroys the rendering context */
-    static void drop();
 };
 } // namespace lemon

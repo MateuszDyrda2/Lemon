@@ -7,14 +7,6 @@
 #include <glad/glad.h>
 
 namespace lemon {
-rendering_context::rendering_context()
-{
-    create();
-}
-rendering_context::~rendering_context()
-{
-    drop();
-}
 void rendering_context::create()
 {
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

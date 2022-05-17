@@ -12,9 +12,9 @@ class scene;
 class LEMON_PUBLIC rendering_system : public system, listener
 {
   public:
-    rendering_system(ptr<scene> s, event_bus& ebus);
+    rendering_system(service_registry& globalServices);
     ~rendering_system();
-    void update(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
     void on_event(event* e) override;
 
   private:

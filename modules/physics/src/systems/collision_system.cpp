@@ -30,20 +30,24 @@ void collision_system::remove_from_tree(entity_registry& /* registy*/, entity_ha
 {
     tree.remove_leaf(u32(ent));
 }
-collision_system::collision_system(ptr<scene> s, scheduler& sch):
-    sch(sch)
+collision_system::collision_system(service_registry& globalRegistry):
+    system(globalRegistry), sch(globalRegistry.get_service<scheduler>())
 {
-    s->get_registry()
-        .on_construct<collider>()
-        .connect<&collision_system::add2tree>(this);
-    s->get_registry()
-        .on_destroy<collider>()
-        .connect<&collision_system::remove_from_tree>(this);
 }
 collision_system::~collision_system()
 {
 }
-void collision_system::update(entity_registry& registry)
+void collision_system::on_scene_load(entity_registry& registry)
+{
+    registry.on_construct<collider>().connect<&collision_system::add2tree>(this);
+    registry.on_destroy<collider>().connect<&collision_system::remove_from_tree>(this);
+}
+void collision_system::on_scene_unload(entity_registry& registry)
+{
+    registry.on_construct<collider>().disconnect<&collision_system::add2tree>(this);
+    registry.on_destroy<collider>().disconnect<&collision_system::remove_from_tree>(this);
+}
+void collision_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
 

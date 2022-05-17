@@ -2,6 +2,7 @@
 
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
+#include <lemon/core/service.h>
 #include <lemon/core/string_id.h>
 
 #include <functional>
@@ -9,6 +10,7 @@
 #include <unordered_map>
 
 namespace lemon {
+class service_registry;
 struct LEMON_PUBLIC event
 {
     string_id name;
@@ -20,9 +22,10 @@ class LEMON_PUBLIC listener
   public:
     virtual void on_event(event*) = 0;
 };
-class LEMON_PUBLIC event_bus
+class LEMON_PUBLIC event_bus : public service
 {
   public:
+    LEMON_REGISTER_SERVICE(event_bus);
     using listeners_t = std::unordered_map<string_id, std::vector<listener*>>;
     class event_sink
     {
@@ -54,7 +57,7 @@ class LEMON_PUBLIC event_bus
     };
 
   public:
-    event_bus()  = default;
+    event_bus(service_registry&);
     ~event_bus() = default;
     void fire(event* e);
     void fire_immediate(event* e);

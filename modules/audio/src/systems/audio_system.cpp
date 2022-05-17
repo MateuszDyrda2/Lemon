@@ -7,21 +7,19 @@
 #include <lemon/scene/scene.h>
 
 namespace lemon {
-audio_system::audio_system(ptr<scene> s):
-    player(), listener(s->get_main_camera())
-{
-}
-audio_system::~audio_system()
-{
-}
-void audio_system::update(entity_registry& registry)
+audio_system::audio_system(service_registry& globalRegistry):
+    system(globalRegistry), player()
+{ }
+void audio_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
+    auto listener = registry.view<audio_listener>().front();
     auto [listenerComponent, listenerTransform] =
-        listener.get_component<audio_listener, transform>();
+        registry.get<audio_listener, transform>(listener);
 
     player.start_playing(
         listenerComponent.masterGain, listenerTransform.position);
+
     auto group = registry.group<audio_source, play>(entt::get<transform>);
     for(auto entity : group)
     {

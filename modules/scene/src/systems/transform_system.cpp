@@ -11,28 +11,20 @@ static void dirty_on_update(entity_registry& registry, entity_handle ent)
 {
     registry.emplace_or_replace<dirty_t>(ent);
 }
-transform_system::transform_system(ptr<scene> s)
-{
-    s->get_registry()
-        .on_update<transform>()
-        .connect<dirty_on_update>();
-}
+transform_system::transform_system(service_registry& globalRegistry):
+    system(globalRegistry)
+{ }
 transform_system::~transform_system()
+{ }
+void transform_system::on_scene_load(entity_registry& registry)
 {
+    registry.on_update<transform>().connect<dirty_on_update>();
 }
-void transform_system::translate(entity ent, const vec2& by)
+void transform_system::on_scene_unload(entity_registry& registry)
 {
-    ent.patch_component<transform>([&](auto& t) { t.position += by; });
+    registry.on_update<transform>().disconnect<dirty_on_update>();
 }
-void transform_system::rotate(entity ent, f32 by)
-{
-    ent.patch_component<transform>([&](auto& t) { t.rotation += by; });
-}
-void transform_system::scale(entity ent, const vec2& by)
-{
-    ent.patch_component<transform>([&](auto& t) { t.scale += by; });
-}
-void transform_system::update(entity_registry& registry)
+void transform_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     registry.sort<dirty_t>([&registry](const entity_handle lhs, const entity_handle rhs) {
@@ -52,5 +44,17 @@ void transform_system::update(entity_registry& registry)
         mdl.matrix = glm::scale(mdl.matrix, vec3(trn.scale, 1.0f));
     });
     registry.clear<dirty_t>();
+}
+void transform_system::translate(entity ent, const vec2& by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.position += by; });
+}
+void transform_system::rotate(entity ent, f32 by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.rotation += by; });
+}
+void transform_system::scale(entity ent, const vec2& by)
+{
+    ent.patch_component<transform>([&](auto& t) { t.scale += by; });
 }
 } // namespace lemon

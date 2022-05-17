@@ -2,21 +2,24 @@
 
 #include "../basic_types.h"
 #include "../defines.h"
+#include "../service.h"
 
 #include <chrono>
 
 namespace lemon {
-class LEMON_PUBLIC clock
+class service_registry;
+class LEMON_PUBLIC game_clock : public service
 {
   public:
-    using self_type     = clock;
+    LEMON_REGISTER_SERVICE(game_clock);
+    using self_type     = game_clock;
     using clock_type    = std::chrono::high_resolution_clock;
     using duration_type = std::chrono::duration<i64, std::nano>;
     using time_point    = std::chrono::time_point<clock_type, duration_type>;
 
   public:
-    clock();
-    ~clock();
+    game_clock(service_registry&);
+    ~game_clock();
     time_point get_real_time() const noexcept
     {
         return realLastFrameTime;

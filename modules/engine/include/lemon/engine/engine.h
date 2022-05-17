@@ -2,7 +2,7 @@
 
 #include <lemon/assets/asset_storage.h>
 #include <lemon/audio/sound_context.h>
-#include <lemon/core/time/clock.h>
+#include <lemon/core/time/game_clock.h>
 #include <lemon/events/event_bus.h>
 #include <lemon/platform/input.h>
 #include <lemon/platform/window.h>
@@ -10,6 +10,8 @@
 #include <lemon/scene/scene_manager.h>
 #include <lemon/scripting/py_engine.h>
 #include <lemon/threading/scheduler.h>
+
+#include <lemon/core/service_registry.h>
 
 #include "py_bindings/py_core.h"
 
@@ -29,16 +31,13 @@ class LEMON_PUBLIC engine
 
   protected:
     friend class game;
+    service_registry globalRegistry;
 
-    owned<py_engine> _scriptingEngine;
-    owned<scheduler> _scheduler;
-    owned<event_bus> _eventBus;
-    owned<window> _window;
-    owned<rendering_context> _renderingContext;
-    owned<sound_context> _soundContext;
-    owned<asset_storage> _resources;
-    owned<input> _input;
-    owned<clock> _clock;
-    owned<scene_manager> _sceneManager;
+    ptr<event_bus> eventBus;
+    ptr<scheduler> sch;
+    ptr<window> win;
+    ptr<input> in;
+    ptr<game_clock> clk;
+    ptr<scene_manager> sceneManager;
 };
 }

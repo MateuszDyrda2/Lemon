@@ -9,15 +9,11 @@ namespace lemon {
 class LEMON_PUBLIC sound_context
 {
   public:
-    sound_context();
-    ~sound_context();
+    static void create();
+    static void drop();
 
   private:
     static ptr<ALCdevice> openALDevice;
     static ptr<ALCcontext> openALContext;
-
-  private:
-    static void create();
-    static void drop();
 };
 } // namespace lemon

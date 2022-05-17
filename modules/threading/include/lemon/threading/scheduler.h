@@ -2,6 +2,7 @@
 
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
+#include <lemon/core/service.h>
 
 #include <moodycamel/concurrentqueue.h>
 
@@ -13,6 +14,7 @@
 #include <vector>
 
 namespace lemon {
+class service_registry;
 struct LEMON_PUBLIC waitable
 {
     std::atomic_uint32_t counter{};
@@ -27,9 +29,10 @@ struct LEMON_PUBLIC job
     job(F&& f):
         callable(f) { }
 };
-class LEMON_PUBLIC scheduler
+class LEMON_PUBLIC scheduler : public service
 {
   public:
+    LEMON_REGISTER_SERVICE(scheduler);
     template<class T>
     using concurrent_queue = moodycamel::ConcurrentQueue<T>;
 
@@ -37,7 +40,7 @@ class LEMON_PUBLIC scheduler
     /** @brief Creates a scheduler
      * @param threadCount number of workers to create
      */
-    scheduler(size_type threadCount);
+    scheduler(service_registry&, size_type threadCount);
     ~scheduler();
     /** @brief Run jobs in another thread
      * @param jobs jobs that are to be scheduled

@@ -5,18 +5,21 @@
 #include <lemon/core/basic_types.h>
 #include <lemon/core/defines.h>
 #include <lemon/core/math/vec2.h>
+#include <lemon/core/service.h>
 #include <lemon/threading/scheduler.h>
 
 #include <string>
 
 namespace lemon {
-class LEMON_PUBLIC window : public listener
+class service_registry;
+class LEMON_PUBLIC window : public listener, public service
 {
   public:
+    LEMON_REGISTER_SYSTEM(window);
     using native_handle_t = void*;
 
   public:
-    window(size_type width, size_type height, event_bus& ebus, scheduler& sch);
+    window(service_registry& globalRegistry, size_type width, size_type height);
     ~window();
     void on_event(event* e) override;
 

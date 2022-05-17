@@ -1,21 +1,21 @@
 #pragma once
 
+#include <lemon/core/time/game_clock.h>
 #include <lemon/scene/system.h>
 #include <lemon/threading/scheduler.h>
-#include <lemon/core/time/clock.h>
 
 namespace lemon {
 class scene;
 class LEMON_PUBLIC movement_system : public system
 {
   public:
-    movement_system(ptr<scene> s, clock& clk,  scheduler& sch);
-    ~movement_system();
+    movement_system(service_registry& globalRegistry);
+    ~movement_system() = default;
 
-    void update(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
 
   private:
     scheduler& sch;
-	clock& clk;
+    game_clock& clk;
 };
 } // namespace lemon

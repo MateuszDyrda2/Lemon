@@ -5,12 +5,14 @@
 #include <lemon/scene/components/transform_components.h>
 
 namespace lemon {
-physics_system::physics_system(ptr<scene> /*s*/, clock& clk, scheduler& sch):
-    clk(clk), sch(sch)
+physics_system::physics_system(service_registry& globalRegistry):
+    system(globalRegistry),
+    clk(globalRegistry.get_service<game_clock>()),
+    sch(globalRegistry.get_service<scheduler>())
 { }
 physics_system::~physics_system()
 { }
-void physics_system::update(entity_registry& registry)
+void physics_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     auto deltaTime = clk.delta_time();

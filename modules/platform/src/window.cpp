@@ -6,13 +6,16 @@
 #include <lemon/core/instrumentor.h>
 #include <lemon/platform/window_events.h>
 
+#include <lemon/core/service_registry.h>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 namespace lemon {
 void setup_callbacks(GLFWwindow* _handle);
-window::window(size_type width, size_type height, event_bus& ebus, scheduler& sch):
-    ebus(ebus), _name(game::get_settings().gameName), size(width, height)
+window::window(service_registry& globalRegistry, size_type width, size_type height):
+    ebus(globalRegistry.get_service<event_bus>()),
+    _name(game::get_settings().gameName), size(width, height)
 {
     if(!glfwInit())
     {

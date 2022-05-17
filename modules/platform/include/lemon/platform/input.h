@@ -1,30 +1,43 @@
 #pragma once
 
-#include "input_device.h"
+#include "glfw_devices.h"
 #include "key_codes.h"
 #include "window.h"
 
-#include <lemon/core/defines.h>
-#include <lemon/core/math/vec2.h>
+#include <lemon/core/service.h>
 
+#include <array>
+#include <unordered_map>
 #include <vector>
 
 namespace lemon {
-class LEMON_PUBLIC input
+class scene;
+class service_registry;
+struct gamepad
+{
+    size_type jid;
+    std::array<key_state, GAMEPAD_KEY_COUNT> keyStates;
+};
+class LEMON_PUBLIC input : public service
 {
   public:
-    input(window& window);
-    void update();
+    LEMON_REGISTER_SYSTEM(input);
+
+  public:
+    input(service_registry& globalRegistry);
     ~input();
-    bool is_key_pressed(key::keycode key) noexcept;
-    bool is_gamepad_key_pressed(key::gamepad key) noexcept;
-    bool is_mouse_pressed(key::mouse button) noexcept;
-    f32 get_gamepad_axis(key::axis axis) noexcept;
-    vec2 get_mouse_pos() noexcept;
-    f32 get_horizontal() noexcept;
-    f32 get_vertical() noexcept;
+    void update();
+    void map2event(key::keycode kc, string_id eventName);
 
   private:
     window& win;
+    std::array<key_state, KEY_COUNT> keyStates;
+    std::array<string_id, KEY_COUNT> keyMapping;
+
+    std::vector<input_device> inputDevices;
+    glfw_devices devices;
+
+  private:
+    void gather_input();
 };
 } // namespace lemon

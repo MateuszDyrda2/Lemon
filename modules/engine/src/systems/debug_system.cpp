@@ -15,9 +15,11 @@
 
 namespace lemon {
 
-debug_system::debug_system(ptr<scene>, event_bus& ebus):
-    enabled(false), showColliders(false),
-    showFPS(false), ebus(ebus)
+debug_system::debug_system(service_registry& globalRegistry):
+    system(globalRegistry),
+    enabled(false),
+    showColliders(false),
+    showFPS(false), ebus(globalRegistry.get_service<event_bus>())
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -44,7 +46,7 @@ void debug_system::on_event(event* e)
         this->enabled ^= 1;
     }
 }
-void debug_system::update(entity_registry& registry)
+void debug_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     if(enabled)

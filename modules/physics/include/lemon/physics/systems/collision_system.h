@@ -15,10 +15,12 @@ class scene;
 class LEMON_PUBLIC collision_system : public system
 {
   public:
-    collision_system(ptr<scene> s, scheduler& sch);
+    collision_system(service_registry& globalRegistry);
     ~collision_system();
 
-    void update(entity_registry& registry) override;
+    void on_scene_load(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
+    void on_scene_unload(entity_registry& registry) override;
 
   private:
     scheduler& sch;

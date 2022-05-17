@@ -13,10 +13,10 @@
 #include <lemon/platform/window_events.h>
 
 namespace lemon {
-rendering_system::rendering_system(ptr<scene> /*s*/,
-                                   event_bus& ebus):
+rendering_system::rendering_system(service_registry& globalServices):
+    system(globalServices),
     spriteRenderer(create_owned<basic_renderer>()),
-    ebus(ebus)
+    ebus(globalServices.get_service<event_bus>())
 {
     ebus.sink(string_id("FramebufferSize")) += this;
     rendering_context::enable_blending();
@@ -30,7 +30,7 @@ void rendering_system::on_event(event* e)
     auto f   = static_cast<FramebufferSize*>(e);
     viewport = { f->width, f->height };
 }
-void rendering_system::update(entity_registry& registry)
+void rendering_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     glm::mat4 projection;

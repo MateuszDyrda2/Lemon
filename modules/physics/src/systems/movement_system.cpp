@@ -8,14 +8,12 @@
 #include <lemon/scene/scene.h>
 
 namespace lemon {
-movement_system::movement_system(ptr<scene>, clock& clk, scheduler& sch):
-    sch(sch), clk(clk)
-{
-}
-movement_system::~movement_system()
-{
-}
-void movement_system::update(entity_registry& registry)
+movement_system::movement_system(service_registry& globalRegistry):
+    system(globalRegistry),
+    sch(globalRegistry.get_service<scheduler>()),
+    clk(globalRegistry.get_service<game_clock>())
+{ }
+void movement_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
     auto deltaTime = clk.delta_time();

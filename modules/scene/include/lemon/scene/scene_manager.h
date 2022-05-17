@@ -1,26 +1,33 @@
 #pragma once
 
 #include "scene.h"
+#include <lemon/core/service.h>
 
-#include <queue>
+#include <unordered_map>
 
 namespace lemon {
-class LEMON_PUBLIC scene_manager
+class service_registry;
+class LEMON_PUBLIC scene_manager : public service
 {
   public:
-    scene_manager();
-    scene_manager(ptr<scene> scene);
-    scene_manager(const scene_manager&) = delete;
-    scene_manager& operator=(const scene_manager&) = delete;
+    LEMON_REGISTER_SERVICE(scene_manager);
+
+  public:
+    scene_manager(service_registry& globalRegistry);
+    scene_manager(service_registry& globalRegistry, ptr<scene> scene);
     ~scene_manager();
-    ptr<scene> push_scene(string_id name);
+
     void update();
-    void pop_scene();
-    ptr<scene> get_current_scene();
-    ptr<scene> change_scene(string_id name);
-    ptr<scene> change_scene(ptr<scene> scene);
+
+    void create_scene(string_id sceneId);
+    scene& load_scene(string_id sceneId);
+    scene& get_current_scene();
+    scene& get_scene(string_id sceneId);
+    bool is_scene(string_id sceneId);
 
   private:
-    std::queue<owned<scene>> scenes;
+    service_registry& globalRegistry;
+    std::unordered_map<string_id, scene> scenes;
+    ptr<scene> currentScene;
 };
 } // namespace lemon

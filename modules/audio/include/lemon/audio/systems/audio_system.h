@@ -10,9 +10,9 @@ class scene;
 class LEMON_PUBLIC audio_system : public system
 {
   public:
-    audio_system(ptr<scene> s);
-    ~audio_system();
-    void update(entity_registry& registry) override;
+    audio_system(service_registry& globalRegistry);
+    ~audio_system() = default;
+    void on_update(entity_registry& registry) override;
     static void begin_play(entity ent);
     static void begin_play(entity ent, const asset<sound>& buffer);
 

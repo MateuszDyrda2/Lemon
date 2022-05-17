@@ -10,10 +10,10 @@ namespace lemon {
 class LEMON_PUBLIC debug_system : public system, listener
 {
   public:
-    debug_system(ptr<scene> s, event_bus& ebus);
+    debug_system(service_registry& globalRegistry);
     ~debug_system();
     void on_event(event* e) override;
-    void update(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
 
   private:
     bool enabled;

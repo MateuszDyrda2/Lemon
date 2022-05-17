@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lemon/core/time/clock.h>
+#include <lemon/core/time/game_clock.h>
 #include <lemon/scene/system.h>
 #include <lemon/threading/scheduler.h>
 
@@ -9,12 +9,12 @@ class scene;
 class physics_system : public system
 {
   public:
-    physics_system(ptr<scene> s, clock& clk, scheduler& sch);
+    physics_system(service_registry& globalRegistry);
     ~physics_system();
-    void update(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
 
   private:
-    clock& clk;
+    game_clock& clk;
     scheduler& sch;
 };
 }

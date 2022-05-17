@@ -1,13 +1,16 @@
 #include <lemon/scene/scene_manager.h>
 
-#include <lemon/core/game.h>
+#include <lemon/core/service_registry.h>
 
 namespace lemon {
-scene_manager::scene_manager()
+using namespace std;
+scene_manager::scene_manager(service_registry& globalRegistry):
+    globalRegistry(globalRegistry)
 {
     LOG_MESSAGE("Scene Manager created");
 }
-scene_manager::scene_manager(ptr<scene> scene)
+scene_manager::scene_manager(service_registry& globalRegistry, ptr<scene> scene):
+    globalRegistry(globalRegistry)
 {
     LOG_MESSAGE("New scene %s", scene->get_id().get_string());
     scenes.emplace(scene);
@@ -16,44 +19,41 @@ scene_manager::~scene_manager()
 {
     LOG_MESSAGE("Scene manager destroyed");
 }
-ptr<scene> scene_manager::push_scene(string_id name)
-{
-    LOG_MESSAGE("New scene %s", name.get_string());
-    auto ptr = scenes.emplace(create_owned<scene>(name)).get();
-
-    return ptr;
-}
 void scene_manager::update()
 {
-    if(scenes.size())
-        scenes.front()->update();
+    lemon_assert(currentScene != nullptr);
+    currentScene->frame_begin();
+    currentScene->update_begin();
+    currentScene->physics_update();
+    currentScene->update_end();
+    currentScene->frame_end();
 }
-void scene_manager::pop_scene()
+void scene_manager::create_scene(string_id sceneId)
 {
-    scenes.pop();
+    lemon_assert(!scenes.contains(sceneId));
+    scenes.emplace(make_pair(sceneId, scene(sceneId, globalRegistry)));
 }
-ptr<scene> scene_manager::get_current_scene()
+scene& scene_manager::load_scene(string_id sceneId)
 {
-    return scenes.front().get();
-}
-ptr<scene> scene_manager::change_scene(string_id name)
-{
-    LOG_MESSAGE("New scene %s", name.get_string());
-    if(scenes.size())
+    if(currentScene)
     {
-        scenes.pop();
+        currentScene->scene_unload();
     }
-    auto current = scenes.emplace(create_owned<scene>(name)).get();
-    return current;
+    lemon_assert(scenes.contains(sceneId));
+    currentScene = &scenes.at(sceneId);
+    LOG_MESSAGE("New scene %s", sceneId.get_string());
+
+    currentScene->scene_load();
+    return *currentScene;
 }
-ptr<scene> scene_manager::change_scene(ptr<scene> scene)
+scene& scene_manager::get_current_scene()
 {
-    LOG_MESSAGE("New scene %s", scene->get_id().get_string());
-    if(scenes.size())
-    {
-        scenes.pop();
-    }
-    auto current = scenes.emplace(scene).get();
-    return current;
+    lemon_assert(currentScene != nullptr);
+    return *currentScene;
+}
+scene& scene_manager::get_scene(string_id sceneId)
+{
+    lemon_assert(scenes.contains(sceneId));
+    return scenes.at(sceneId);
 }
 } // namespace lemon

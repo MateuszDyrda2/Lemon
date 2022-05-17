@@ -26,10 +26,12 @@ class LEMON_PUBLIC transform_system : public system
     static void rotate(entity ent, f32 by);
     static void scale(entity ent, const vec2& by);
 
-    transform_system(ptr<scene> s);
+    transform_system(service_registry& globalRegistry);
     ~transform_system();
-    void update(entity_registry& registry) override;
-    friend class scene;
+
+    void on_scene_load(entity_registry& registry) override;
+    void on_update(entity_registry& registry) override;
+    void on_scene_unload(entity_registry& registry) override;
 };
 template<class F>
 void transform_system::for_each_child(entity ent, F&& callable) requires(

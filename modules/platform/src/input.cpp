@@ -1,13 +1,16 @@
 #include <lemon/platform/systems/input_system.h>
 
+#include <lemon/core/service_registry.h>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 namespace lemon {
 using namespace std;
-input_system::input_system(ptr<scene> s, ptr<window> w)
+input_system::input_system(service_registry& globalRegistry):
+    win(globalRegistry.get_service<window>())
 {
-    auto _handle = (GLFWwindow*)w->get_handle();
+    auto _handle = (GLFWwindow*)win->get_handle();
     glfwSetWindowUserPointer(_handle, this);
     glfwSetKeyCallback(_handle, [](GLFWwindow* w, int k, int scancode, int action, int mods) {
         auto sys        = (input_system*)glfwGetWindowUserPointer(w);

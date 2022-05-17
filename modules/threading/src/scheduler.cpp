@@ -1,12 +1,13 @@
 #include <lemon/threading/scheduler.h>
 
 #include <lemon/core/assert.h>
+#include <lemon/core/service_registry.h>
 
 #include <ctime>
 
 namespace lemon {
 size_type thread_local scheduler::threadIndex;
-scheduler::scheduler(size_type threadCount)
+scheduler::scheduler(service_registry&, size_type threadCount)
 {
     std::srand((unsigned int)time(NULL));
     nbWorkers = threadCount;

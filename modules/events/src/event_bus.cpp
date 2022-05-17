@@ -1,6 +1,7 @@
 #include <lemon/events/event_bus.h>
 
 #include <lemon/core/logger.h>
+#include <lemon/core/service_registry.h>
 
 namespace lemon {
 event_bus::event_sink event_bus::sink(string_id event_id)
@@ -20,6 +21,7 @@ event_bus::event_sink::~event_sink()
 {
     ebus.listenerLock.unlock();
 }
+event_bus::event_bus(service_registry&) { }
 void event_bus::fire(event* e)
 {
     std::lock_guard lck(eventLock);
