@@ -93,7 +93,7 @@ texture::texture(string_id name, const ivec2& size, const color& c):
 texture::texture(string_id name, const ivec2& size, const color& c, wrap wrapping, filter filtering):
     resource(name), size(size), wrapping(wrapping), filtering(filtering)
 {
-    LEMON_ASSERT(!(size.x % 4) && !(size.y % 4));
+    lemon_assert(!(size.x % 4) && !(size.y % 4));
     std::vector<byte>
         data(size.x * size.y * 4);
     auto&& [r, g, b, a] = c.to_u8();

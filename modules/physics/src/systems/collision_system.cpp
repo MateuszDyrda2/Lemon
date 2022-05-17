@@ -87,7 +87,7 @@ AABB calculate_AABB(const collider& col, const transform& tr)
         return AABB{ { realPos.x - col.capsule.radius, realPos.y - (col.capsule.hHeight + col.capsule.radius) },
                      { realPos.x + col.capsule.radius, realPos.y + (col.capsule.hHeight + col.capsule.radius) } };
     default:
-        LEMON_ASSERT(0);
+        lemon_assert(0);
     }
 }
 std::optional<MTV> collide(SAT& sat,

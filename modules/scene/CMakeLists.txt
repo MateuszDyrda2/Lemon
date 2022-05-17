@@ -7,6 +7,8 @@ set(lemon_scene_SRC
 	src/reflection.cpp
 	src/systems/entity_system.cpp
 	src/systems/transform_system.cpp
+	src/systems/event_system.cpp
+	src/systems/time_system.cpp
 )
 
 add_library(lemon_scene ${lemon_scene_SRC})
@@ -18,6 +20,5 @@ target_link_libraries(lemon_scene
 	lemon::core
 	lemon::threading
 	lemon::events
-	lemon::platform
 	EnTT::EnTT
 )

@@ -1,6 +1,7 @@
 #include "lemon/platform/key_codes.h"
 #include <lemon/engine/systems/input_system.h>
 
+#include <lemon/core/math/math.h>
 #include <lemon/scene/components/player_components.h>
 #include <lemon/scene/scene.h>
 
@@ -18,33 +19,19 @@ void input_system::update(entity_registry& registry)
     auto view = registry.view<player_input>();
     view.each([&, this](auto ent, auto& player) {
         vec2 moveBy{};
-        bool set = false;
-        if(i.is_key_pressed(player.moveUp))
+        for(auto&& [keycode, modifier] : player.moveForward)
         {
-            moveBy.y += 1.f;
-            set = true;
+            if(i.is_key_pressed(keycode))
+                moveBy.y = modifier;
         }
-        if(i.is_key_pressed(player.moveDown))
+        for(auto&& [keycode, modifier] : player.moveSideways)
         {
-            moveBy.y -= 1.f;
-            set = true;
+            if(i.is_key_pressed(keycode))
+                moveBy.x = modifier;
         }
-        if(i.is_key_pressed(player.moveLeft))
+        if(moveBy.x != 0.f || moveBy.y != 0.f)
         {
-            moveBy.x -= 1.f;
-            set = true;
-        }
-        if(i.is_key_pressed(player.moveRight))
-        {
-            moveBy.x += 1.f;
-            set = true;
-        }
-        if(set)
-        {
-            if(moveBy.x != 0.f && moveBy.y != 0.f)
-            {
-                moveBy *= 0.7071f;
-            }
+            moveBy = normalize(moveBy);
             registry.emplace<move_m>(ent, moveBy);
         }
     });

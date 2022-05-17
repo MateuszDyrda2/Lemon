@@ -51,7 +51,7 @@ struct LEMON_PUBLIC color
     color(const char* hex)
     {
         int ir, ig, ib, ia;
-        LEMON_ASSERT(hex[0] == '#');
+        lemon_assert(hex[0] == '#');
         std::sscanf(hex, "%*c%02x%02x%02x%02x", &ir, &ig, &ib, &ia);
         rgba = vec4{ normalize(ir), normalize(ig), normalize(ib), normalize(ia) };
     }

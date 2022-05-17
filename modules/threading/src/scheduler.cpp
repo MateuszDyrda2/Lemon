@@ -76,7 +76,7 @@ scheduler::~scheduler()
 }
 void scheduler::run(job* jobs, size_type count, waitable* sig)
 {
-    LEMON_ASSERT(jobs != nullptr);
+    lemon_assert(jobs != nullptr);
     static thread_local size_type lastUsed = std::rand() % nbWorkers;
     if(sig != nullptr)
     {
@@ -98,8 +98,8 @@ void scheduler::run(job* jobs, size_type count, waitable* sig)
 }
 void scheduler::run(job* jobs, size_type count, waitable* sig, size_type tid)
 {
-    LEMON_ASSERT(jobs != nullptr);
-    LEMON_ASSERT(tid < nbWorkers);
+    lemon_assert(jobs != nullptr);
+    lemon_assert(tid < nbWorkers);
     if(sig != nullptr)
     {
         sig->counter.fetch_add(count, std::memory_order_relaxed);
@@ -116,7 +116,7 @@ void scheduler::run(job* jobs, size_type count, waitable* sig, size_type tid)
 }
 void scheduler::wait(waitable* sig)
 {
-    LEMON_ASSERT(sig != nullptr);
+    lemon_assert(sig != nullptr);
     if(sig->counter.load() != 0)
     {
         auto& localMtx  = *localMtxs[threadIndex];

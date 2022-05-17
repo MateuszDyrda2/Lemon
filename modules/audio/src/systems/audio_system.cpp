@@ -35,14 +35,14 @@ void audio_system::update(entity_registry& registry)
 }
 void audio_system::begin_play(entity ent)
 {
-    LEMON_ASSERT((ent.has_all_of<audio_source, transform>()));
+    lemon_assert((ent.has_all_of<audio_source, transform>()));
     auto&& aComponent = ent.get_component<audio_source>();
-    LEMON_ASSERT(aComponent.clip);
+    lemon_assert(aComponent.clip);
     ent.add_component<play>();
 }
 void audio_system::begin_play(entity ent, const asset<sound>& buffer)
 {
-    LEMON_ASSERT((ent.has_all_of<audio_source, transform>()));
+    lemon_assert((ent.has_all_of<audio_source, transform>()));
     auto&& aComponent = ent.get_component<audio_source>();
     aComponent.clip   = buffer;
     ent.add_component<play>();

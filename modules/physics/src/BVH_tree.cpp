@@ -53,7 +53,7 @@ void BVH_tree::insert_leaf(u32 entityId, const AABB& box)
 }
 void BVH_tree::remove_leaf(u32 entityId)
 {
-    LEMON_ASSERT(entityNodeMap.contains(entityId));
+    lemon_assert(entityNodeMap.contains(entityId));
     index_t index = entityNodeMap[entityId];
     remove_leaf(index);
     deallocate_node(index);
@@ -240,7 +240,7 @@ BVH_tree::index_t BVH_tree::find_sibling(const AABB& box)
 }
 BVH_tree::index_t BVH_tree::rotate(index_t index)
 {
-    LEMON_ASSERT(index != nullIndex);
+    lemon_assert(index != nullIndex);
     if(nodes[index].isLeaf || nodes[index].height < 2) return index;
 
     index_t child1 = nodes[index].child1;

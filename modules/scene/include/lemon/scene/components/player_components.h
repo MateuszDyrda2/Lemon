@@ -7,25 +7,14 @@
 #include <lemon/platform/key_codes.h>
 #include <lemon/scene/reflection.h>
 
-#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace lemon {
 struct LEMON_PUBLIC player_input
 {
-    key::keycode moveUp;
-    key::keycode moveDown;
-    key::keycode moveLeft;
-    key::keycode moveRight;
-
-    player_input() = default;
-    player_input(key::keycode moveUp,
-                 key::keycode moveDown,
-                 key::keycode moveLeft,
-                 key::keycode moveRight):
-        moveUp(moveUp),
-        moveDown(moveDown),
-        moveLeft(moveLeft),
-        moveRight(moveRight) { }
+    std::vector<std::pair<key::keycode, f32>> moveForward;
+    std::vector<std::pair<key::keycode, f32>> moveSideways;
 };
 struct LEMON_PUBLIC entity_controller
 {

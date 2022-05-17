@@ -29,7 +29,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
-option(LEMON_PROFILE "Profile functions" OFF)
+option(LEMON_PROFILE "Profile functions" ON)
 
 if(WIN32)
 	#platform windows
@@ -45,7 +45,7 @@ endif(WIN32)
 add_compile_definitions(
 	"$<$<CONFIG:Debug>:LEMON_DEBUG>"
 	"${LEMON_PLATFORM}"
-	"$<$<BOOL:${LEMON_PROFILE}>:LEMON_PROFILE=1>"
+	"$<$<BOOL:${LEMON_PROFILE}>:LEMON_PROFILE>"
 )
 add_compile_options(
 	"$<$<AND:$<CXX_COMPILER_ID:ARMCland,AppleClang,Clang,GNU>,$<CONFIG:DEBUG>>:-Wall;-Wextra;-Wformat=2;-Wunused;-fvisibility=hidden>"
@@ -57,12 +57,12 @@ add_subdirectory(modules/core)
 add_subdirectory(modules/threading)
 add_subdirectory(modules/events)
 add_subdirectory(modules/platform)
+add_subdirectory(modules/scene)
 add_subdirectory(modules/rendering)
 add_subdirectory(modules/audio)
 add_subdirectory(modules/physics)
 add_subdirectory(modules/assets)
 add_subdirectory(modules/scripting)
-add_subdirectory(modules/scene)
 add_subdirectory(modules/engine)
 add_subdirectory(modules/serialization)
 

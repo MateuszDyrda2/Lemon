@@ -18,7 +18,7 @@ py_script::py_script(const std::string& moduleName)
 void py_script::instantiate(entity ent)
 {
     py::object instance = py_class(ent);
-    LEMON_ASSERT(py::isinstance<scriptable_entity>(instance));
+    lemon_assert(py::isinstance<scriptable_entity>(instance));
     s_entity = instance.cast<scriptable_entity*>();
 }
 } // namespace lemon
