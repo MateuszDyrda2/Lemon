@@ -17,12 +17,6 @@ class LEMON_PUBLIC py_script
   public:
     py_script(const std::string& moduleName);
     void instantiate(entity ent);
-    py::function create;
-    py::function update;
-    py::function lateUpdate;
-    py::function destroy;
-    py::function onEnable;
-    py::function onDisable;
     ~py_script() = default;
 
   private:
@@ -62,25 +56,11 @@ struct LEMON_PUBLIC script_component
     inline void instantiate(entity_registry& reg, entity_handle h)
     {
         script->instantiate(entity(&reg, h));
-        script->create();
-        if(reg.any_of<enabled>(h))
-        {
-            script->onEnable();
-        }
-    }
-    inline void update(f32 delta)
-    {
-        script->update(delta);
-    }
-    inline void late_update(f32 delta)
-    {
-        script->lateUpdate(delta);
     }
     ~script_component()
     {
         if(script)
         {
-            script->destroy();
             delete script;
         }
     }

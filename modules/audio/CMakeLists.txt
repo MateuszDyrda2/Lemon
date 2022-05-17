@@ -5,6 +5,7 @@ set(lemon_audio_SRC
 	src/sound_context.cpp
 	src/sound.cpp
 	src/sound_source.cpp
+	src/systems/audio_system.cpp
 )
 add_library(lemon_audio ${lemon_audio_SRC})
 add_library(lemon::audio ALIAS lemon_audio)
@@ -15,6 +16,7 @@ target_link_libraries(lemon_audio
 	PUBLIC
 	lemon::core
 	lemon::assets
+	lemon::scene
 	${OPENAL_LIBRARY}
 	wave
 )

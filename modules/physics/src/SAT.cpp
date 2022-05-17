@@ -13,7 +13,6 @@ std::optional<MTV> SAT::operator()(
     rotated_t) const noexcept
 {
     // get the normals
-    // note: for boxes they are just the walls
     vec2 axis[4] = {
         normalize(lhs.vertices[1] - lhs.vertices[0]),
         normalize(lhs.vertices[2] - lhs.vertices[1]),
@@ -62,7 +61,7 @@ SAT::operator()(const box_shape& lhs, const box_shape& rhs,
         auto dist = min(lhsMaxX, rhsMaxX) - max(lhsMinX, rhsMinX);
         dist > 0.f)
     {
-        MTV mtv{ dist, { 1.f, 0.f } };
+        MTV mtv{ dist, { (lhsMaxX < rhsMaxX) ? -1.f : 1.f, 0.f } };
         if(
             dist = min(lhsMaxY, rhsMaxY) - max(lhsMinY, rhsMinY);
             dist > 0.f)
@@ -70,7 +69,7 @@ SAT::operator()(const box_shape& lhs, const box_shape& rhs,
             if(dist < mtv.overlap)
             {
                 mtv.overlap = dist;
-                mtv.axis    = { 0.f, 1.f };
+                mtv.axis    = { 0.f, (lhsMaxY < rhsMaxY) ? -1.f : 1.f };
             }
             return mtv;
         }

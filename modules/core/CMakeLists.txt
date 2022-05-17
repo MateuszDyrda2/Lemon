@@ -7,6 +7,7 @@ set(lemon_core_SRC
 	src/time/clock.cpp
 	src/file.cpp
 	src/game.cpp 
+	src/instrumentor.cpp
 )
 
 add_library(lemon_core ${lemon_core_SRC})

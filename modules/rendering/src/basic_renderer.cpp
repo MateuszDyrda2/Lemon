@@ -2,6 +2,7 @@
 
 #include <lemon/rendering/rendering_context.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/math.h>
 #include <lemon/core/math/vec2.h>
@@ -55,6 +56,7 @@ basic_renderer::basic_renderer():
 }
 void basic_renderer::start_render(const mat4& viewProj)
 {
+    LEMON_PROFILE_FUNCTION();
     this->viewProj = viewProj;
     auto shader    = _shader.get();
     shader->use();
@@ -63,11 +65,18 @@ void basic_renderer::start_render(const mat4& viewProj)
 void basic_renderer::render_sprite(const vec4& color, const vec4& texCoords, asset<texture>& tex,
                                    const mat4& m)
 {
-    auto shader  = _shader.get();
-    auto texture = tex.get();
+    LEMON_PROFILE_FUNCTION();
+    static constexpr auto ppx = 100.f;
+    auto shader               = _shader.get();
+    auto texture              = tex.get();
     shader->use();
     mat4 model = m;
-    model      = scale(model, vec3(texture->get_size(), 1.0f));
+    //    model      = scale(model, vec3(texture->get_size(), 1.0f));
+    const auto texSize = texture->get_size();
+    const auto texW    = f32(texSize.x) / ppx;
+    const auto texH    = f32(texSize.y) / ppx;
+
+    model = scale(model, vec3(texW, texH, 1.f));
 
     shader->set_uniform("spriteColor", color);
     shader->set_uniform("model", model);

@@ -1,6 +1,7 @@
 #include <lemon/engine/engine.h>
 
 #include <lemon/core/game.h>
+#include <lemon/core/instrumentor.h>
 #include <lemon/rendering/rendering_context.h>
 
 namespace lemon {
@@ -19,7 +20,9 @@ void engine::initialize()
 }
 bool engine::update()
 {
+    LEMON_PROFILE_FUNCTION();
     _clock->update();
+    _eventBus->flush();
     _sceneManager->update();
     return !_window->end_frame();
 }

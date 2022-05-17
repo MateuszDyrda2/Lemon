@@ -1,6 +1,6 @@
 project(LemonThreading)
 
-set(lemon_threading_SRC
+set(lemon_threading_SRC	
 	src/scheduler.cpp
 )
 
@@ -11,4 +11,5 @@ target_include_directories(lemon_threading PUBLIC include)
 target_link_libraries(lemon_threading 
 	PUBLIC 
 	lemon::core
+	concurrentqueue
 )

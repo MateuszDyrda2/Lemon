@@ -9,12 +9,12 @@
 #    else
 #        error "No debug break for the platform"
 #    endif // LEMON_WINDOWS
-#    define LEMON_ASSERT(arg)      \
+#    define lemon_assert(arg)      \
         {                          \
             if(!(arg)) LEMON_DB(); \
         }
 #else
 #    define LEMON_DB()
-#    define LEMON_ASSERT(arg)
+#    define lemon_assert(arg)
 #endif // LEMON_DEBUG
-#define LEMON_SASSERT(arg, msg) static_assert(arg, msg)
+#define lemon_sassert(arg, msg) static_assert(arg, msg)

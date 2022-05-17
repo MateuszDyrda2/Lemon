@@ -1,6 +1,17 @@
 #pragma once
 
 namespace lemon {
+#define MOUSE_FIRST        (size_type(key::keycode::mouse_1))
+#define MOUSE_LAST         (size_type(key::keycode::mouse_y))
+#define MOUSE_KEY_COUNT    (size_type(MOUSE_LAST) - size_type(MOUSE_FIRST) + 1)
+#define KEYBOARD_FIRST     (size_type(key::keycode::space))
+#define KEYBOARD_LAST      (size_type(key::keycode::menu))
+#define KEYBOARD_KEY_COUNT (size_type(KEYBOARD_LAST) - size_type(KEYBOARD_FIRST) + 1)
+#define GAMEPAD_FIRST      (size_type(key::keycode::gamepad_a))
+#define GAMEPAD_LAST       (size_type(key::keycode::gamepad_right_trigger))
+#define GAMEPAD_KEY_COUNT  (size_type(GAMEPAD_LAST) - size_type(GAMEPAD_LAST) + 1)
+#define KEY_COUNT          (size_type(GAMEPAD_LAST) + 1)
+
 /* printable keys */
 namespace key {
 enum action
@@ -11,6 +22,7 @@ enum action
 };
 enum keycode
 {
+    // Keyboard keys
     space         = 32,
     apostrophe    = 39 /* ' */,
     comma         = 44 /* , */,
@@ -131,6 +143,41 @@ enum keycode
     right_alt     = 346,
     right_super   = 347,
     menu          = 348,
+    // Mouse buttons
+    mouse_1 = 349 + 0,
+    mouse_2,
+    mouse_3,
+    mouse_4,
+    mouse_5,
+    mouse_6,
+    mouse_7,
+    mouse_8,
+    // Mouse axis
+    mouse_x = 357,
+    mouse_y,
+    // Gamepad keys
+    gamepad_a = 360 + 0,
+    gamepad_b,
+    gamepad_x,
+    gamepad_y,
+    gamepad_left_bumper,
+    gamepad_right_bumper,
+    gamepad_back,
+    gamepad_start,
+    gamepad_guide,
+    gamepad_left_thumb,
+    gamepad_right_thumb,
+    gamepad_dpad_up,
+    gamepad_dpad_right,
+    gamepad_dpad_down,
+    gamepad_dpad_left,
+    // Gamepad axis
+    gamepad_left_x = 375 + 0,
+    gamepad_left_y,
+    gamepad_right_x,
+    gamepad_right_y,
+    gamepad_left_trigger,
+    gamepad_right_trigger,
 };
 enum keymod
 {
@@ -141,16 +188,5 @@ enum keymod
     CAPS_LOCK = 0x0010,
     NUM_LOCK  = 0x0020
 };
-enum mouse
-{
-    button_1 = 0,
-    button_2 = 1,
-    button_3 = 2,
-    button_4 = 3,
-    button_5 = 4,
-    button_6 = 5,
-    button_7 = 6,
-    button_8 = 7,
-};
-} // namespace keycode
+} // namespace key
 } // namespace lemon

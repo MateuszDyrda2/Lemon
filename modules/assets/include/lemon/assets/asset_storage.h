@@ -69,24 +69,8 @@ class LEMON_PUBLIC asset_storage
 template<class T>
 ptr<T> asset_storage::get_mock_asset() const
 {
-    // LEMON_SASSERT(NULL, "Not implemented");
     return static_cast<ptr<T>>(cachedAssets.at(T::get_mocked()).get());
 }
-/*template<>
-inline ptr<texture> asset_storage::get_mock_asset() const
-{
-    return static_cast<ptr<texture>>(cachedAssets.at(string_id("mock_texture")).get());
-}
-template<>
-inline ptr<shader> asset_storage::get_mock_asset() const
-{
-    return static_cast<ptr<shader>>(cachedAssets.at(string_id("mock_shader")).get());
-}
-template<>
-inline ptr<sound> asset_storage::get_mock_asset() const
-{
-    return static_cast<ptr<sound>>(cachedAssets.at(string_id("mock_sound")).get());
-} */
 template<class T>
 ptr<T> asset_storage::get_asset(string_id name) const
 {

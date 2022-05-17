@@ -9,7 +9,7 @@ ptr<asset_storage> asset_storage::storage = nullptr;
 asset_storage::asset_storage():
     loader(create_owned<asset_loader>())
 {
-    LEMON_ASSERT(!storage);
+    lemon_assert(!storage);
     storage = this;
 
     auto _texture = string_id("mock_texture");

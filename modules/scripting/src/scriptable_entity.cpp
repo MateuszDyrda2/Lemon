@@ -19,13 +19,13 @@ const tag& scriptable_entity::get_tag() const
 }
 bool scriptable_entity::get_enabled() const
 {
-    return ent.has_component<enabled>();
+    return ent.has_component<enabled_t>();
 }
 void scriptable_entity::set_enabled(bool value)
 {
     if(value)
-        ent.emplace_or_replace<enabled>();
+        ent.emplace_or_replace<enabled_t>();
     else
-        ent.remove_component<enabled>();
+        ent.remove_component<enabled_t>();
 }
 } // namespace lemon

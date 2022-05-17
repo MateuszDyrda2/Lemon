@@ -18,27 +18,7 @@ py_script::py_script(const std::string& moduleName)
 void py_script::instantiate(entity ent)
 {
     py::object instance = py_class(ent);
-    LEMON_ASSERT(py::isinstance<scriptable_entity>(instance));
-    try
-    {
-        auto c  = instance.attr("create");
-        auto u  = instance.attr("update");
-        auto lu = instance.attr("late_update");
-        auto d  = instance.attr("destroy");
-        auto e  = instance.attr("on_enable");
-        auto de = instance.attr("on_disable");
-
-        create     = c.cast<py::function>();
-        update     = u.cast<py::function>();
-        lateUpdate = lu.cast<py::function>();
-        destroy    = d.cast<py::function>();
-        onEnable   = e.cast<py::function>();
-        onDisable  = de.cast<py::function>();
-    }
-    catch(const py::error_already_set& err)
-    {
-        LOG_ERROR("%s", err.what());
-    }
+    lemon_assert(py::isinstance<scriptable_entity>(instance));
     s_entity = instance.cast<scriptable_entity*>();
 }
 } // namespace lemon

@@ -3,6 +3,7 @@
 #include <lemon/assets/asset_storage.h>
 #include <lemon/audio/sound_context.h>
 #include <lemon/core/time/clock.h>
+#include <lemon/events/event_bus.h>
 #include <lemon/platform/input.h>
 #include <lemon/platform/window.h>
 #include <lemon/rendering/rendering_context.h>
@@ -31,7 +32,7 @@ class LEMON_PUBLIC engine
 
     owned<py_engine> _scriptingEngine;
     owned<scheduler> _scheduler;
-    //    owned<event_handler> _events;
+    owned<event_bus> _eventBus;
     owned<window> _window;
     owned<rendering_context> _renderingContext;
     owned<sound_context> _soundContext;

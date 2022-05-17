@@ -30,7 +30,7 @@ void clock::update() noexcept
     deltaTime = _delta.count() / 1000000000.0f;
     virtualFrameTime += _delta;
 }
-void clock::set_timescale(float timeScale) noexcept
+void clock::set_timescale(f32 timeScale) noexcept
 {
     this->timeScale = timeScale;
 }

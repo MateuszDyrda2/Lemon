@@ -143,14 +143,14 @@ class reflection
     template<std::size_t I, class T>
     static constexpr decltype(auto) get_field(T& comp)
     {
-        using field = typename T::field<T, I>;
+        using field = typename T::template field<T, I>;
         field f(comp);
         return f.get();
     }
     template<std::size_t I, class T>
     static constexpr decltype(auto) get_field(const T& comp)
     {
-        using field = typename T::field<const T, I>;
+        using field = typename T::template field<const T, I>;
         const field f(comp);
         return f.get();
     }

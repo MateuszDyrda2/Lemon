@@ -3,28 +3,16 @@
 #include <lemon/core/game.h>
 #include <lemon/platform/key_codes.h>
 
+#include <lemon/core/instrumentor.h>
 #include <lemon/platform/window_events.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 namespace lemon {
-event window::onKeyPressed;
-event window::onMouseButtonPressed;
-event window::onMouseScroll;
-event window::onWindowClose;
-event window::onWindowSize;
-event window::onFramebufferSize;
-event window::onWindowContentScale;
-event window::onWindowPos;
-event window::onWindowIconify;
-event window::onWindowMaximize;
-event window::onWindowFocused;
-event window::onWindowRefresh;
-
 void setup_callbacks(GLFWwindow* _handle);
-window::window(size_type width, size_type height):
-    _name(game::get_settings().gameName), size(width, height)
+window::window(size_type width, size_type height, event_bus& ebus, scheduler& sch):
+    ebus(ebus), _name(game::get_settings().gameName), size(width, height)
 {
     if(!glfwInit())
     {
@@ -38,115 +26,100 @@ window::window(size_type width, size_type height):
     {
         LOG_FATAL("Window or OpenGL context creation failed");
     }
+    // TODO: Set the thread with index 0 as the rendering thread
     glfwMakeContextCurrent((GLFWwindow*)_handle);
+
     glfwSwapInterval(1); // fps locked to 60
 
     glfwSetWindowUserPointer((GLFWwindow*)_handle, (void*)this);
-    setup_callbacks((GLFWwindow*)_handle);
-    window::onWindowSize.register_observer([this](event_args* a) {
-        auto s = (WindowSize*)a;
-        size   = ivec2(s->width, s->height);
-        LOG_MESSAGE("Window resize: %dx%d", size.x, size.y);
-    },
-                                           string_id("window::onWindowSize"));
-
+    setup_callbacks(_handle);
+    ebus.sink(string_id("WindowSize")) += this;
     glfwSetErrorCallback([](int /* error */, const char* description) {
         LOG_ERROR("GLFWError: %s", description);
     });
+
     LOG_MESSAGE("Window created %dx%d", width, height);
 }
 window::~window()
 {
+    ebus.sink(string_id("WindowSize")) -= this;
     glfwDestroyWindow((GLFWwindow*)_handle);
     glfwTerminate();
     LOG_MESSAGE("Window destroyed");
 }
+void window::on_event(event* e)
+{
+    auto ev = static_cast<WindowSize*>(e);
+    size    = ivec2(ev->width, ev->height);
+}
 bool window::end_frame()
 {
+    LEMON_PROFILE_FUNCTION();
     glfwSwapBuffers((GLFWwindow*)_handle);
     glfwPollEvents();
     return !!glfwWindowShouldClose((GLFWwindow*)_handle);
 }
-void setup_callbacks(GLFWwindow* _handle)
+void window::setup_callbacks(native_handle_t handle)
 {
+    auto _handle = (GLFWwindow*)handle;
     glfwSetKeyCallback(_handle, [](GLFWwindow* w, int k, int scancode, int action, int mods) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onKeyPressed.notify(
-                new KeyPressed(
-                    key::keycode(k),
-                    scancode,
-                    key::action(action),
-                    key::keymod(mods)));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new KeyPressed(key::keycode(k), scancode, key::action(action), key::keymod(mods)));
     });
     glfwSetMouseButtonCallback(_handle, [](GLFWwindow* w, int button, int action, int mods) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onMouseButtonPressed.notify(
-                new MouseButtonPressed(
-                    key::mouse(button),
-                    key::action(action),
-                    key::keymod(mods)));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new MouseButtonPressed(key::mouse(button), key::action(action), key::keymod(mods)));
     });
     glfwSetScrollCallback(_handle, [](GLFWwindow* w, double xoffset, double yoffset) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onMouseScroll.notify(
-                new MouseScroll(
-                    xoffset,
-                    yoffset));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new MouseScroll(xoffset, yoffset));
     });
     glfwSetWindowCloseCallback(_handle, [](GLFWwindow* w) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowClose.notify(
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
                 new WindowClose);
     });
     glfwSetWindowSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowSize.notify(
-                new WindowSize(
-                    width,
-                    height));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowSize(width, height));
     });
     glfwSetFramebufferSizeCallback(_handle, [](GLFWwindow* w, int width, int height) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onFramebufferSize.notify(
-                new FramebufferSize(
-                    width,
-                    height));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new FramebufferSize(width, height));
     });
     glfwSetWindowContentScaleCallback(_handle, [](GLFWwindow* w, float xscale, float yscale) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowContentScale.notify(
-                new WindowContentScale(
-                    xscale,
-                    yscale));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowContentScale(xscale, yscale));
     });
     glfwSetWindowPosCallback(_handle, [](GLFWwindow* w, int xpos, int ypos) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowPos.notify(
-                new WindowPos(
-                    xpos,
-                    ypos));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowPos(xpos, ypos));
     });
     glfwSetWindowIconifyCallback(_handle, [](GLFWwindow* w, int iconified) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowIconify.notify(
-                new WindowIconify(
-                    iconified));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowIconify(iconified));
     });
     glfwSetWindowMaximizeCallback(_handle, [](GLFWwindow* w, int maximized) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowMaximize.notify(
-                new WindowMaximize(
-                    maximized));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowMaximize(maximized));
     });
     glfwSetWindowFocusCallback(_handle, [](GLFWwindow* w, int focused) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowFocused.notify(
-                new WindowFocused(
-                    focused));
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
+                new WindowFocused(focused));
     });
     glfwSetWindowRefreshCallback(_handle, [](GLFWwindow* w) {
-        ((window*)(glfwGetWindowUserPointer(w)))
-            ->onWindowRefresh.notify(
+        ((window*)glfwGetWindowUserPointer(w))
+            ->ebus.fire(
                 new WindowRefresh);
     });
 }
