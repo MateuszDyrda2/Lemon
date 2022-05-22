@@ -23,7 +23,7 @@ class LEMON_PUBLIC window : public listener, public service
     ~window();
     void on_event(event* e) override;
 
-    bool end_frame();
+    bool update();
     ivec2 get_size() const { return size; }
 
     native_handle_t get_handle() { return (void*)_handle; }

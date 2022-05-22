@@ -26,7 +26,7 @@ class LEMON_PUBLIC engine
     virtual ~engine();
     // void run();
     void initialize();
-    bool update();
+    void run();
     void drop();
 
   protected:

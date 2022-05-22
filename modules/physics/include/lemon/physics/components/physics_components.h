@@ -24,21 +24,27 @@ struct LEMON_PUBLIC rigidbody : public component
         Kinematic
     };
 
+    vec2 position{};
     vec2 velocity{};
+    f32 rotation{};
     f32 angularVelocity{};
     f32 linearDrag{};
     f32 angularDrag{};
     f32 mass{ 1.0f };
-    f32 gravityScale{ 10.f };
     bool freezeRotation{};
     body_type bodyType{};
     collision_detection collisionDetection{};
 
+    vec2 _oldPosition{};
+    vec2 _oldVelocity{};
+    f32 _oldRotation{};
+    f32 _oldAngularVelocity{};
+
     rigidbody()  = default;
     ~rigidbody() = default;
 
-    LEMON_REFLECT(rigidbody, velocity, angularVelocity, linearDrag, angularDrag,
-                  mass, gravityScale, freezeRotation, bodyType, collisionDetection);
+    LEMON_REFLECT(rigidbody, position, velocity, rotation, angularVelocity, linearDrag, angularDrag,
+                  mass, freezeRotation, bodyType, collisionDetection);
 };
 struct LEMON_PUBLIC collider : public component
 {

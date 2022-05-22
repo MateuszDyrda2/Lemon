@@ -1,14 +1,16 @@
-#include <lemon/core/time/clock.h>
+#include <lemon/core/time/game_clock.h>
 
 #include <lemon/core/logger.h>
-
 #include <lemon/core/service_registry.h>
 
 namespace lemon {
 game_clock::game_clock(service_registry&):
     startTime(clock_type::now()), virtualFrameTime{},
-    realLastFrameTime{ startTime }, deltaTime{},
-    realDeltaTime{}, timeScale{ 1.0f }
+    realLastFrameTime{ startTime }, physicsLastFrameTime{},
+    deltaTime{},
+    physicsDeltaTime{ 1'000'000'000.0 / 100.0 },
+    realDeltaTime{}, timeScale{ 1.0f }, accumulator{ 0.0 },
+    alpha{ 0.0 }
 {
     LOG_MESSAGE("Clock created");
 }
@@ -16,24 +18,46 @@ game_clock::~game_clock()
 {
     LOG_MESSAGE("Clock destroyed");
 }
-game_clock::duration_type game_clock::elapsed_from_start(const time_point& tp) const noexcept
+void game_clock::calculate_delta_time() noexcept
 {
-    return tp - startTime;
-}
-void game_clock::update() noexcept
-{
-    time_point _now          = clock_type::now();
-    duration_type _realDelta = _now - realLastFrameTime;
-    duration_type _delta     = duration_type(i64(_realDelta.count() * timeScale));
-
-    realDeltaTime     = _realDelta.count() / 1000000000.0f;
+    auto _now         = clock_type::now();
+    realDeltaTime     = (_now - realLastFrameTime).count();
     realLastFrameTime = _now;
 
-    deltaTime = _delta.count() / 1000000000.0f;
-    virtualFrameTime += _delta;
+    deltaTime = realDeltaTime * timeScale;
+    virtualFrameTime += deltaTime;
 }
 void game_clock::set_timescale(f32 timeScale) noexcept
 {
     this->timeScale = timeScale;
 }
+f64 game_clock::get_real_time() const noexcept
+{
+    return nano2sec((realLastFrameTime - startTime).count());
+}
+f64 game_clock::get_time() const noexcept
+{
+    return nano2sec(virtualFrameTime);
+}
+f64 game_clock::get_physics_time() const noexcept
+{
+    return nano2sec(physicsLastFrameTime);
+}
+f64 game_clock::get_delta() const noexcept
+{
+    return nano2sec(deltaTime);
+}
+f64 game_clock::get_real_delta() const noexcept
+{
+    return nano2sec(realDeltaTime);
+}
+f64 game_clock::get_physics_delta() const noexcept
+{
+    return nano2sec(physicsDeltaTime);
+}
+f64 game_clock::get_alpha() const noexcept
+{
+    return alpha;
+}
+
 } // namespace lemon

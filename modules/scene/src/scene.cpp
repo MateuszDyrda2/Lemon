@@ -7,11 +7,13 @@
 namespace lemon {
 using namespace std;
 scene::scene(string_id name, service_registry& globalRegistry, entity_registry&& registry):
-    name(name), registry(std::move(registry)), globalRegistry(globalRegistry)
+    name(name), registry(std::move(registry)), globalRegistry(globalRegistry),
+    clk(globalRegistry.get_service<game_clock>())
 {
 }
 scene::scene(string_id name, service_registry& globalRegistry):
-    name(name), registry(), globalRegistry(globalRegistry)
+    name(name), registry(), globalRegistry(globalRegistry),
+    clk(globalRegistry.get_service<game_clock>())
 {
     /*
     mainCamera.add_component<tag>(string_id("MainCamera"));
@@ -40,14 +42,6 @@ void scene::frame_begin()
         s->on_update(registry);
     }
 }
-void scene::update_begin()
-{
-    LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onUpdateBeginMap)
-    {
-        s->on_update(registry);
-    }
-}
 void scene::physics_update()
 {
     LEMON_PROFILE_FUNCTION();
@@ -56,10 +50,10 @@ void scene::physics_update()
         s->on_update(registry);
     }
 }
-void scene::update_end()
+void scene::update()
 {
     LEMON_PROFILE_FUNCTION();
-    for(auto& [_, s] : onUpdateEndMap)
+    for(auto& [_, s] : onUpdateMap)
     {
         s->on_update(registry);
     }
@@ -145,17 +139,13 @@ void scene::push2map(ptr<system> s, update_stage::frame_begin_t, size_type order
 {
     onFrameBeginMap[order] = s;
 }
-void scene::push2map(ptr<system> s, update_stage::update_begin_t, size_type order)
+void scene::push2map(ptr<system> s, update_stage::update_t, size_type order)
 {
-    onUpdateBeginMap[order] = s;
+    onUpdateMap[order] = s;
 }
 void scene::push2map(ptr<system> s, update_stage::physics_t, size_type order)
 {
     onPhysicsMap[order] = s;
-}
-void scene::push2map(ptr<system> s, update_stage::update_end_t, size_type order)
-{
-    onUpdateEndMap[order] = s;
 }
 void scene::push2map(ptr<system> s, update_stage::frame_end_t, size_type order)
 {

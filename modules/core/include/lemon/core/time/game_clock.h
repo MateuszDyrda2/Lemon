@@ -12,40 +12,57 @@ class LEMON_PUBLIC game_clock : public service
 {
   public:
     LEMON_REGISTER_SERVICE(game_clock);
-    using self_type     = game_clock;
-    using clock_type    = std::chrono::high_resolution_clock;
-    using duration_type = std::chrono::duration<i64, std::nano>;
-    using time_point    = std::chrono::time_point<clock_type, duration_type>;
+    using self_type  = game_clock;
+    using clock_type = std::chrono::high_resolution_clock;
 
   public:
     game_clock(service_registry&);
     ~game_clock();
-    time_point get_real_time() const noexcept
-    {
-        return realLastFrameTime;
-    }
-    time_point get_time() const noexcept
-    {
-        return virtualFrameTime;
-    }
-    duration_type elapsed_from_start(const time_point& tp) const noexcept;
-    void update() noexcept;
+    void calculate_delta_time() noexcept;
     void set_timescale(f32 timeScale) noexcept;
-    [[nodiscard]] f32 delta_time() const noexcept
-    {
-        return deltaTime;
-    }
-    [[nodiscard]] f32 read_delta_time() const noexcept
-    {
-        return realDeltaTime;
-    }
+
+    [[nodiscard]] f64 get_real_time() const noexcept;
+    [[nodiscard]] f64 get_time() const noexcept;
+    [[nodiscard]] f64 get_physics_time() const noexcept;
+
+    [[nodiscard]] f64 get_delta() const noexcept;
+    [[nodiscard]] f64 get_real_delta() const noexcept;
+    [[nodiscard]] f64 get_physics_delta() const noexcept;
+    [[nodiscard]] f64 get_alpha() const noexcept;
+
+    template<class F>
+    void physics_step(F&& callable);
 
   private:
-    time_point startTime;
-    time_point virtualFrameTime;
-    time_point realLastFrameTime;
-    f32 deltaTime;
-    f32 realDeltaTime;
+    clock_type::time_point startTime;
+    clock_type::time_point realLastFrameTime;
+    i64 virtualFrameTime;
+    i64 physicsLastFrameTime;
+    i64 deltaTime;
+    i64 physicsDeltaTime;
+    i64 realDeltaTime;
     f32 timeScale;
+
+    f64 accumulator;
+    f64 alpha;
+
+  private:
+    static inline f64 nano2sec(i64 val)
+    {
+        return f64(val * 1'000'000'000.0);
+    }
 };
+template<class F>
+void game_clock::physics_step(F&& callable)
+{
+    accumulator += get_delta();
+    auto pdt = get_physics_delta();
+    while(accumulator >= pdt)
+    {
+        callable();
+        physicsLastFrameTime += physicsDeltaTime;
+        accumulator -= pdt;
+    }
+    alpha = accumulator / pdt;
+}
 } // namespace lemon

@@ -4,7 +4,7 @@ project(LemonCore)
 set(lemon_core_SRC 
 	src/logger.cpp
 	src/string_id.cpp
-	src/time/clock.cpp
+	src/time/game_clock.cpp
 	src/file.cpp
 	src/game.cpp 
 	src/instrumentor.cpp

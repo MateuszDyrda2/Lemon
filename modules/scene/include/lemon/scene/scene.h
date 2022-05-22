@@ -6,6 +6,7 @@
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/service_registry.h>
 #include <lemon/core/time/game_clock.h>
+#include <lemon/threading/scheduler.h>
 
 #include <functional>
 #include <map>
@@ -17,15 +18,12 @@ struct update_stage
     static struct frame_begin_t
     {
     } frameBegin;
-    static struct update_begin_t
+    static struct update_t
     {
     } updateBegin;
     static struct physics_t
     {
     } physics;
-    static struct update_end_t
-    {
-    } updateEnd;
     static struct frame_end_t
     {
     } frameEnd;
@@ -44,9 +42,8 @@ class LEMON_PUBLIC scene
     void scene_start();
 
     void frame_begin();
-    void update_begin();
     void physics_update();
-    void update_end();
+    void update();
     void frame_end();
 
     void scene_end();
@@ -54,37 +51,25 @@ class LEMON_PUBLIC scene
 
     const string_id& get_id() const { return name; }
 
-    /*
-        entity add_entity(string_id name);
-        entity add_entity(string_id name, entity parent);
-        entity add_entity(string_id name, const vec2& position,
-                          const vec2& scale, f32 rotation);
-        entity add_entity(string_id name, const vec2& position,
-                          const vec2& scale, f32 rotation, entity parent);
-        entity clone_entity(entity ent, string_id name);
-        void remove_entity(entity& ent);
-        entity_registry& get_registry() { return registry; }
-        entity get_main_camera() const { return mainCamera; }
-        */
-
   private:
     string_id name;
     entity_registry registry;
     service_registry globalRegistry;
+    job physicsJob;
+    double accumulator;
+    game_clock& clk;
 
     std::vector<owned<system>> systems;
     std::map<size_type, ptr<system>> onFrameBeginMap;
-    std::map<size_type, ptr<system>> onUpdateBeginMap;
     std::map<size_type, ptr<system>> onPhysicsMap;
-    std::map<size_type, ptr<system>> onUpdateEndMap;
+    std::map<size_type, ptr<system>> onUpdateMap;
     std::map<size_type, ptr<system>> onFrameEndMap;
 
   private:
     friend class scene_attachment;
     void push2map(ptr<system> s, update_stage::frame_begin_t, size_type order);
-    void push2map(ptr<system> s, update_stage::update_begin_t, size_type order);
+    void push2map(ptr<system> s, update_stage::update_t, size_type order);
     void push2map(ptr<system> s, update_stage::physics_t, size_type order);
-    void push2map(ptr<system> s, update_stage::update_end_t, size_type order);
     void push2map(ptr<system> s, update_stage::frame_end_t, size_type order);
 };
 template<class T, class Stage, class... Args>

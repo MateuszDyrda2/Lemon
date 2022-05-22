@@ -15,15 +15,25 @@ physics_system::~physics_system()
 void physics_system::on_update(entity_registry& registry)
 {
     LEMON_PROFILE_FUNCTION();
-    auto deltaTime = clk.delta_time();
+    auto pdt = clk.get_physics_delta();
 
     auto view = registry.view<rigidbody>();
-    sch.for_each(view.begin(), view.end(),
-                 [&](auto ent) {
-                     auto&& [rb] = view.get(ent);
-                     rb.velocity *= glm::clamp(1.f - rb.linearDrag * deltaTime, 0.f, 1.f);
-                     rb.angularVelocity *= glm::clamp(1.f - rb.angularDrag * deltaTime, 0.f, 1.f);
-                 });
+    // switch to a new state
+    for(auto&& [ent, rb] : view.each())
+    {
+        rb._oldPosition        = rb.position;
+        rb._oldRotation        = rb.rotation;
+        rb._oldAngularVelocity = rb.angularVelocity;
+        rb._oldVelocity        = rb.velocity;
+    }
+
+    sch.for_each(
+        view.begin(), view.end(),
+        [&](auto ent) {
+            auto&& [rb] = view.get(ent);
+            rb.velocity *= glm::clamp(1.f - rb.linearDrag * pdt, 0.f, 1.f);
+            rb.angularVelocity *= glm::clamp(1.f - rb.angularDrag * pdt, 0.f, 1.f);
+        });
 
     // auto group = registry.group<transform, collider, rigidbody>();
     auto trrb = registry.view<transform, rigidbody>();
@@ -31,8 +41,8 @@ void physics_system::on_update(entity_registry& registry)
         trrb.begin(), trrb.end(),
         [&](auto ent) {
             auto&& [tr, rb] = trrb.get(ent);
-            tr.position += rb.velocity * deltaTime;
-            tr.rotation += rb.angularVelocity * deltaTime;
+            tr.position += rb.velocity * pdt;
+            tr.rotation += rb.angularVelocity * pdt;
         });
     for(auto&& [ent, rb] : view.each())
     {

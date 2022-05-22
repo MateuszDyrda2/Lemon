@@ -7,6 +7,8 @@ set(lemon_physics_SRC
 	src/systems/collision_system.cpp
 	src/systems/collision_response_system.cpp
 	src/systems/movement_system.cpp
+	src/systems/prephysics_system.cpp
+	src/systems/postphysics_system.cpp
 )
 
 add_library(lemon_physics ${lemon_physics_SRC})

@@ -17,7 +17,10 @@ class LEMON_PUBLIC scene_manager : public service
     scene_manager(service_registry& globalRegistry, ptr<scene> scene);
     ~scene_manager();
 
+    void frame_begin();
+    void physics_update();
     void update();
+    void frame_end();
 
     void create_scene(string_id sceneId);
     scene& load_scene(string_id sceneId);

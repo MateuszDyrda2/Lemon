@@ -2,6 +2,7 @@ project(LemonEvents)
 
 set(lemon_events_SRC
 	src/event_bus.cpp
+	src/event_handler.cpp
 )
 
 add_library(lemon_events ${lemon_events_SRC})

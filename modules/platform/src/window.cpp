@@ -55,7 +55,7 @@ void window::on_event(event* e)
     auto ev = static_cast<WindowSize*>(e);
     size    = ivec2(ev->width, ev->height);
 }
-bool window::end_frame()
+bool window::update()
 {
     LEMON_PROFILE_FUNCTION();
     glfwSwapBuffers((GLFWwindow*)_handle);

@@ -93,39 +93,6 @@ void collision_response_system::on_update(entity_registry& registry)
                 // trA.position += rbA.velocity * deltaTime;
             }
         });
-    /*
-        auto deltaTime = clk.delta_time();
-        for(auto&& [ent, tr, rb] : registry.view<transform, rigidbody>().each())
-        {
-            tr.position += rb.velocity * deltaTime;
-            registry.emplace_or_replace<dirty_t>(ent);
-        }
-    */
-    /*
-        auto collisions = registry.view<collision_m>();
-        sch.for_each(
-            collisions.begin(), collisions.end(),
-            [&](auto ent) {
-                auto&& [coll]            = collisions.get(ent);
-                auto&& [trA, collA, rbA] = registry.get<transform, collider, rigidbody>(coll.A);
-                auto&& [trB, collB]      = registry.get<transform, collider>(coll.B);
-
-                // impulse collision response
-                auto bounciness = std::min(collA.bounciness, collB.bounciness);
-                auto vj         = -(1 + bounciness) * dot(rbA.velocity, coll.mtv.axis);
-                auto j          = vj;
-                rbA.velocity += j * coll.mtv.axis;
-            });
-
-        // TODO: trigger response
-        auto triggers = registry.view<trigger_m>();
-        sch.for_each(
-            triggers.begin(), triggers.end(),
-            [&](auto ent) {
-                auto&& [trg] = triggers.get(ent);
-                (void)trg;
-            });
-            */
 }
 
 } // namespace lemon

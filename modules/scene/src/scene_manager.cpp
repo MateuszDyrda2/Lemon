@@ -19,13 +19,24 @@ scene_manager::~scene_manager()
 {
     LOG_MESSAGE("Scene manager destroyed");
 }
-void scene_manager::update()
+void scene_manager::frame_begin()
 {
     lemon_assert(currentScene != nullptr);
     currentScene->frame_begin();
-    currentScene->update_begin();
+}
+void scene_manager::physics_update()
+{
+    lemon_assert(currentScene != nullptr);
     currentScene->physics_update();
-    currentScene->update_end();
+}
+void scene_manager::update()
+{
+    lemon_assert(currentScene != nullptr);
+    currentScene->update();
+}
+void scene_manager::frame_end()
+{
+    lemon_assert(currentScene != nullptr);
     currentScene->frame_end();
 }
 void scene_manager::create_scene(string_id sceneId)

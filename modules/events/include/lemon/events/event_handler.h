@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../system.h"
-
 #include <lemon/core/assert.h>
-#include <lemon/core/basic_types.h>
-#include <lemon/core/defines.h>
-#include <lemon/core/string_id.h>
+#include <lemon/core/service.h>
 
 #include <cstring>
 #include <queue>
@@ -24,11 +20,13 @@ class event_listener
     std::queue<event> eventQueue;
     friend event_system;
 };
-class LEMON_PUBLIC event_system : public system
+class LEMON_PUBLIC event_handler : public service
 {
   public:
-    event_system(ptr<scene> s);
-    ~event_system();
+    LEMON_REGISTER_SERVICE(event_handler);
+
+  public:
+    ~event_handler() = default;
 
     template<class... Args>
     requires(sizeof(std::tuple<string_id, Args...>) <= 32) void push_event(
@@ -42,7 +40,7 @@ class LEMON_PUBLIC event_system : public system
     std::unordered_map<string_id, std::vector<ptr<event_listener>>> subscribers;
 };
 template<class... Args>
-requires(sizeof(std::tuple<string_id, Args...>) <= 32) void event_system::push_event(
+requires(sizeof(std::tuple<string_id, Args...>) <= 32) void event_handler::push_event(
     string_id eventId, Args&&... args) noexcept
 {
     lemon_assert(bool(eventId));
@@ -61,7 +59,7 @@ requires(sizeof(std::tuple<string_id, Args...>) <= 32) void event_system::push_e
     // else discard the event
 }
 template<class... Args>
-inline const std::tuple<Args...>& get_arguments(event& e)
+inline const std::tuple<Args...>& event_handler::get_arguments(event& e)
 {
     return *static_cast<std::tuple<Args...>*>(&e)
 }

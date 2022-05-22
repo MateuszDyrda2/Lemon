@@ -7,9 +7,11 @@
 #include <moodycamel/concurrentqueue.h>
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <vector>
 
@@ -23,11 +25,17 @@ struct LEMON_PUBLIC waitable
 struct LEMON_PUBLIC job
 {
     std::function<void(void)> callable;
-    waitable* wait{};
+    ptr<waitable> wait{};
+    std::chrono::high_resolution_clock::time_point wakeTime{};
     job() = default;
     template<class F>
     job(F&& f):
         callable(f) { }
+
+    bool operator<(const job& other)
+    {
+        return wakeTime < other.wakeTime;
+    }
 };
 class LEMON_PUBLIC scheduler : public service
 {
@@ -58,6 +66,8 @@ class LEMON_PUBLIC scheduler : public service
      * @param sig waitable object
      */
     void wait(waitable* sig);
+    void run_in(job* jobs, size_type count, const std::chrono::milliseconds& delta);
+    void run_at(job* jobs, size_type count, const std::chrono::high_resolution_clock::time_point& at);
     /** @returns index of the calling thread */
     size_type get_thread_index();
     /** @brief Executes an unary function on each element in range
@@ -72,13 +82,17 @@ class LEMON_PUBLIC scheduler : public service
   private:
     std::vector<std::thread> workers;
     size_type nbWorkers;
-    std::vector<concurrent_queue<job*>> localQueues;
-    std::vector<concurrent_queue<job*>> globalQueues;
+
+    std::priority_queue<ptr<job>> sleepingJobs;
+    std::mutex sleepingMtx;
+    std::vector<concurrent_queue<ptr<job>>> localQueues;
+    std::vector<concurrent_queue<ptr<job>>> globalQueues;
     std::vector<owned<std::mutex>> localMtxs;
     std::vector<owned<std::condition_variable>> localCvars;
 
     std::atomic_bool shouldEnd;
     static thread_local size_type threadIndex;
+    static thread_local size_type lastUsed;
 
   private:
     void job_finished(job* j);

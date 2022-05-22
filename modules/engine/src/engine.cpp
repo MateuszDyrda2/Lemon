@@ -31,14 +31,21 @@ void engine::initialize()
     rendering_context::create();
     sound_context::drop();
 }
-bool engine::update()
+void engine::run()
 {
-    LEMON_PROFILE_FUNCTION();
+    while(win->update())
+    {
+        LEMON_PROFILE_SCOPE("GameLoop");
+        clk->calculate_delta_time(); // calculate new dt
+        in->update();                // get inputs
 
-    clk->update();
-    in->update();
-    sceneManager->update();
-    return win->end_frame();
+        sceneManager->frame_begin();
+
+        clk->physics_step([=] { sceneManager->physics_update(); });
+
+        sceneManager->update();
+        sceneManager->frame_end();
+    }
 }
 void engine::drop()
 {
