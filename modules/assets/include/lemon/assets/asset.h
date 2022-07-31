@@ -130,10 +130,7 @@ asset<T> asset_storage::get_asset(hash_str nameid)
         cachedAssets.insert(std::make_pair(nameid, loader->load_resource<T>(nameid)));
         return asset<T>(nameid, this);
     }
-    else
-    {
-        logger::fatal("Resource {} not found", nameid);
-    }
+    logger::fatal("Resource {} not found", nameid);
 }
 template<class T>
 T* asset_storage::get_mock_asset() const

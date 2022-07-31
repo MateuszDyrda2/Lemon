@@ -107,7 +107,7 @@ void scheduler::for_each(Iter beg, Iter end, F callable)
     else
     {
         auto step = _size / nbWorkers;
-        job jobs[nbWorkers - 1];
+        std::vector<job> jobs(nbWorkers - 1);
         for(std::size_t i = 0; i < nbWorkers - 1; ++i)
         {
             jobs[i].callable = [&, it = beg]() mutable {
@@ -119,7 +119,7 @@ void scheduler::for_each(Iter beg, Iter end, F callable)
             std::advance(beg, step);
         }
         lemon::waitable sig;
-        run(jobs, nbWorkers - 1, &sig);
+        run(jobs.data(), nbWorkers - 1, &sig);
         for(; beg != end; ++beg)
         {
             callable(*beg);

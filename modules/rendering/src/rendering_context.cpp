@@ -35,7 +35,7 @@ void rendering_context::clear_screen(const color& c)
 }
 void rendering_context::draw_arrays(GLenum mode, std::size_t first, std::size_t count)
 {
-    glDrawArrays(mode, first, count);
+    glDrawArrays(mode, first, GLsizei(count));
 }
 void rendering_context::draw_elements(GLenum mode, std::size_t count, GLenum type, void* indices)
 {

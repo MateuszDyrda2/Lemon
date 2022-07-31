@@ -1,0 +1,18 @@
+[submodule "modules/assets/libs/rapidjson"]
+	path = modules/assets/libs/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "modules/core/libs/glm"]
+	path = modules/core/libs/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "modules/core/libs/fmt"]
+	path = modules/core/libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "modules/platform/libs/glfw"]
+	path = modules/platform/libs/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "modules/threading/libs/concurrentqueue"]
+	path = modules/threading/libs/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
+[submodule "tests/libs/googletest"]
+	path = tests/libs/googletest
+	url = https://github.com/google/googletest.git

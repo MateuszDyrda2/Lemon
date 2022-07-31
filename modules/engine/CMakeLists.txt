@@ -13,5 +13,4 @@ target_link_libraries(lemon_engine
 	PUBLIC lemon::assets
 	PUBLIC lemon::threading
 	PUBLIC lemon::rendering
-	PUBLIC lemon::scripting
 )

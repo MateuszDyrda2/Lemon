@@ -71,8 +71,8 @@ struct color
     std::string to_string() const
     {
         char buffer[10];
-        u8 ur = r * 255, ug = g * 255,
-           ub = b * 255, ua = a * 255;
+        u8 ur = u8(r * 255), ug = u8(g * 255),
+           ub = u8(b * 255), ua = u8(a * 255);
 
         std::sprintf(buffer, "#%02x%02x%02x%02x", ur, ug, ub, ua);
         return std::string(buffer);

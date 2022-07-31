@@ -66,6 +66,8 @@ class input::impl
                        && gamepadAction.key == other.gamepadAction.key;
             case device::gamepad_axis:
                 return gamepadAxis == other.gamepadAxis;
+
+            default: return false;
             }
         }
     };
@@ -87,6 +89,8 @@ class input::impl
                 return std::hash<u64>{}(u64(act.gamepadAction.key) << 32 | u64(act.gamepadAction.action));
             case device::gamepad_axis:
                 return std::hash<u64>{}(u64(act.gamepadAxis));
+
+            default: return 0ULL;
             }
         }
     };
@@ -119,12 +123,12 @@ class input::impl
                 in->mousePos[1] = f32(ypos);
             });
 
-        for(std::size_t i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
+        for(int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
         {
             glfwSetJoystickUserPointer(i, reinterpret_cast<void*>(this));
             if(glfwJoystickIsGamepad(i) == GLFW_TRUE)
             {
-                jid = i;
+                jid = std::size_t(i);
             }
         }
         glfwSetJoystickCallback([](int jid, int event) {

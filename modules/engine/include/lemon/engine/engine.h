@@ -6,7 +6,6 @@
 #include <lemon/platform/window.h>
 #include <lemon/rendering/rendering_context.h>
 #include <lemon/threading/scheduler.h>
-#include <lemon/scripting/domain.h>
 
 namespace lemon {
 class engine
@@ -23,6 +22,5 @@ class engine
     rendering_context rContext;
     asset_storage assets;
     scheduler sch;
-	domain scripting;
 };
 } // namespace lemon
