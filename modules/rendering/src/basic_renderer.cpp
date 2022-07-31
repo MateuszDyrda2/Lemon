@@ -2,35 +2,17 @@
 
 #include <lemon/rendering/rendering_context.h>
 
-#include <lemon/core/instrumentor.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/math.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec4.h>
 
 namespace lemon {
-basic_renderer::basic_renderer():
-    // vao(create_owned<vertex_array>()),
-    _shader(string_id("sprite_renderer_shader"))
+basic_renderer::basic_renderer(asset_storage& storage):
+    renderer2d(storage),
+    _shader(storage.get_asset<shader>("sprite_renderer_shader"_hs))
 {
-    /// struct vertex
-    /// {
-    ///     vec2 pos;
-    ///     vec2 texCoords;
-    /// } vertices[]{
-    ///     { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-    ///     { { 0.5f, -0.5f }, { 1.0f, 0.0f } },
-    ///     { { 0.5f, 0.5f }, { 1.0f, 1.0f } },
-    ///     { { 0.5f, 0.5f }, { 1.0f, 1.0f } },
-    ///     { { -0.5f, 0.5f }, { 0.0f, 1.0f } },
-    ///     { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-    /// };
-    /// vao->add_vertex_buffer(
-    ///        create_owned<vertex_buffer>(&vertices, sizeof(vertices)))
-    ///     ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(float) * 4, 0)
-    ///     ->enable_vertex_attrib(1, 2, GL_FLOAT, false, sizeof(float) * 4, sizeof(float) * 2);
-    /// vao->unbind();
-    glCreateVertexArrays(1, &vao);
+    glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     u32 buffers[2];
     glGenBuffers(2, buffers);
@@ -56,7 +38,6 @@ basic_renderer::basic_renderer():
 }
 void basic_renderer::start_render(const mat4& viewProj)
 {
-    LEMON_PROFILE_FUNCTION();
     this->viewProj = viewProj;
     auto shader    = _shader.get();
     shader->use();
@@ -65,7 +46,6 @@ void basic_renderer::start_render(const mat4& viewProj)
 void basic_renderer::render_sprite(const vec4& color, const vec4& texCoords, asset<texture>& tex,
                                    const mat4& m)
 {
-    LEMON_PROFILE_FUNCTION();
     static constexpr auto ppx = 100.f;
     auto shader               = _shader.get();
     auto texture              = tex.get();

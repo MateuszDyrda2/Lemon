@@ -1,8 +1,7 @@
 #pragma once
 
-#include <glm/mat4x4.hpp>
+#include <glm/matrix.hpp>
 
 namespace lemon {
-using glm::dmat4;
-using glm::mat4;
+using mat4 = glm::mat4x4;
 } // namespace lemon

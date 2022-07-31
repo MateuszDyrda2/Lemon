@@ -16,42 +16,42 @@
 
 namespace lemon {
 /** 2D texture renderer working in batches */
-class LEMON_PUBLIC batch_renderer : public renderer2d
+class batch_renderer : public renderer2d
 {
     struct vertex
     {
-        glm::vec2 position;
-        glm::vec4 color;
-        glm::vec2 texCoords;
+        vec2 position;
+        vec4 color;
+        vec2 texCoords;
     };
     struct batch
     {
-        size_type usedVertices;
-        owned<vertex_array> vao;
-        ptr<texture> _texture;
+        std::size_t usedVertices;
+        std::unique_ptr<vertex_array> vao;
+        texture* _texture;
 
         batch();
         bool is_empty() const noexcept { return usedVertices == 0ULL; }
         void add_quad(const mat4& trans, vec4 color, vec4 texCoords);
-        void set_texture(ptr<texture> tex);
-        bool is_texture(const ptr<texture> other) const;
-        ptr<batch> get_bigger(ptr<batch> other) const;
+        void set_texture(texture* tex);
+        bool is_texture(const texture* other) const;
+        batch* get_bigger(batch* other) const;
         bool is_full() const;
-        void flush(const mat4& viewProj, ptr<shader> textureShader);
+        void flush(const mat4& viewProj, shader* textureShader);
     };
 
   public:
-    static constexpr size_type maxBatches  = 10;
-    static constexpr size_type maxVertices = 1024;
+    static constexpr std::size_t maxBatches  = 10;
+    static constexpr std::size_t maxVertices = 1024;
 
     using container_type = std::array<batch, maxBatches>;
 
   public:
     /** @brief Creates the batch renderer */
-    batch_renderer();
+    batch_renderer(asset_storage& storage);
     virtual ~batch_renderer();
     /** @see renderer2d::start_render */
-    void start_render(const glm::mat4& viewProj) override;
+    void start_render(const mat4& viewProj) override;
     /** @see renderer2d::render_sprite */
     void render_sprite(const vec4& color, const vec4& texCoords, asset<texture>& tex,
                        const mat4& model) override;

@@ -6,11 +6,11 @@
 
 namespace lemon {
 /** Basic texture 2D renderer */
-class LEMON_PUBLIC basic_renderer : public renderer2d
+class basic_renderer : public renderer2d
 {
   public:
     /** @brief Creates the renderer */
-    basic_renderer();
+    basic_renderer(asset_storage& storage);
     virtual ~basic_renderer() = default;
     /** @see renderer2d::start_render */
     void start_render(const mat4& viewProj) override;
@@ -23,7 +23,6 @@ class LEMON_PUBLIC basic_renderer : public renderer2d
   private:
     mat4 viewProj;
     u32 vao, vbo1, vbo2;
-    // owned<vertex_array> vao;
     asset<shader> _shader;
 };
 } // namespace lemon

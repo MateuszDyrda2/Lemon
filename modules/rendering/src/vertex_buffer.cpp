@@ -1,7 +1,7 @@
 #include <lemon/rendering/vertex_buffer.h>
 
 namespace lemon {
-vertex_buffer::vertex_buffer(size_type byteSize)
+vertex_buffer::vertex_buffer(std::size_t byteSize)
 {
     glGenBuffers(1, &handle);
     glBindBuffer(GL_ARRAY_BUFFER, handle);
@@ -11,13 +11,13 @@ vertex_buffer::~vertex_buffer()
 {
     glDeleteBuffers(1, &handle);
 }
-ptr<vertex_buffer> vertex_buffer::bind()
+vertex_buffer* vertex_buffer::bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, handle);
     return this;
 }
-ptr<vertex_buffer> vertex_buffer::enable_vertex_attrib(size_type index, size_type elementCount, GLenum type,
-                                                       bool normalized, size_type stride, size_type startsAt)
+vertex_buffer* vertex_buffer::enable_vertex_attrib(std::size_t index, std::size_t elementCount, GLenum type,
+                                                   bool normalized, std::size_t stride, std::size_t startsAt)
 {
     glVertexAttribPointer(index, elementCount, type, normalized, stride, (void*)startsAt);
     glEnableVertexAttribArray(index);

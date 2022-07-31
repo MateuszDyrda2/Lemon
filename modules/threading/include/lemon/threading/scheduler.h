@@ -1,10 +1,8 @@
 #pragma once
 
-#include <lemon/core/basic_types.h>
-#include <lemon/core/defines.h>
-#include <lemon/core/service.h>
+#include <lemon/core/lemon_types.h>
 
-#include <moodycamel/concurrentqueue.h>
+#include <concurrentqueue.h>
 
 #include <atomic>
 #include <chrono>
@@ -16,16 +14,15 @@
 #include <vector>
 
 namespace lemon {
-class service_registry;
-struct LEMON_PUBLIC waitable
+struct waitable
 {
     std::atomic_uint32_t counter{};
-    size_type tid{};
+    std::size_t tid{};
 };
-struct LEMON_PUBLIC job
+struct job
 {
     std::function<void(void)> callable;
-    ptr<waitable> wait{};
+    waitable* wait{};
     std::chrono::high_resolution_clock::time_point wakeTime{};
     job() = default;
     template<class F>
@@ -37,10 +34,9 @@ struct LEMON_PUBLIC job
         return wakeTime < other.wakeTime;
     }
 };
-class LEMON_PUBLIC scheduler : public service
+class scheduler
 {
   public:
-    LEMON_REGISTER_SERVICE(scheduler);
     template<class T>
     using concurrent_queue = moodycamel::ConcurrentQueue<T>;
 
@@ -48,28 +44,28 @@ class LEMON_PUBLIC scheduler : public service
     /** @brief Creates a scheduler
      * @param threadCount number of workers to create
      */
-    scheduler(service_registry&, size_type threadCount);
+    scheduler(std::size_t threadCount);
     ~scheduler();
     /** @brief Run jobs in another thread
      * @param jobs jobs that are to be scheduled
      * @param sig object to be waited on
      */
-    void run(job* jobs, size_type count = 1, waitable* sig = nullptr);
+    void run(job* jobs, std::size_t count = 1, waitable* sig = nullptr);
     /** @brief Run jobs on a choosen thread
      * @param jobs jobs that are to be scheduled
      * @param sig object to be waited on
      * @param threadIndex index of the thread
      */
-    void run(job* jobs, size_type count, waitable* sig, size_type threadIndex);
+    void run(job* jobs, std::size_t count, waitable* sig, std::size_t threadIndex);
     /** @brief Wait untill the results of the jobs waited on
      * become available
      * @param sig waitable object
      */
     void wait(waitable* sig);
-    void run_in(job* jobs, size_type count, const std::chrono::milliseconds& delta);
-    void run_at(job* jobs, size_type count, const std::chrono::high_resolution_clock::time_point& at);
+    void run_in(job* jobs, std::size_t count, const std::chrono::milliseconds& delta);
+    void run_at(job* jobs, std::size_t count, const std::chrono::high_resolution_clock::time_point& at);
     /** @returns index of the calling thread */
-    size_type get_thread_index();
+    std::size_t get_thread_index();
     /** @brief Executes an unary function on each element in range
      * on multiple workers
      * @param beg iterator to the beggining of the range
@@ -81,18 +77,18 @@ class LEMON_PUBLIC scheduler : public service
 
   private:
     std::vector<std::thread> workers;
-    size_type nbWorkers;
+    std::size_t nbWorkers;
 
-    std::priority_queue<ptr<job>> sleepingJobs;
+    std::priority_queue<job*> sleepingJobs;
     std::mutex sleepingMtx;
-    std::vector<concurrent_queue<ptr<job>>> localQueues;
-    std::vector<concurrent_queue<ptr<job>>> globalQueues;
-    std::vector<owned<std::mutex>> localMtxs;
-    std::vector<owned<std::condition_variable>> localCvars;
+    std::vector<concurrent_queue<job*>> localQueues;
+    std::vector<concurrent_queue<job*>> globalQueues;
+    std::vector<std::unique_ptr<std::mutex>> localMtxs;
+    std::vector<std::unique_ptr<std::condition_variable>> localCvars;
 
     std::atomic_bool shouldEnd;
-    static thread_local size_type threadIndex;
-    static thread_local size_type lastUsed;
+    static thread_local std::size_t threadIndex;
+    static thread_local std::size_t lastUsed;
 
   private:
     void job_finished(job* j);
@@ -100,7 +96,7 @@ class LEMON_PUBLIC scheduler : public service
 template<class Iter, class F>
 void scheduler::for_each(Iter beg, Iter end, F callable)
 {
-    size_type _size = std::distance(beg, end);
+    std::size_t _size = std::distance(beg, end);
     if(_size < nbWorkers)
     {
         for(; beg != end; ++beg)
@@ -112,10 +108,10 @@ void scheduler::for_each(Iter beg, Iter end, F callable)
     {
         auto step = _size / nbWorkers;
         job jobs[nbWorkers - 1];
-        for(size_type i = 0; i < nbWorkers - 1; ++i)
+        for(std::size_t i = 0; i < nbWorkers - 1; ++i)
         {
             jobs[i].callable = [&, it = beg]() mutable {
-                for(size_type j = 0; j < step; ++j, ++it)
+                for(std::size_t j = 0; j < step; ++j, ++it)
                 {
                     callable(*it);
                 }

@@ -2,7 +2,7 @@
 
 #include <lemon/assets/resource.h>
 #include <lemon/core/assert.h>
-#include <lemon/core/defines.h>
+#include <lemon/core/lemon_types.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec3.h>
@@ -13,11 +13,11 @@
 #include <vector>
 
 namespace lemon {
-class LEMON_PUBLIC shader : public resource
+class shader : public resource
 {
   public:
-    shader(string_id name, const std::string& shaderPath);
-    shader(string_id name, const std::vector<byte>& buffer);
+    shader(hash_str name, const std::string& shaderPath);
+    shader(hash_str name, const std::vector<byte>& buffer);
     shader(const shader&) = delete;
     shader& operator=(const shader&) = delete;
     shader(shader&& other) noexcept;
@@ -47,7 +47,7 @@ class LEMON_PUBLIC shader : public resource
     void set_uniform(const char* name, const uvec4& value);
     void set_uniform(const char* name, const mat4& value);
 
-    static string_id get_mocked() { return string_id("mock_shader"); }
+    static hash_str get_mocked() { return hash_string("mock_shader"); }
 
   private:
     unsigned int ID;

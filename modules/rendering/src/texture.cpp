@@ -1,12 +1,14 @@
 #include <lemon/rendering/texture.h>
 
+#include <lemon/core/logger.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include <glad/glad.h>
 
 namespace lemon {
-texture::texture(string_id name, const std::string& path,
+texture::texture(hash_str name, const std::string& path,
                  wrap wrapping, filter filtering):
     resource(name),
     handle(0),
@@ -23,10 +25,10 @@ texture::texture(string_id name, const std::string& path,
 
         glGenTextures(1, &handle);
         glBindTexture(GL_TEXTURE_2D, handle);
-        glTextureParameteri(handle, GL_TEXTURE_WRAP_S, static_cast<int>(wrapping));
-        glTextureParameteri(handle, GL_TEXTURE_WRAP_T, static_cast<int>(wrapping));
-        glTextureParameteri(handle, GL_TEXTURE_MIN_FILTER, static_cast<int>(filtering));
-        glTextureParameteri(handle, GL_TEXTURE_MAG_FILTER, static_cast<int>(filtering));
+        glTexParameteri(handle, GL_TEXTURE_WRAP_S, static_cast<int>(wrapping));
+        glTexParameteri(handle, GL_TEXTURE_WRAP_T, static_cast<int>(wrapping));
+        glTexParameteri(handle, GL_TEXTURE_MIN_FILTER, static_cast<int>(filtering));
+        glTexParameteri(handle, GL_TEXTURE_MAG_FILTER, static_cast<int>(filtering));
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
@@ -42,10 +44,10 @@ texture::texture(string_id name, const std::string& path,
     }
     else
     {
-        LOG_ERROR("Failed to load texture: %s from %s", name.get_string(), path.c_str());
+        logger::error("Failed to load texture from {}", path);
     }
 }
-texture::texture(string_id name, const std::vector<byte>& buffer):
+texture::texture(hash_str name, const std::vector<u8>& buffer):
     resource(name), handle(0),
     wrapping(wrap::clampToBorder), filtering(filter::nearest)
 {
@@ -62,10 +64,10 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
 
         glGenTextures(1, &handle);
         glBindTexture(GL_TEXTURE_2D, handle);
-        glTextureParameteri(handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTextureParameteri(handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTextureParameteri(handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTextureParameteri(handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
         if(noc == 3)
@@ -81,23 +83,22 @@ texture::texture(string_id name, const std::vector<byte>& buffer):
     }
     else
     {
-        LOG_ERROR("Failed to load texture: %s from buffer", name.get_string());
+        logger::error("Failed to load texture: from buffer");
     }
 }
-texture::texture(string_id name, const std::string& path):
+texture::texture(hash_str name, const std::string& path):
     texture(name, path, wrap::clampToBorder, filter::nearest)
 { }
-texture::texture(string_id name, const ivec2& size, const color& c):
+texture::texture(hash_str name, const ivec2& size, const color& c):
     texture(name, size, c, wrap::clampToBorder, filter::nearest)
 { }
-texture::texture(string_id name, const ivec2& size, const color& c, wrap wrapping, filter filtering):
+texture::texture(hash_str name, const ivec2& size, const color& c, wrap wrapping, filter filtering):
     resource(name), size(size), wrapping(wrapping), filtering(filtering)
 {
     lemon_assert(!(size.x % 4) && !(size.y % 4));
-    std::vector<byte>
-        data(size.x * size.y * 4);
+    std::vector<unsigned char> data(size.x * size.y * 4);
     auto&& [r, g, b, a] = c.to_u8();
-    for(size_type i = 0; i < data.size(); i += 4)
+    for(std::size_t i = 0; i < data.size(); i += 4)
     {
         data[i]     = r;
         data[i + 1] = g;
@@ -106,10 +107,10 @@ texture::texture(string_id name, const ivec2& size, const color& c, wrap wrappin
     }
     glGenTextures(1, &handle);
     glBindTexture(GL_TEXTURE_2D, handle);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<int>(wrapping));
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<int>(wrapping));
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<int>(filtering));
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<int>(filtering));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<int>(wrapping));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<int>(wrapping));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<int>(filtering));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<int>(filtering));
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
     glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -1,13 +1,13 @@
 #include <lemon/rendering/batch_renderer.h>
 
 #include <algorithm>
-#include <lemon/assets/asset.h>
+#include <memory>
 
 namespace lemon {
 batch_renderer::batch::batch():
-    usedVertices{}, vao(create_owned<vertex_array>()), _texture{ nullptr }
+    usedVertices{}, vao(std::make_unique<vertex_array>()), _texture{ nullptr }
 {
-    vao->add_vertex_buffer(create_owned<vertex_buffer>(batch_renderer::maxVertices * sizeof(vertex)))
+    vao->add_vertex_buffer(std::make_unique<vertex_buffer>(batch_renderer::maxVertices * sizeof(vertex)))
         ->enable_vertex_attrib(0, 2, GL_FLOAT, false, sizeof(vertex), 0)
         ->enable_vertex_attrib(1, 4, GL_FLOAT, false, sizeof(vertex), sizeof(vec2))
         ->enable_vertex_attrib(2, 2, GL_FLOAT, false, sizeof(vertex), sizeof(vec2) + sizeof(vec4));
@@ -54,23 +54,23 @@ void batch_renderer::batch::add_quad(
     vao->unbind();
     usedVertices += 6;
 }
-void batch_renderer::batch::set_texture(ptr<texture> tex)
+void batch_renderer::batch::set_texture(texture* tex)
 {
     _texture = tex;
 }
-bool batch_renderer::batch::is_texture(const ptr<texture> other) const
+bool batch_renderer::batch::is_texture(const texture* other) const
 {
     return other == _texture;
 }
-ptr<batch_renderer::batch> batch_renderer::batch::get_bigger(ptr<batch> other) const
+batch_renderer::batch* batch_renderer::batch::get_bigger(batch* other) const
 {
-    return usedVertices > other->usedVertices ? ptr<batch>(this) : other;
+    return usedVertices > other->usedVertices ? (batch*)(this) : other;
 }
 bool batch_renderer::batch::is_full() const
 {
     return batch_renderer::maxVertices - usedVertices < 6;
 }
-void batch_renderer::batch::flush(const mat4& viewProj, ptr<shader> textureShader)
+void batch_renderer::batch::flush(const mat4& viewProj, shader* textureShader)
 {
     if(usedVertices == 0) return;
     textureShader->use();
@@ -82,14 +82,13 @@ void batch_renderer::batch::flush(const mat4& viewProj, ptr<shader> textureShade
     _texture->unbind();
     usedVertices = 0;
 }
-batch_renderer::batch_renderer():
-    textureShader(string_id("mock_shader")),
+batch_renderer::batch_renderer(asset_storage& storage):
+    renderer2d(storage),
+    textureShader(storage.get_asset<shader>(hash_string("mock_shader"))),
     batches()
-{
-}
+{ }
 batch_renderer::~batch_renderer()
-{
-}
+{ }
 void batch_renderer::start_render(const mat4& viewProj)
 {
     this->viewProj = viewProj;
@@ -97,9 +96,9 @@ void batch_renderer::start_render(const mat4& viewProj)
 void batch_renderer::render_sprite(const vec4& color, const vec4& texCoords, asset<texture>& tex,
                                    const mat4& model)
 {
-    static ptr<batch> biggestBatch = &batches.front();
-    ptr<batch> empty{};
-    ptr<batch> found{};
+    static batch* biggestBatch = &batches.front();
+    batch* empty{};
+    batch* found{};
     for(auto& b : batches)
     {
         if(b.is_texture(tex.get()))

@@ -2,15 +2,16 @@
 
 #include "texture.h"
 #include <lemon/assets/asset.h>
+#include <lemon/core/lemon_types.h>
 #include <lemon/core/math/mat4.h>
 #include <lemon/core/math/vec3.h>
 
 namespace lemon {
 /** Base interface for 2d renderers */
-class LEMON_PUBLIC renderer2d
+class renderer2d
 {
   public:
-    renderer2d()          = default;
+    renderer2d(asset_storage& storage) { }
     virtual ~renderer2d() = default;
     /** @brief Prepares for rendering in this frame
      * @param viewProj view-project matrix of the main camera

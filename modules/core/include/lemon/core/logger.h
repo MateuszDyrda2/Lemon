@@ -1,46 +1,99 @@
+/** @file logger.h
+ * @brief Utility class for logging
+ */
 #pragma once
 
 #include "assert.h"
-#include "defines.h"
 
-#include <cstdarg>
-#include <cstdio>
-#include <string>
+#include <iostream>
+#include <ostream>
 
-#define LOG_MESSAGE(...)                                \
-    {                                                   \
-        logger::print(__FILE__, __LINE__, __VA_ARGS__); \
-    }
-#define LOG_WARN(...)                                  \
-    {                                                  \
-        logger::warn(__FILE__, __LINE__, __VA_ARGS__); \
-    }
-#define LOG_ERROR(...)                                  \
-    {                                                   \
-        logger::error(__FILE__, __LINE__, __VA_ARGS__); \
-    }
-#define LOG_FATAL(...)                                  \
-    {                                                   \
-        logger::fatal(__FILE__, __LINE__, __VA_ARGS__); \
-    }
+#include <fmt/color.h>
+#include <fmt/core.h>
+#include <fmt/ostream.h>
 
 namespace lemon {
-class LEMON_PUBLIC logger
+/** Class supporting logging to stdout or file */
+class logger
 {
   public:
-    static void print(char const* file, int line, char const* msg, ...);
-    static void warn(char const* file, int line, char const* msg, ...);
-    static void error(char const* file, int line, char const* msg, ...);
-    static void fatal(char const* file, int line, char const* msg, ...);
-
-    static void pprint(std::string message);
-    static void pwarn(std::string message);
-    static void perror(std::string message);
-    static void pfatal(std::string message);
-
-  private:
-    static void poutput(std::string message, const char* color, const char* type);
-    static void output(char const* color, char const* type,
-                       char const* file, int line, char const* msg);
+    /** @brief Log as info
+     * @param message the message to be logger
+     * @param args format parameters
+     */
+    template<class... Args>
+    inline static void info(fmt::format_string<Args...> message, Args&&... args)
+    {
+        fmt::print(
+            stream(),
+            "[INFO]:\t");
+        fmt::print(
+            stream(),
+            message, std::forward<Args>(args)...);
+        fmt::print(
+            stream(),
+            "\n");
+    }
+    /** @brief Log as warning
+     * @param message the message to be logger
+     * @param args format parameters
+     */
+    template<class... Args>
+    inline static void warn(fmt::format_string<Args...> message, Args&&... args)
+    {
+        fmt::print(
+            stream(),
+            "[WARN]:\t");
+        fmt::print(
+            stream(),
+            message, std::forward<Args>(args)...);
+        fmt::print(
+            stream(),
+            "\n");
+    }
+    /** @brief Log as error
+     * @param message the message to be logger
+     * @param args format parameters
+     */
+    template<class... Args>
+    inline static void error(fmt::format_string<Args...> message, Args&&... args)
+    {
+        fmt::print(
+            stream(),
+            "[ERROR]:\t");
+        fmt::print(
+            stream(),
+            message, std::forward<Args>(args)...);
+        fmt::print(
+            stream(),
+            "\n");
+    }
+    /** @brief Log as fatal and stop program execution
+     * @param message the message to be logger
+     * @param args format parameters
+     */
+    template<class... Args>
+    inline static void fatal(fmt::format_string<Args...> message, Args&&... args)
+    {
+        fmt::print(
+            stream(),
+            "[FATAL]:\t");
+        fmt::print(
+            stream(),
+            message, std::forward<Args>(args)...);
+        fmt::print(
+            stream(),
+            "\n");
+        lemon_assert(false);
+    }
+    /** @brief Set or get the output stream (default cout)
+     * @param os output stream
+     * @return the current output stream
+     */
+    inline static std::ostream& stream(std::ostream& os = std::cout)
+    {
+        static std::ostream& s_os = os;
+        return s_os;
+    }
 };
-}
+} // namespace lemon

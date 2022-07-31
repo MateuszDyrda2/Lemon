@@ -17,7 +17,7 @@ void vertex_array::unbind()
 {
     glBindVertexArray(0);
 }
-ptr<vertex_buffer> vertex_array::add_vertex_buffer(owned<vertex_buffer>&& vertex_buffer)
+vertex_buffer* vertex_array::add_vertex_buffer(std::unique_ptr<vertex_buffer>&& vertex_buffer)
 {
     vbo = std::move(vertex_buffer);
     glBindVertexArray(handle);

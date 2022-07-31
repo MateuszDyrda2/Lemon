@@ -1,43 +1,75 @@
+/** @file input.h
+ * input manager
+ */
 #pragma once
 
-#include "glfw_devices.h"
-#include "key_codes.h"
+#include "keycodes.h"
 #include "window.h"
 
-#include <lemon/core/service.h>
+#include <lemon/core/hash_string.h>
+#include <lemon/events/events.h>
 
-#include <array>
-#include <unordered_map>
-#include <vector>
+#include <functional>
+#include <memory>
 
 namespace lemon {
-class scene;
-class service_registry;
-struct gamepad
+struct input_event : public event_args
+{ };
+struct axis_event : public event_args
 {
-    size_type jid;
-    std::array<key_state, GAMEPAD_KEY_COUNT> keyStates;
+    axis_event(f32 value):
+        value(value) { }
+    f32 value;
 };
-class LEMON_PUBLIC input : public service
+/** Class responsible for processing input for the engine */
+class input
 {
   public:
-    LEMON_REGISTER_SYSTEM(input);
+    class impl;
 
   public:
-    input(service_registry& globalRegistry);
+    /** @brief Create an input instance
+     * @param wnd main applicatio window
+     */
+    input(window& wnd, event_queue& queue);
     ~input();
+    /** @brief Process input events for the frame */
     void update();
-    void map2event(key::keycode kc, string_id eventName);
+    /** @brief Bind a keyboard key with action to event
+     * @param key keycode
+     * @param action key action when the event should be fired
+     * @param actionId nameid of the event
+     */
+    void add_key(keycode key, key_action action, hash_str actionId);
+    /** @brief Bind a mouse key with action to event
+     * @param button keycode
+     * @param action key action when the event should be fired
+     * @param actionId nameid of the event
+     */
+    void add_key(mouse button, key_action action, hash_str actionId);
+    /** @brief Bind a gamepad button with action to event
+     * @param button keycode
+     * @param action key action when the event should be fired
+     * @param actionId nameid of the event
+     */
+    void add_key(gamepad button, key_action action, hash_str actionId);
+    /** @brief Bind a mouse axis to event
+     * @param mouse mouse axis (either x or y)
+     * @param actionId nameid of the event
+     */
+    void add_axis(mouse_axis mouse, hash_str actionId);
+    /** @brief Bind a gamepad axis to event
+     * @param gamepad gamepad axis
+     * @param actionId nameid of the event
+     */
+    void add_axis(gamepad_axis gamepad, hash_str actionId);
+    /** @brief Bind a keyboard axis to event
+     * @param axis a pair of keycodes that represent an axis
+     * @param actionId nameid of the event
+     */
+    void add_axis(std::pair<keycode, keycode> axis, hash_str actionId);
 
   private:
-    window& win;
-    std::array<key_state, KEY_COUNT> keyStates;
-    std::array<string_id, KEY_COUNT> keyMapping;
-
-    std::vector<input_device> inputDevices;
-    glfw_devices devices;
-
-  private:
-    void gather_input();
+    std::unique_ptr<impl> pImpl;
 };
 } // namespace lemon

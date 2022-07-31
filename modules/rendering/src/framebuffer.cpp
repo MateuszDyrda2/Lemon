@@ -3,7 +3,7 @@
 #include <lemon/core/logger.h>
 
 namespace lemon {
-framebuffer::framebuffer(const glm::ivec2& size):
+framebuffer::framebuffer(const ivec2& size):
     size(size)
 {
     glGenFramebuffers(1, &handle);
@@ -20,7 +20,7 @@ framebuffer::framebuffer(const glm::ivec2& size):
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        LOG_ERROR("Failed to create the framebuffer");
+        logger::error("Failed to create the framebuffer");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -38,7 +38,7 @@ void framebuffer::unbind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-void framebuffer::resize(const glm::ivec2& newSize)
+void framebuffer::resize(const ivec2& newSize)
 {
     size = newSize;
     glDeleteFramebuffers(1, &handle);

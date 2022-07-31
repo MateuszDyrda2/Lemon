@@ -1,16 +1,19 @@
 #include <lemon/rendering/shader.h>
 
+#include <lemon/core/logger.h>
+
 #include <fstream>
 #include <sstream>
 
 namespace lemon {
-shader::shader(string_id name, const std::string& shaderPath):
+using namespace std;
+shader::shader(hash_str name, const std::string& shaderPath):
     resource(name)
 {
-    std::string shaderCode;
-    std::ifstream shaderFile;
+    string shaderCode;
+    ifstream shaderFile;
 
-    shaderFile.exceptions(std::ifstream::badbit);
+    shaderFile.exceptions(ifstream::badbit);
     try
     {
         shaderFile.open(shaderPath);
@@ -22,10 +25,9 @@ shader::shader(string_id name, const std::string& shaderPath):
 
         shaderCode = shaderStream.str();
     }
-    catch(std::ifstream::failure& e)
+    catch(ifstream::failure& e)
     {
-        LOG_ERROR("Shader read failure! %s",
-                  shaderPath.c_str());
+        logger::error("Shader read failure! {}", shaderPath);
     }
 
     const char* vShaderCode[2] = { "#version 330\n#define VERTEX_PROGRAM\n",
@@ -47,7 +49,7 @@ shader::shader(string_id name, const std::string& shaderPath):
     if(!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-        LOG_ERROR("Vertex shader compilation failure!: %s", infoLog);
+        logger::error("Vertex shader compilation failure!: {}", infoLog);
     }
     // fragment shader
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -59,7 +61,7 @@ shader::shader(string_id name, const std::string& shaderPath):
     if(!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-        LOG_ERROR("Fragment shader compilation failure!: %s", infoLog);
+        logger::error("Fragment shader compilation failure!: {}", infoLog);
     }
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
@@ -71,14 +73,14 @@ shader::shader(string_id name, const std::string& shaderPath):
     if(success == GL_FALSE)
     {
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
-        LOG_ERROR("Shader program linking failure!: %s", infoLog);
+        logger::error("Shader program linking failure!: {}", infoLog);
     }
     glDetachShader(ID, vertex);
     glDetachShader(ID, fragment);
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
-shader::shader(string_id name, const std::vector<byte>& buffer):
+shader::shader(hash_str name, const std::vector<byte>& buffer):
     resource(name)
 {
     const char* vShaderCode[2] = { "#version 330\n#define VERTEX_PROGRAM\n",
@@ -100,7 +102,7 @@ shader::shader(string_id name, const std::vector<byte>& buffer):
     if(!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-        LOG_ERROR("Vertex shader compilation failure!: %s", infoLog);
+        logger::error("Vertex shader compilation failure!: {}", infoLog);
     }
     // fragment shader
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -112,7 +114,7 @@ shader::shader(string_id name, const std::vector<byte>& buffer):
     if(!success)
     {
         glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-        LOG_ERROR("Fragment shader compilation failure!: %s", infoLog);
+        logger::error("Fragment shader compilation failure!: {}", infoLog);
     }
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
@@ -124,7 +126,7 @@ shader::shader(string_id name, const std::vector<byte>& buffer):
     if(success == GL_FALSE)
     {
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
-        LOG_ERROR("Shader program linking failure!: %s", infoLog);
+        logger::error("Shader program linking failure!: {}", infoLog);
     }
     glDetachShader(ID, vertex);
     glDetachShader(ID, fragment);

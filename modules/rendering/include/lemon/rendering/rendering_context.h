@@ -1,7 +1,6 @@
 #pragma once
 
-#include <lemon/core/basic_types.h> // for size_type
-#include <lemon/core/defines.h>
+#include <lemon/core/lemon_types.h>
 #include <lemon/core/math/color.h>
 #include <lemon/core/math/vec2.h>
 #include <lemon/core/math/vec4.h>
@@ -10,13 +9,13 @@
 
 namespace lemon {
 /** OpenGL rendering context */
-class LEMON_PUBLIC rendering_context
+class rendering_context
 {
   public:
     /** @brief Initializes the rendering context */
-    static void create();
+    rendering_context();
     /** @brief Destroys the rendering context */
-    static void drop();
+    ~rendering_context();
 
     /** @brief Enable blending and set the blend function */
     static void enable_blending();
@@ -33,22 +32,22 @@ class LEMON_PUBLIC rendering_context
      * @param first starting index in the enabled arrays
      * @param count number of indices to be rendered
      */
-    static void draw_arrays(GLenum mode, size_type first, size_type count);
+    static void draw_arrays(GLenum mode, std::size_t first, std::size_t count);
     /** @brief Render primitives from array data
      * @param mode kind of primitives to renderer
      * @param count number of elements to be rendered
      * @param type type of values in indices
      * @param indices pointer to the location where the indices are stored
      */
-    static void draw_elements(GLenum mode, size_type count, GLenum type, void* indices);
+    static void draw_elements(GLenum mode, std::size_t count, GLenum type, void* indices);
     /** @brief Render primitives from array data
      * @param mode kind of primitives to render
      * @param first starting index in the enabled arrays
      * @param count number of elements to be rendered
      * @param instanceCount number of instances to be rendered
      */
-    static void draw_arrays_instanced(GLenum mode, size_type first, size_type count,
-                                      size_type instanceCount);
+    static void draw_arrays_instanced(GLenum mode, std::size_t first, std::size_t count,
+                                      std::size_t instanceCount);
     /** @brief Render primitives from array data
      * @param mode kind of primitives to render
      * @param count number of elements to be rendered
@@ -56,7 +55,7 @@ class LEMON_PUBLIC rendering_context
      * @param pointer to the location where the indices are stored
      * @param instanceCount number of instances to be rendered
      */
-    static void draw_elements_instanced(GLenum mode, size_type count, GLenum type,
-                                        const void* indices, size_type instanceCount);
+    static void draw_elements_instanced(GLenum mode, std::size_t count, GLenum type,
+                                        const void* indices, std::size_t instanceCount);
 };
 } // namespace lemon

@@ -4,15 +4,15 @@
 #include "vec4.h"
 
 #include "../assert.h"
-#include "../basic_types.h"
-#include "../defines.h"
+#include "../lemon_types.h"
 
 #include <cstddef>
 #include <string>
+#include <tuple>
 #include <utility>
 
 namespace lemon {
-struct LEMON_PUBLIC color
+struct color
 {
     union
     {

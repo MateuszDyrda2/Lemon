@@ -1,13 +1,12 @@
 #pragma once
 
-#include <lemon/core/basic_types.h>
-#include <lemon/core/defines.h>
+#include <lemon/core/lemon_types.h>
 #include <lemon/core/math/vec2.h>
 
 #include <glad/glad.h>
 
 namespace lemon {
-class LEMON_PUBLIC framebuffer
+class framebuffer
 {
   public:
     framebuffer(const ivec2& size);

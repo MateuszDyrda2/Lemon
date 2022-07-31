@@ -1,24 +1,31 @@
 #include <lemon/assets/asset_loader.h>
 
-#include <lemon/core/file.h>
-#include <lemon/core/game.h>
+#include <lemon/core/logger.h>
 
 #include <rapidjson/document.h>
 
+#include <fstream>
+
 namespace lemon {
 using namespace std;
-asset_loader::asset_loader()
+using namespace rapidjson;
+asset_loader::asset_loader(const string& path):
+    path(path)
 {
     using namespace rapidjson;
-
-    file dataFile;
-    dataFile.open(
-        game::get_settings().workingDirectory + "/"
-            + game::get_settings().assetPath + "assets.json",
-        ios::binary | ios::in);
+    ifstream stream(path, ios::binary | ios::ate);
+    if(!stream)
+    {
+        logger::fatal("Failed to open asset file: {}", path);
+        return;
+    }
+    std::size_t nBytes = stream.tellg();
+    stream.seekg(0, stream.beg);
     vector<char> buff;
-    dataFile.read(buff);
-    dataFile.close();
+    buff.resize(nBytes + 1ULL);
+    stream.read(buff.data(), nBytes);
+    stream.close();
+
     buff.push_back('\0');
     Document document;
     document.ParseInsitu(buff.data());
@@ -28,23 +35,29 @@ asset_loader::asset_loader()
         auto iter = a->MemberBegin();
         auto name = iter->value.GetString();
         ++iter;
-        auto path                      = iter->value.GetString();
-        resourcePaths[string_id(name)] = path;
+        auto path                          = iter->value.GetString();
+        resourcePaths[hash_string_d(name)] = path;
     }
 }
 asset_loader::~asset_loader()
 {
 }
-bool asset_loader::resource_exists(string_id name) const noexcept
+bool asset_loader::resource_exists(hash_str name) const noexcept
 {
     return resourcePaths.contains(name);
 }
-std::vector<byte> asset_loader::load_from_file(const string& path)
+std::vector<char> asset_loader::load_from_file(const string& path)
 {
-    file dataFile(path, ios::binary | ios::in);
-    vector<byte> buff;
-    dataFile.read(buff);
-    dataFile.close();
+    vector<char> buff;
+    ifstream stream(path, ios::binary | ios::ate);
+    if(stream)
+    {
+        std::size_t nBytes = stream.tellg();
+        stream.seekg(0, stream.beg);
+        buff.reserve(nBytes + 1ULL);
+        stream.read(buff.data(), nBytes);
+        stream.close();
+    }
     return buff;
 }
 } // namespace lemon

@@ -1,31 +1,31 @@
 #include <lemon/threading/scheduler.h>
 
 #include <lemon/core/assert.h>
-#include <lemon/core/service_registry.h>
+#include <lemon/core/logger.h>
 
 #include <ctime>
 
 namespace lemon {
 using namespace std;
-size_type thread_local scheduler::threadIndex;
-scheduler::scheduler(service_registry&, size_type threadCount)
+std::size_t thread_local scheduler::threadIndex;
+scheduler::scheduler(std::size_t threadCount)
 {
     srand((unsigned int)time(NULL));
     nbWorkers = threadCount;
     workers.reserve(threadCount);
-    for(size_type i = 0; i < threadCount; ++i)
+    for(std::size_t i = 0; i < threadCount; ++i)
     {
         localQueues.emplace_back();
         globalQueues.emplace_back();
-        localMtxs.emplace_back(create_owned<mutex>());
-        localCvars.emplace_back(create_owned<condition_variable>());
+        localMtxs.emplace_back(std::make_unique<mutex>());
+        localCvars.emplace_back(std::make_unique<condition_variable>());
     }
-    localMtxs.emplace_back(create_owned<mutex>());
-    localCvars.emplace_back(create_owned<condition_variable>());
-    for(size_type i = 0; i < threadCount; ++i)
+    localMtxs.emplace_back(std::make_unique<mutex>());
+    localCvars.emplace_back(std::make_unique<condition_variable>());
+    for(std::size_t i = 0; i < threadCount; ++i)
     {
         workers.emplace_back(
-            [&](size_type threadIndex) {
+            [&](std::size_t threadIndex) {
                 auto& globalQueue      = globalQueues[threadIndex];
                 auto& localQueue       = localQueues[threadIndex];
                 auto& localMtx         = *localMtxs[threadIndex];
@@ -53,8 +53,8 @@ scheduler::scheduler(service_registry&, size_type threadCount)
                     {
                         if(localQueue.try_dequeue(j)) break;
                         if(globalQueue.try_dequeue(j)) break;
-                        size_type nbTries = nbWorkers - 1;
-                        size_type next    = threadIndex;
+                        std::size_t nbTries = nbWorkers - 1;
+                        std::size_t next    = threadIndex;
                         while(j == nullptr && nbTries-- > 0)
                         {
                             next = next >= nbWorkers - 1 ? 0 : next + 1;
@@ -73,11 +73,12 @@ scheduler::scheduler(service_registry&, size_type threadCount)
             i);
         scheduler::threadIndex = nbWorkers;
     }
+    logger::info("Scheduler created <{}>", threadCount);
 }
 scheduler::~scheduler()
 {
     shouldEnd.store(true);
-    for(size_type i = 0; i < nbWorkers; ++i)
+    for(std::size_t i = 0; i < nbWorkers; ++i)
     {
         auto& cvar = *localCvars[i];
         auto& mtx  = *localMtxs[i];
@@ -88,11 +89,12 @@ scheduler::~scheduler()
     {
         t.join();
     }
+    logger::info("Scheduler destroyed");
 }
-void scheduler::run(job* jobs, size_type count, waitable* sig)
+void scheduler::run(job* jobs, std::size_t count, waitable* sig)
 {
     lemon_assert(jobs != nullptr);
-    static thread_local size_type lastUsed = std::rand() % nbWorkers;
+    static thread_local std::size_t lastUsed = std::rand() % nbWorkers;
     if(sig != nullptr)
     {
         sig->counter.fetch_add(count, std::memory_order_relaxed);
@@ -111,7 +113,7 @@ void scheduler::run(job* jobs, size_type count, waitable* sig)
         localCvar.notify_one();
     }
 }
-void scheduler::run(job* jobs, size_type count, waitable* sig, size_type tid)
+void scheduler::run(job* jobs, std::size_t count, waitable* sig, std::size_t tid)
 {
     lemon_assert(jobs != nullptr);
     lemon_assert(tid < nbWorkers);
@@ -129,12 +131,13 @@ void scheduler::run(job* jobs, size_type count, waitable* sig, size_type tid)
     }
     localCvar.notify_one();
 }
-void scheduler::run_in(job* jobs, size_type count, const std::chrono::milliseconds& delta)
+void scheduler::run_in(job* jobs, std::size_t count, const std::chrono::milliseconds& delta)
 {
     auto at = chrono::high_resolution_clock::now() + delta;
     run_at(jobs, count, at);
 }
-void scheduler::run_at(job* jobs, size_type count, const std::chrono::high_resolution_clock::time_point& at)
+void scheduler::run_at(job* jobs, std::size_t count,
+                       const std::chrono::high_resolution_clock::time_point& at)
 {
     lemon_assert(jobs != nullptr);
     if(count == 0) return;
@@ -174,7 +177,7 @@ void scheduler::job_finished(job* j)
         }
     }
 }
-size_type scheduler::get_thread_index()
+std::size_t scheduler::get_thread_index()
 {
     return threadIndex;
 }
