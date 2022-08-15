@@ -1,12 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <lemon/threading/scheduler.h>
-
-#include <iostream>
-#include <thread>
+#include <threading/scheduler.h>
 
 using namespace lemon;
-class scheduler_test : public ::testing::Test
+class SchedulerTest : public ::testing::Test
 {
   protected:
     static void SetUpTestSuite()
@@ -19,8 +16,7 @@ class scheduler_test : public ::testing::Test
     }
     static inline scheduler* sch;
 };
-
-TEST_F(scheduler_test, RunOneJob)
+TEST_F(SchedulerTest, RunOneJob)
 {
     int w = 2;
     waitable s;
@@ -31,7 +27,7 @@ TEST_F(scheduler_test, RunOneJob)
     sch->wait(&s);
     ASSERT_EQ(w, 3);
 }
-TEST_F(scheduler_test, RunMultiple)
+TEST_F(SchedulerTest, RunMultiple)
 {
     job jobs[4];
     int x = 1, y = 2, z = 3, w = 4;
@@ -55,7 +51,7 @@ TEST_F(scheduler_test, RunMultiple)
     ASSERT_EQ(z, 4) << "not the same value";
     ASSERT_EQ(w, 5) << "not the same value";
 }
-TEST_F(scheduler_test, RunConsecutive)
+TEST_F(SchedulerTest, RunConsecutive)
 {
     job jobs[4];
     int z   = 3;
@@ -82,10 +78,10 @@ TEST_F(scheduler_test, RunConsecutive)
     sch->wait(&sig);
     ASSERT_EQ(z, 22) << "not equal";
 }
-TEST_F(scheduler_test, ParrarelForBig)
+TEST_F(SchedulerTest, ParrarelForBig)
 {
     int arr[256];
-    for(size_t i = 0; i < 256; ++i)
+    for(int i = 0; i < 256; ++i)
     {
         arr[i] = i;
     }
@@ -97,7 +93,7 @@ TEST_F(scheduler_test, ParrarelForBig)
         EXPECT_EQ(a, 3) << a << " and " << 3;
     }
 }
-TEST_F(scheduler_test, ParrarelForSmall)
+TEST_F(SchedulerTest, ParrarelForSmall)
 {
     int arr[3] = { 0, 1, 2 };
     sch->for_each(arr, arr + 3, [](int& i) {
@@ -107,7 +103,7 @@ TEST_F(scheduler_test, ParrarelForSmall)
     ASSERT_EQ(arr[1], 2);
     ASSERT_EQ(arr[2], 3);
 }
-TEST_F(scheduler_test, NestedJobs)
+TEST_F(SchedulerTest, NestedJobs)
 {
     int z = 0;
     job j;
@@ -126,10 +122,10 @@ TEST_F(scheduler_test, NestedJobs)
     sch->wait(&sig);
     ASSERT_EQ(z, 9);
 }
-TEST_F(scheduler_test, ChoosenThread)
+TEST_F(SchedulerTest, ChoosenThread)
 {
     job j;
-    size_type threadIndex;
+    std::size_t threadIndex;
     j.callable = [&] {
         threadIndex = sch->get_thread_index();
     };
@@ -138,7 +134,7 @@ TEST_F(scheduler_test, ChoosenThread)
     sch->wait(&sig);
     ASSERT_EQ(threadIndex, 2);
 }
-TEST_F(scheduler_test, MultipleJobs)
+TEST_F(SchedulerTest, MultipleJobs)
 {
     job jobs[5];
     bool run[5] = {};
@@ -167,3 +163,4 @@ TEST_F(scheduler_test, MultipleJobs)
     for(auto& r : run)
         EXPECT_TRUE(r);
 }
+

@@ -1,10 +1,21 @@
-[submodule "external/pybind11"]
-	path = external/pybind11
-	url = https://github.com/pybind/pybind11.git
-	branch = stable
 [submodule "tests/googletest"]
-	path = tests/googletest
+	path = Lemon/libs/googletest
 	url = https://github.com/google/googletest.git
-[submodule "external/entt"]
-	path = external/entt
+[submodule "Lemon/LemonCore/libs/rapidjson"]
+	path = Lemon/libs/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "Lemon/LemonCore/libs/glm"]
+	path = Lemon/libs/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Lemon/LemonCore/libs/fmt"]
+	path = Lemon/libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "Lemon/LemonCore/libs/glfw"]
+	path = Lemon/libs/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Lemon/LemonCore/libs/concurrentqueue"]
+	path = Lemon/libs/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
+[submodule "Lemon/libs/entt"]
+	path = Lemon/libs/entt
 	url = https://github.com/skypjack/entt.git

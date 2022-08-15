@@ -1,0 +1,69 @@
+import React, { createRef, useEffect, useState } from "react";
+import "./styles/app.scss";
+import Sidebar from "./components/sidebar";
+import Sidepanel from "./components/sidepanel";
+import { Tabs } from "./props/tabs";
+import Midpanel from "./components/midpanel";
+import darkTheme from "./theme";
+import "./App.css";
+import ScopedCssBaseline from "@mui/material/ScopedCssBaseline/ScopedCssBaseline";
+import { ThemeProvider } from "@emotion/react";
+import { Divider } from "@mui/material";
+
+const MIN_WIDTH = 50;
+
+function App() {
+  const [currentTab, setTab] = React.useState<Tabs>(Tabs.None);
+  const splitAppRef = createRef<HTMLDivElement>();
+  const [leftWidth, setLeftWidth] = useState<number | undefined>(undefined);
+  const [separatorXPosition, setSeparatorXPosition] = useState<
+    number | undefined
+  >(undefined);
+  const [dragging, setDragging] = useState(false);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    setSeparatorXPosition(e.clientX);
+    setDragging(true);
+  };
+  const onMouseMove = (e: MouseEvent) => {
+    if (dragging && leftWidth && separatorXPosition) {
+      const newWidth = leftWidth + e.clientX - separatorXPosition;
+      setSeparatorXPosition(e.clientX);
+      const splitPanelWidth = splitAppRef.current?.clientWidth ?? newWidth;
+      setLeftWidth(Math.min(Math.max(MIN_WIDTH, newWidth), splitPanelWidth));
+    }
+  };
+  const onMouseUp = () => {
+    setDragging(false);
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+  });
+  return (
+    <ThemeProvider theme={darkTheme}>
+      <ScopedCssBaseline enableColorScheme>
+        <div className="App" ref={splitAppRef}>
+          <Sidebar currentTab={currentTab} setTab={setTab} />
+          <Divider orientation="vertical" flexItem />
+          <Sidepanel
+            child={currentTab}
+            leftWidth={leftWidth}
+            setLeftWidth={setLeftWidth}
+          />
+          <div className="vertDiv-container" onMouseDown={onMouseDown}>
+            <div className="vertDiv" />
+          </div>
+          <Midpanel />
+        </div>
+      </ScopedCssBaseline>
+    </ThemeProvider>
+  );
+}
+
+export default App;

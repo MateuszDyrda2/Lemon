@@ -1,0 +1,10 @@
+{
+    "textures": [],
+    "sounds": [],
+    "shaders": [
+        {
+            "name": "sprite_renderer_shader",
+            "path": "D:\\custom\\Lemon\\Sandbox\\assets\\shaders\\sprite_renderer_shader.glsl"
+        }
+    ]
+}

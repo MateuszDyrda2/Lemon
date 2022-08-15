@@ -16,3 +16,7 @@ out
 CMakeLists.txt.user
 # clangd cache
 .cache/
+
+*.sln
+
+**/*.vcxproj*

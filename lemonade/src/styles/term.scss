@@ -1,0 +1,7 @@
+@use "./styles.scss";
+
+.term {
+    @include styles.fill;
+    background-color: white;
+    position: relative;
+}

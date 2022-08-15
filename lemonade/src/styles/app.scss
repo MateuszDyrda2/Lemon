@@ -1,0 +1,19 @@
+.App {
+  display: flex;
+}
+
+.vertDiv-container {
+  order: 2;
+  cursor: ew-resize;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 0px 0px 0px 5px;
+  margin: 0px 0px 0px -5px;
+}
+
+.vertDiv {
+  border-right: 1px solid #454545;
+  width: 1px;
+  height: 100%;
+}
