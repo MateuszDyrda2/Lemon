@@ -58,7 +58,7 @@ void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asse
 
     model = scale(model, vec3(texW, texH, 1.f));
 
-    shader->set_uniform("spriteColor", vec4{ col.r, col.g, col.b, col.a });
+    shader->set_uniform("spriteColor", col.rgba);
     shader->set_uniform("model", model);
 
     texture->bind();

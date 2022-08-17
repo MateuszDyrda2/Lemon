@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../reflection.h"
+
 #include <core/defines.h>
 #include <core/hash_string.h>
 
@@ -19,5 +21,7 @@ struct LEMON_API enabled_t
 struct LEMON_API tag
 {
     hash_str nameid;
+
+    LEMON_REFL(tag, nameid);
 };
 }

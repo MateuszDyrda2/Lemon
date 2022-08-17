@@ -26,6 +26,8 @@ struct LEMON_API transform
     std::size_t order{};
 
     LEMON_REFL(transform, position, scale, rotation, first, next, parent, order);
+
+    transform::field<transform, 2>::field_t;
 };
 
 struct LEMON_API model
@@ -36,8 +38,7 @@ struct LEMON_API model
 };
 
 struct LEMON_API main_camera_t
-{
-};
+{ };
 
 struct LEMON_API camera
 {

@@ -2,6 +2,7 @@
 #include <engine/engine.h>
 
 #include <rendering/systems/rendering_system.h>
+#include <serialization/scene_serializer.h>
 #include <world/systems/entity_system.h>
 #include <world/systems/transform_system.h>
 
@@ -41,6 +42,8 @@ void Sandbox::initialize()
     reg.emplace<camera>(mainCamera);
     reg.emplace<model>(mainCamera);
     reg.emplace<transform>(mainCamera);
+
+    scene_serializer::serialize(&scene, "D:\\custom\\Lemon\\Sandbox\\scenes\\sandbox_scene.json");
 }
 
 GAME_DECL(Sandbox);
