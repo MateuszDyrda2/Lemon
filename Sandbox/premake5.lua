@@ -21,6 +21,7 @@ project "Sandbox"
         includes["glm"],
         includes["glad"],
         includes["entt"],
+        includes["rapidjson"],
     }
 
     links 

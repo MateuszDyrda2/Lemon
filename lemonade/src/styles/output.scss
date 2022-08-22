@@ -1,7 +1,6 @@
 @use "./styles.scss";
 
-.sidepanel {
-  height: 100vh;
-  overflow: hidden;
+.output {
+  @include styles.fill;
   background-color: styles.$bg;
 }

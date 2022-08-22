@@ -10,6 +10,8 @@ class LEMON_API system
 {
   public:
     virtual void update() { }
-    virtual ~system() = default;
+    virtual const char* get_name() const = 0;
+    virtual hash_str get_nameid() const  = 0;
+    virtual ~system()                    = default;
 };
 }

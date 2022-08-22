@@ -1,6 +1,6 @@
-import { Tabs, Tab, Divider } from "@mui/material";
+import { Tabs, Tab } from "@mui/material";
 import React, { createRef } from "react";
-import Term from "./term";
+import Output from "./output";
 import Files from "./files";
 import "../styles/bottombar.scss";
 
@@ -30,11 +30,11 @@ const Bottombar = ({ bottomHeight, setBottomHeight }: Props) => {
   return (
     <div className="bottombar-container" ref={bottomRef}>
       <Tabs value={value} onChange={handleChange} indicatorColor="secondary">
-        <Tab label="Terminal" />
         <Tab label="Files" />
+        <Tab label="Output" />
       </Tabs>
-      {value === 0 && <Term />}
-      {value === 1 && <Files />}
+      {value === 0 && <Files />}
+      {value === 1 && <Output />}
     </div>
   );
 };

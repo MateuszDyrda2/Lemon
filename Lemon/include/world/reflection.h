@@ -15,13 +15,33 @@
 #define LASTOF(a, b, c, d, e, f, g, h, i, j, k, l, m, ...) m
 #define PREFIX(...)                                        0, ##__VA_ARGS__
 
+#define LEMON_TAG(_class)                                       \
+    struct LEMON_API _class                                     \
+    {                                                           \
+      private:                                                  \
+        friend class reflection::component;                     \
+        using field_n = std::integral_constant<std::size_t, 0>; \
+        inline static const char* name()                        \
+        {                                                       \
+            return #_class;                                     \
+        }                                                       \
+        static constexpr hash_str nameid()                      \
+        {                                                       \
+            return hash_string(#_class);                        \
+        }                                                       \
+    };
+
 #define LEMON_REFL(_class, ...)                                                      \
   private:                                                                           \
-    friend class reflection;                                                         \
+    friend class reflection::component;                                              \
     using field_n = std::integral_constant<std::size_t, GET_ARG_COUNT(__VA_ARGS__)>; \
     inline static const char* name()                                                 \
     {                                                                                \
         return #_class;                                                              \
+    }                                                                                \
+    static constexpr hash_str nameid()                                               \
+    {                                                                                \
+        return hash_string(#_class);                                                 \
     }                                                                                \
     template<class T, std::size_t I>                                                 \
     struct field;                                                                    \
@@ -101,13 +121,36 @@
     REFL_10(_comp, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10)
 
 namespace lemon {
-class reflection
+namespace reflection {
+class system
 {
   public:
     template<class T>
     inline static const char* name()
     {
         return T::name();
+    }
+
+    template<class T>
+    inline static constexpr hash_str nameid()
+    {
+        return T::nameid();
+    }
+};
+
+class component
+{
+  public:
+    template<class T>
+    inline static const char* name()
+    {
+        return T::name();
+    }
+
+    template<class T>
+    static constexpr hash_str nameid()
+    {
+        return T::nameid();
     }
 
     template<class T>
@@ -154,4 +197,6 @@ class reflection
     static void for_each(const T& comp, F&& callable) requires(I == T::field_n::value)
     { }
 };
+
+}
 }

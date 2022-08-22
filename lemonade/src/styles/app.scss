@@ -1,19 +1,29 @@
+@use "./styles.scss";
+
 .App {
   display: flex;
-}
 
-.vertDiv-container {
-  order: 2;
-  cursor: ew-resize;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  padding: 0px 0px 0px 5px;
-  margin: 0px 0px 0px -5px;
-}
+  Divider {
+    background-color: styles.$bg0_s;
+  }
 
-.vertDiv {
-  border-right: 1px solid #454545;
-  width: 1px;
-  height: 100%;
+  .vertDiv-container {
+    order: 2;
+    cursor: ew-resize;
+    background-color: styles.$bg0;
+    width: 5px;
+    position: relative;
+
+    .vertDiv {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      left: auto;
+      z-index: 100;
+      display: block;
+      width: 2px;
+      height: 100%;
+      background-color: styles.$bg0_s;
+    }
+  }
 }

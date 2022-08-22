@@ -1,6 +1,6 @@
 @use "./styles.scss";
 
 .files {
-    @include styles.fill();
-    background-color: red;
+  @include styles.fill();
+  background-color: styles.$bg;
 }

@@ -1,3 +1,5 @@
+@use "./styles.scss";
+
 .midpanel {
   display: flex;
   flex-flow: column nowrap;
@@ -5,18 +7,21 @@
   order: 3;
 
   .divider-container {
-    overflow: hidden;
     order: 1;
-    height: 12px;
-    cursor: n-resize;
-    display: flex;
-    align-items: center;
-    align-self: stretch;
-    margin: -6px 0px 0px 0px;
+    cursor: ns-resize;
+    background-color: styles.$bg0_h;
+    height: 5px;
+    position: relative;
 
     .divider {
-      border-top: 1px solid #454545;
-      height: 1px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      bottom: auto;
+      z-index: 100;
+      display: block;
+      height: 2px;
+      background-color: styles.$bg0_s;
       width: 100%;
     }
   }

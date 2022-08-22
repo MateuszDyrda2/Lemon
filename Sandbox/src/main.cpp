@@ -6,6 +6,8 @@
 #include <world/systems/entity_system.h>
 #include <world/systems/transform_system.h>
 
+#include "../_generated/_components.h"
+
 using namespace lemon;
 class Sandbox : public engine
 {
@@ -43,7 +45,8 @@ void Sandbox::initialize()
     reg.emplace<model>(mainCamera);
     reg.emplace<transform>(mainCamera);
 
-    scene_serializer::serialize(&scene, "D:\\custom\\Lemon\\Sandbox\\scenes\\sandbox_scene.json");
+    scene_serializer::serialize(
+        &scene, "D:\\custom\\Lemon\\Sandbox\\scenes\\sandbox_scene.json", componentList);
 }
 
 GAME_DECL(Sandbox);

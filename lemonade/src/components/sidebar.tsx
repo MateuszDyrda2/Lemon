@@ -18,7 +18,7 @@ interface Props {
 
 const Sidebar = (tab: Props) => {
   const changeTab = (newTab: Tabs) => {
-    tab.setTab(tab.currentTab == newTab ? Tabs.None : newTab);
+    tab.setTab(tab.currentTab === newTab ? Tabs.None : newTab);
   };
   return (
     <div className="sidebar-container">

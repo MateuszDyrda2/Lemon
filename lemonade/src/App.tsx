@@ -5,7 +5,6 @@ import Sidepanel from "./components/sidepanel";
 import { Tabs } from "./props/tabs";
 import Midpanel from "./components/midpanel";
 import darkTheme from "./theme";
-import "./App.css";
 import ScopedCssBaseline from "@mui/material/ScopedCssBaseline/ScopedCssBaseline";
 import { ThemeProvider } from "@emotion/react";
 import { Divider } from "@mui/material";
@@ -15,7 +14,7 @@ const MIN_WIDTH = 50;
 function App() {
   const [currentTab, setTab] = React.useState<Tabs>(Tabs.None);
   const splitAppRef = createRef<HTMLDivElement>();
-  const [leftWidth, setLeftWidth] = useState<number | undefined>(undefined);
+  const [leftWidth, setLeftWidth] = useState<number | undefined>(120);
   const [separatorXPosition, setSeparatorXPosition] = useState<
     number | undefined
   >(undefined);
@@ -50,7 +49,6 @@ function App() {
       <ScopedCssBaseline enableColorScheme>
         <div className="App" ref={splitAppRef}>
           <Sidebar currentTab={currentTab} setTab={setTab} />
-          <Divider orientation="vertical" flexItem />
           <Sidepanel
             child={currentTab}
             leftWidth={leftWidth}

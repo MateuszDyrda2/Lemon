@@ -34,6 +34,7 @@ class LEMON_API scene
     void on_load();
     void update();
     void on_unload();
+    const auto& get_systems() const { return systems; }
     template<class S>
     scene& register_system(execution_stage stage);
 

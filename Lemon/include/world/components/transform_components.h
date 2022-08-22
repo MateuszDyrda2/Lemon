@@ -35,9 +35,7 @@ struct LEMON_API model
     LEMON_REFL(model, matrix);
 };
 
-struct LEMON_API main_camera_t
-{
-};
+LEMON_TAG(main_camera_t)
 
 struct LEMON_API camera
 {

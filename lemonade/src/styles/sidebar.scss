@@ -1,35 +1,37 @@
 @use "./styles.scss";
 
 .sidebar-container {
-    margin: 0;
-    padding: 0;
-    float: left;
-    min-width: 48px;
-    order: 0;
+  margin: 0;
+  padding: 0;
+  float: left;
+  min-width: 56px;
+  order: 0;
+  background-color: styles.$bg0_h;
+  border-right: 2px solid styles.$bg0_s;
 }
 
 .sidebar {
-    height: 100vh;
+  height: 100vh;
 }
 
 .sidebar-child {
-    @include styles.center-children;
-    padding-top: 20px;
+  @include styles.center-children;
+  padding-top: 20px;
 }
 
 .sidebar-item {
-    transition: 0.2s;
+  transition: 0.2s;
 
-    &:hover {
-        transform: scale(1.2);
-    }
+  &:hover {
+    transform: scale(1.2);
+  }
 }
 
 #lemon-ico {
-    display: flex;
-    height: inherit;
-    width: inherit;
+  display: flex;
+  height: inherit;
+  width: inherit;
 }
 .icon-root {
-    text-align: center;
+  text-align: center;
 }

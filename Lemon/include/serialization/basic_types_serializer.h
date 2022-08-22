@@ -15,50 +15,50 @@
 #include <rapidjson/writer.h>
 
 namespace lemon {
-void serialize(i32 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(u32 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(i64 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(u64 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(bool value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(f32 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(f64 value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const std::string& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const vec2& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(entity value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
-void serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& iter);
+void LEMON_API serialize(i32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(u32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(i64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(u64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(bool value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(f32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(f64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const std::string& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const vec2& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(entity value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 template<class T>
-inline void serialize(const std::vector<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& iter)
+inline void serialize(const std::vector<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-    iter.StartArray();
+    writer.StartArray();
     for(const auto& elem : value)
     {
-        serialize(elem, iter);
+        serialize(elem, writer);
     }
-    iter.EndArray();
+    writer.EndArray();
 }
 template<class T>
-inline void serialize(const asset<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& iter)
+inline void serialize(const asset<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-    serialize(value.get_id(), iter);
+    serialize(value.get_id(), writer);
 }
 
-void deserialize(i32& value, const rapidjson::Value& iter);
-void deserialize(u32& value, const rapidjson::Value& iter);
-void deserialize(i64& value, const rapidjson::Value& iter);
-void deserialize(u64& value, const rapidjson::Value& iter);
-void deserialize(bool& value, const rapidjson::Value& iter);
-void deserialize(f32& value, const rapidjson::Value& iter);
-void deserialize(f64& value, const rapidjson::Value& iter);
-void deserialize(std::string& value, const rapidjson::Value& iter);
-void deserialize(vec2& value, const rapidjson::Value& iter);
-void deserialize(vec3& value, const rapidjson::Value& iter);
-void deserialize(vec4& value, const rapidjson::Value& iter);
-void deserialize(mat4& value, const rapidjson::Value& iter);
-void deserialize(entity& value, const rapidjson::Value& iter);
-void deserialize(color& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(i32& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(u32& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(i64& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(u64& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(bool& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(f32& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(f64& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(std::string& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(vec2& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(vec3& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(vec4& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(mat4& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(entity& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(color& value, const rapidjson::Value& iter);
 template<class T>
 inline void deserialize(std::vector<T>& value, const rapidjson::Value& iter)
 {
