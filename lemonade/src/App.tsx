@@ -7,14 +7,13 @@ import Midpanel from "./components/midpanel";
 import darkTheme from "./theme";
 import ScopedCssBaseline from "@mui/material/ScopedCssBaseline/ScopedCssBaseline";
 import { ThemeProvider } from "@emotion/react";
-import { Divider } from "@mui/material";
 
 const MIN_WIDTH = 50;
 
 function App() {
   const [currentTab, setTab] = React.useState<Tabs>(Tabs.None);
   const splitAppRef = createRef<HTMLDivElement>();
-  const [leftWidth, setLeftWidth] = useState<number | undefined>(120);
+  const [leftWidth, setLeftWidth] = useState<number | undefined>(200);
   const [separatorXPosition, setSeparatorXPosition] = useState<
     number | undefined
   >(undefined);
@@ -54,7 +53,11 @@ function App() {
             leftWidth={leftWidth}
             setLeftWidth={setLeftWidth}
           />
-          <div className="vertDiv-container" onMouseDown={onMouseDown}>
+          <div
+            className="vertDiv-container"
+            onMouseDown={onMouseDown}
+            style={{ display: currentTab === Tabs.None ? "none" : "block" }}
+          >
             <div className="vertDiv" />
           </div>
           <Midpanel />

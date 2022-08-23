@@ -9,6 +9,24 @@ interface Props {
   setLeftWidth: (value: number) => void;
 }
 
+const TabToName = (tab: Tabs) => {
+  switch (tab) {
+    case Tabs.Lemon:
+      return "Lemon";
+    case Tabs.SceneHierarchy:
+      return "Scene Hierarchy";
+    case Tabs.Systems:
+      return "Systems";
+    case Tabs.Components:
+      return "Components";
+    case Tabs.Settings:
+      return "Settings";
+
+    default:
+      return "None";
+  }
+};
+
 const Sidepanel = ({ child, leftWidth, setLeftWidth }: Props) => {
   const leftRef = createRef<HTMLDivElement>();
 
@@ -23,7 +41,12 @@ const Sidepanel = ({ child, leftWidth, setLeftWidth }: Props) => {
     }
   }, [leftRef, leftWidth, setLeftWidth, child]);
 
-  return <div id="sidepanel" className="sidepanel" ref={leftRef}></div>;
+  return (
+    <div id="sidepanel" className="sidepanel" ref={leftRef}>
+      <p className="sidepanel-top">{TabToName(child)}</p>
+      <div className="content"></div>
+    </div>
+  );
 };
 
 export default Sidepanel;

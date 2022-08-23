@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "width": 1080,
+        "height": 720,
         "resizable": true,
-        "title": "Lemonade",
-        "width": 800
+        "title": "Lemonade"
       }
     ]
   }

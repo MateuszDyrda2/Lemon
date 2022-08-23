@@ -1,9 +1,18 @@
 {
   "systems": [
-    { "stage": 0, "systems": [4124121830] },
+    {
+      "stage": 0,
+      "systems": [4124121830]
+    },
     { "stage": 1, "systems": [] },
-    { "stage": 2, "systems": [2282876357] },
-    { "stage": 3, "systems": [752933127] }
+    {
+      "stage": 2,
+      "systems": [2282876357]
+    },
+    {
+      "stage": 3,
+      "systems": [752933127]
+    }
   ],
   "entities": [2, [4294967295, 0]],
   "components": [
@@ -31,5 +40,15 @@
     [],
     1,
     [0]
-  ]
+  ],
+  "assets": {
+    "textures": [],
+    "sounds": [],
+    "shaders": [
+      {
+        "name": "sprite_renderer_shader",
+        "path": "D:\\custom\\Lemon\\Sandbox\\assets\\shaders\\sprite_renderer_shader.glsl"
+      }
+    ]
+  }
 }

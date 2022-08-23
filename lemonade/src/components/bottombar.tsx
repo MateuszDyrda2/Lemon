@@ -1,7 +1,6 @@
-import { Tabs, Tab } from "@mui/material";
 import React, { createRef } from "react";
 import Output from "./output";
-import Files from "./files";
+import Assets from "./assets";
 import "../styles/bottombar.scss";
 
 interface Props {
@@ -23,17 +22,28 @@ const Bottombar = ({ bottomHeight, setBottomHeight }: Props) => {
     }
   }, [bottomRef, bottomHeight, setBottomHeight]);
 
-  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const BottomTab = ({
+    name,
+    expected,
+  }: {
+    name: string;
+    expected: number;
+  }) => {
+    return (
+      <button
+        className={value === expected ? "tab--chosen" : "tab"}
+        onClick={() => setValue(expected)}
+      >
+        {name}
+      </button>
+    );
   };
 
   return (
     <div className="bottombar-container" ref={bottomRef}>
-      <Tabs value={value} onChange={handleChange} indicatorColor="secondary">
-        <Tab label="Files" />
-        <Tab label="Output" />
-      </Tabs>
-      {value === 0 && <Files />}
+      <BottomTab name="Assets" expected={0} />
+      <BottomTab name="Output" expected={1} />
+      {value === 0 && <Assets />}
       {value === 1 && <Output />}
     </div>
   );

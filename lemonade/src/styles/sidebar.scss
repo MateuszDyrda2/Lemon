@@ -15,15 +15,25 @@
 }
 
 .sidebar-child {
+  padding: 20px 0px 0px 0px;
+  margin: 0px;
   @include styles.center-children;
-  padding-top: 20px;
 }
 
 .sidebar-item {
   transition: 0.2s;
+  box-sizing: border-box;
+  color: styles.$fg4;
+  cursor: pointer;
 
   &:hover {
-    transform: scale(1.2);
+    transform: scale(1.2) rotate(360deg);
+    color: styles.$fg0;
+  }
+
+  &--choosen {
+    @extend .sidebar-item;
+    color: styles.$fg0;
   }
 }
 
@@ -31,7 +41,4 @@
   display: flex;
   height: inherit;
   width: inherit;
-}
-.icon-root {
-  text-align: center;
 }

@@ -5,3 +5,13 @@
   overflow: hidden;
   background-color: styles.$bg;
 }
+
+.sidepanel-top {
+  text-align: center;
+  background-color: styles.$bg0_h;
+  color: styles.$fg0;
+  margin: 0;
+  padding: 6px 0px;
+  text-transform: uppercase;
+  border-bottom: 2px solid styles.$bg0_s;
+}

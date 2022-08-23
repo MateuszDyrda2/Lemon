@@ -7,3 +7,24 @@
   order: 2;
   background-color: styles.$bg0_h;
 }
+
+.tab {
+  text-align: center;
+  text-transform: uppercase;
+  border: none;
+  color: styles.$fg4;
+  background-color: styles.$bg0_h;
+  padding: 6px;
+  margin-left: 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: styles.$fg0;
+  }
+
+  &--chosen {
+    @extend .tab;
+    color: styles.$fg0;
+    border-bottom: 2px solid styles.$yellow2;
+  }
+}

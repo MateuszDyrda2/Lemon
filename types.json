@@ -1,0 +1,19 @@
+{
+  "systems": ["rendering_system", "entity_system", "transform_system"],
+  "components": {
+    "sprite_renderer": ["col", "texCoords", "tex"],
+    "tag": ["id"],
+    "transform": [
+      "position",
+      "scale",
+      "rotation",
+      "first",
+      "next",
+      "parent",
+      "order"
+    ],
+    "model": ["matrix"],
+    "camera": ["viewport", "size"]
+  },
+  "tags": ["enabled_t", "main_camera_t"]
+}

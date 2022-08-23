@@ -20,6 +20,7 @@ const Sidebar = (tab: Props) => {
   const changeTab = (newTab: Tabs) => {
     tab.setTab(tab.currentTab === newTab ? Tabs.None : newTab);
   };
+
   return (
     <div className="sidebar-container">
       <div className="sidebar">
@@ -27,29 +28,53 @@ const Sidebar = (tab: Props) => {
           <Stack spacing={2}>
             <Icon
               fontSize="large"
-              className="sidebar-item"
+              className={
+                tab.currentTab === Tabs.Lemon
+                  ? "sidebar-item--choosen"
+                  : "sidebar-item"
+              }
               onClick={() => changeTab(Tabs.Lemon)}
             >
-              <img src={LemonIcon} id="lemon-ico" />
+              <img
+                src={LemonIcon}
+                id="lemon-ico"
+                alt="icon of the lemon engine"
+              />
             </Icon>
             <AccountTreeRounded
               fontSize="large"
-              className="sidebar-item"
+              className={
+                tab.currentTab === Tabs.SceneHierarchy
+                  ? "sidebar-item--choosen"
+                  : "sidebar-item"
+              }
               onClick={() => changeTab(Tabs.SceneHierarchy)}
             />
             <MenuBookRounded
               fontSize="large"
-              className="sidebar-item"
+              className={
+                tab.currentTab === Tabs.Systems
+                  ? "sidebar-item--choosen"
+                  : "sidebar-item"
+              }
               onClick={() => changeTab(Tabs.Systems)}
             />
             <ExtensionRounded
               fontSize="large"
-              className="sidebar-item"
+              className={
+                tab.currentTab === Tabs.Components
+                  ? "sidebar-item--choosen"
+                  : "sidebar-item"
+              }
               onClick={() => changeTab(Tabs.Components)}
             />
             <SettingsRounded
               fontSize="large"
-              className="sidebar-item"
+              className={
+                tab.currentTab === Tabs.Settings
+                  ? "sidebar-item--choosen"
+                  : "sidebar-item"
+              }
               onClick={() => changeTab(Tabs.Settings)}
             />
           </Stack>
