@@ -1,6 +1,7 @@
 import React, { createRef } from "react";
 import Output from "./output";
 import Assets from "./assets";
+import Scenes from "./scenes";
 import "../styles/bottombar.scss";
 
 interface Props {
@@ -41,10 +42,14 @@ const Bottombar = ({ bottomHeight, setBottomHeight }: Props) => {
 
   return (
     <div className="bottombar-container" ref={bottomRef}>
-      <BottomTab name="Assets" expected={0} />
-      <BottomTab name="Output" expected={1} />
-      {value === 0 && <Assets />}
-      {value === 1 && <Output />}
+      <div className="bottombar-bar">
+        <BottomTab name="Scenes" expected={0} />
+        <BottomTab name="Assets" expected={1} />
+        <BottomTab name="Output" expected={2} />
+      </div>
+      {value === 0 && <Scenes />}
+      {value === 1 && <Assets />}
+      {value === 2 && <Output />}
     </div>
   );
 };

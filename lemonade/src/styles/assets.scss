@@ -21,12 +21,12 @@
   }
 
   .icon {
-    font-size: 80px;
+    font-size: 60px;
     color: styles.$fg0;
   }
 
   .caption {
     display: block;
-    color: styles.$fg0;
+    @extend .text-fg-ns--md;
   }
 }

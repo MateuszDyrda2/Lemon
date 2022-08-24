@@ -1,0 +1,29 @@
+@use "../styles.scss";
+
+.lemon {
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      @extend .btn;
+      margin: 4px;
+      display: block;
+      padding: 8px 8px;
+      width: 8rem;
+      font-size: 0.9rem;
+    }
+    p {
+      @extend .text-fg--sm;
+      padding: 10px;
+    }
+
+    #lemon-icon {
+      display: flex;
+      width: 86px;
+      height: 86px;
+      margin: 24px;
+    }
+  }
+}

@@ -1,6 +1,8 @@
 import Bottombar from "./bottombar";
-import "../styles/midpanel.scss";
 import Viewport from "./viewport";
+import Topbar from "./topbar";
+
+import "../styles/midpanel.scss";
 import React, { createRef, useEffect, useState } from "react";
 
 const MIN_HEIGHT = 50;
@@ -43,6 +45,7 @@ const Midpanel = () => {
 
   return (
     <div className="midpanel" ref={splitPanelRef}>
+      <Topbar />
       <Viewport />
       <div className="divider-container" onMouseDown={onMouseDown}>
         <div className="divider" />

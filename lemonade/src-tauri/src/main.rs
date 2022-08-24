@@ -3,31 +3,17 @@
     windows_subsystem = "windows"
 )]
 
-use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value};
-use std::env;
-use std::fs;
+use assets::{read_assets, Assets};
+use project::read_project;
+use tauri::Manager;
 
-#[derive(Serialize, Deserialize)]
-struct Path {
-    name: String,
-    path: String,
+mod assets;
+mod project;
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    message: String,
 }
-
-#[derive(Serialize, Deserialize)]
-struct Assets {
-    textures: Vec<Path>,
-    sounds: Vec<Path>,
-    shaders: Vec<Path>,
-}
-
-fn read_assets(path: &str) -> Result<Assets> {
-    let contents = fs::read_to_string(path).expect("Failed to read the asset file");
-
-    let assets: Assets = serde_json::from_str(&contents)?;
-    Ok(assets)
-}
-
 #[tauri::command]
 fn get_assets() -> Assets {
     read_assets("D:/custom/Lemon/Sandbox/assets/assets.json").unwrap()
@@ -35,6 +21,14 @@ fn get_assets() -> Assets {
 
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            let copy = window.clone();
+            window.listen("open-project", move |event| {
+                read_project(&copy, event.payload().unwrap());
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![get_assets])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -30,7 +30,6 @@
   width: 100%;
   height: 100%;
 }
-
 $bg: #282828;
 $gray: #928374;
 $bg0_h: #1d2021;
@@ -50,3 +49,61 @@ $yellow: #d79921;
 $yellow2: #fabd2f;
 $red: #cc241d;
 $red2: #fb4934;
+
+.noselect {
+  user-select: none;
+}
+
+.text {
+  font-family: RobotoMono;
+  color: $fg0;
+}
+
+.text-fg {
+  @extend .text;
+  &::selection {
+    color: $fg1;
+    background: $bg3;
+  }
+  &--sm {
+    @extend .text-fg;
+    font-size: 0.8rem;
+  }
+  &--md {
+    @extend .text-fg;
+    font-size: 1rem;
+  }
+  &--lg {
+    @extend .text-fg;
+    font-size: 1.2rem;
+  }
+}
+.text-fg-ns {
+  @extend .text;
+  @extend .noselect;
+
+  &--sm {
+    @extend .text-fg-ns;
+    font-size: 0.8rem;
+  }
+  &--md {
+    @extend .text-fg-ns;
+    font-size: 1rem;
+  }
+  &--lg {
+    @extend .text-fg-ns;
+    font-size: 1.2rem;
+  }
+}
+
+.btn {
+  @extend .text-fg-ns--md;
+  background-color: $bg0;
+  text-transform: capitalize;
+  border: 2px solid $bg1;
+
+  cursor: pointer;
+  &:hover {
+    background-color: $bg1;
+  }
+}

@@ -2,6 +2,11 @@ import "../styles/sidepanel.scss";
 
 import { Tabs } from "../props/tabs";
 import { createRef, useEffect } from "react";
+import Lemon from "./sidepanels/lemon";
+import SceneHierarchy from "./sidepanels/scene_hierarchy";
+import Systems from "./sidepanels/systems";
+import Components from "./sidepanels/components";
+import Settings from "./sidepanels/settings";
 
 interface Props {
   child: Tabs;
@@ -44,7 +49,13 @@ const Sidepanel = ({ child, leftWidth, setLeftWidth }: Props) => {
   return (
     <div id="sidepanel" className="sidepanel" ref={leftRef}>
       <p className="sidepanel-top">{TabToName(child)}</p>
-      <div className="content"></div>
+      <div className="content">
+        {child === Tabs.Lemon && <Lemon />}
+        {child === Tabs.SceneHierarchy && <SceneHierarchy />}
+        {child === Tabs.Systems && <Systems />}
+        {child === Tabs.Components && <Components />}
+        {child === Tabs.Settings && <Settings />}
+      </div>
     </div>
   );
 };

@@ -2,15 +2,19 @@
 
 .bottombar-container {
   height: 20%;
-  width: 100%;
   overflow: hidden;
-  order: 2;
+  order: 3;
   background-color: styles.$bg0_h;
+  display: flex;
+  flex-flow: column;
 }
 
 .tab {
+  @extend .noselect;
+  flex: 0 0 auto;
   text-align: center;
   text-transform: uppercase;
+  font-family: "RobotoMono";
   border: none;
   color: styles.$fg4;
   background-color: styles.$bg0_h;

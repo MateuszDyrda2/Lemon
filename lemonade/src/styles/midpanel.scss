@@ -5,9 +5,11 @@
   flex-flow: column nowrap;
   flex: 1;
   order: 3;
+  width: 100%;
+  margin: 0;
 
   .divider-container {
-    order: 1;
+    order: 2;
     cursor: ns-resize;
     background-color: styles.$bg0_h;
     height: 5px;
