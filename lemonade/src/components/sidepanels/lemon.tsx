@@ -1,14 +1,11 @@
 import "../../styles/sidepanels/lemon.scss";
 import LemonIcon from "../../img/lemon.svg";
 import { open } from "@tauri-apps/api/dialog";
-import { emit, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
-import { appWindow } from "@tauri-apps/api/window";
-import React from "react";
-import { Project, UserContext } from "../../props/project";
+import { useEffect, useState } from "react";
 
 const Lemon = () => {
-  const proj = React.useContext<Project | undefined>(UserContext);
+  const [project, setProject] = useState<string | undefined>(undefined);
 
   const openProject = async () => {
     const selected = await open({
@@ -20,14 +17,23 @@ const Lemon = () => {
         },
       ],
     });
-    selected && invoke("open_project", { path: selected });
+    selected &&
+      invoke("open_project", { path: selected })
+        .then((name) => setProject(name as string))
+        .catch((error) => console.log(error));
   };
+
+  useEffect(() => {
+    invoke("get_project_name").then((value) => {
+      setProject(value as string);
+    });
+  }, []);
 
   return (
     <div className="lemon">
       <div className="button-group">
         <img src={LemonIcon} id="lemon-icon" alt="logo of the game engine" />
-        {proj && <p>Project: {proj.project_name}</p>}
+        {project && <p>Project: {project}</p>}
         <button>New project</button>
         <button onClick={openProject}>Open project</button>
         <button>Save</button>

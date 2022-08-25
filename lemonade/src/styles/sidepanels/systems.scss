@@ -1,4 +1,84 @@
 @use "../styles.scss";
 
 .systems {
+  padding-top: 25px;
+  @include styles.center-children;
+
+  .stage-list {
+  }
+}
+.stage-group {
+  width: auto;
+  .icon {
+    color: styles.$bg0_s;
+  }
+  .stage {
+    margin: 0;
+    padding: 4px 4px;
+    border: 2px solid styles.$bg0_h;
+    border-radius: 5px;
+    background-color: styles.$fg1;
+    overflow: hidden;
+
+    .stage-name {
+      margin: 0 5px;
+      float: left;
+      text-align: left;
+      @extend .text-fg-ns--md;
+
+      color: styles.$bg0_s;
+    }
+
+    .icon-right {
+      @extend .icon;
+      float: right;
+    }
+    .icon-left {
+      @extend .icon;
+      float: left;
+    }
+
+    .stage-more {
+      @extend .icon-right;
+      cursor: pointer;
+    }
+    .stage-arrow {
+      @extend .icon-left;
+      cursor: pointer;
+    }
+  }
+  .system-list {
+    padding: 2px;
+
+    &--hidden {
+      height: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+.system {
+  margin: 0;
+  padding: 4px 4px;
+  background-color: styles.$bg0;
+  border: 1px solid styles.$fg4;
+  user-select: all;
+  overflow: hidden;
+
+  .system-name {
+    margin: 0 5px;
+    text-align: left;
+    @extend .text-fg-ns--sm;
+    float: left;
+  }
+  .system-icon {
+    color: styles.$fg0;
+    cursor: grab;
+    float: left;
+  }
+  .system-more {
+    color: styles.$fg0;
+    cursor: pointer;
+    float: right;
+  }
 }

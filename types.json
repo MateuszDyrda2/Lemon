@@ -1,5 +1,15 @@
 {
-  "systems": ["rendering_system", "entity_system", "transform_system"],
+  "stages": {
+    "0": "earlyUpdate",
+    "1": "update",
+    "2": "lateUpdate",
+    "3": "render"
+  },
+  "systems": {
+    "752933127": "rendering_system",
+    "4124121830": "entity_system",
+    "2282876357": "transform_system"
+  },
   "components": {
     "sprite_renderer": ["col", "texCoords", "tex"],
     "tag": ["id"],

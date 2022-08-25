@@ -2,8 +2,21 @@ import glob
 import json
 import os
 import re
+from sqlite3 import dbapi2
 import sys
 import time
+from zlib import decompressobj
+
+
+def djb2(str):
+    if not str:
+        return 0
+
+    hashstr = 5381
+    for el in str:
+        hashstr = ((hashstr << 5) + hashstr) + ord(el)
+
+    return hashstr & 0xFFFFFFFF
 
 
 def main(argv):
@@ -13,9 +26,10 @@ def main(argv):
     matchSys = re.compile('SYSTEM\((.*?)\)')
     matchComp = re.compile('LEMON_REFL\((.*?)\)')
     matchTag = re.compile('LEMON_TAG\((.*?)\)')
-    systems = []
+    systems = {}
     components = {}
     tags = []
+    stages = {0: "earlyUpdate", 1: "update", 2: "lateUpdate", 3: "render"}
 
     projectFiles = glob.glob(os.path.join(
         srcPath, '**/*[!reflection].h'), recursive=True)
@@ -25,17 +39,21 @@ def main(argv):
             for m in re.finditer(matchSys, line):
                 string = m.group(1)
                 name = [x.strip() for x in string.split(',')].pop(0)
-                systems.append(name)
+                nameid = djb2(name)
+                systems[nameid] = name
+
             for m in re.finditer(matchComp, line):
                 string = m.group(1)
                 res = [x.strip() for x in string.split(',')]
                 name = res.pop(0)
                 components[name] = res
+
             for m in re.finditer(matchTag, line):
                 string = m.group(1)
                 tags.append(string)
 
     data = {
+        'stages': stages,
         'systems': systems,
         'components': components,
         'tags': tags
