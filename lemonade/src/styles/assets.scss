@@ -2,7 +2,7 @@
 
 .assets {
   @include styles.fill();
-  background-color: styles.$bg;
+  background-color: styles.$bg0_h;
 }
 .grid-parent {
   display: flexbox;

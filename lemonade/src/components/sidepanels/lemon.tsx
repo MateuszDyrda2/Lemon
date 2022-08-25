@@ -2,6 +2,7 @@ import "../../styles/sidepanels/lemon.scss";
 import LemonIcon from "../../img/lemon.svg";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/tauri";
 import { appWindow } from "@tauri-apps/api/window";
 import React from "react";
 import { Project, UserContext } from "../../props/project";
@@ -19,7 +20,7 @@ const Lemon = () => {
         },
       ],
     });
-    selected && appWindow.emit("open-project", selected);
+    selected && invoke("open_project", { path: selected });
   };
 
   return (

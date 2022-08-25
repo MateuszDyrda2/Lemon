@@ -16,11 +16,6 @@ interface AssetData {
 const Assets = () => {
   const [assets, setAssets] = React.useState<AssetData | undefined>(undefined);
 
-  React.useEffect(() => {
-    invoke("get_assets").then((result) => {
-      setAssets(result as AssetData);
-    });
-  }, []);
   return (
     <div className="assets">
       <div className="grid-parent">
