@@ -24,9 +24,9 @@ const Lemon = () => {
   };
 
   useEffect(() => {
-    invoke("get_project_name").then((value) => {
-      setProject(value as string);
-    });
+    invoke("get_project_name")
+      .then((value) => setProject(value as string))
+      .catch((_) => {});
   }, []);
 
   return (

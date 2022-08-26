@@ -1,0 +1,37 @@
+{
+  "stages": {
+    "0": "earlyUpdate",
+    "1": "update",
+    "2": "lateUpdate",
+    "3": "render"
+  },
+  "systems": {
+    "752933127": "rendering_system",
+    "4124121830": "entity_system",
+    "2282876357": "transform_system"
+  },
+  "components": {
+    ".\\Lemon\\include\\rendering\\components\\rendering_components.h": [
+      { "sprite_renderer": ["col", "texCoords", "tex"] }
+    ],
+    ".\\Lemon\\include\\world\\components\\entity_components.h": [
+      { "tag": ["id"] }
+    ],
+    ".\\Lemon\\include\\world\\components\\transform_components.h": [
+      {
+        "transform": [
+          "position",
+          "scale",
+          "rotation",
+          "first",
+          "next",
+          "parent",
+          "order"
+        ]
+      },
+      { "model": ["matrix"] },
+      { "camera": ["viewport", "size"] }
+    ]
+  },
+  "tags": ["enabled_t", "main_camera_t"]
+}

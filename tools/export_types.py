@@ -43,10 +43,11 @@ def main(argv):
                 systems[nameid] = name
 
             for m in re.finditer(matchComp, line):
+                cfile = filename
                 string = m.group(1)
                 res = [x.strip() for x in string.split(',')]
                 name = res.pop(0)
-                components[name] = res
+                components.setdefault(cfile, []).append({name: res})
 
             for m in re.finditer(matchTag, line):
                 string = m.group(1)

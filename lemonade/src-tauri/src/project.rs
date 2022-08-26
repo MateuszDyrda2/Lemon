@@ -4,7 +4,7 @@ use std::{fs, path::Path, result::Result, sync::Mutex};
 use tauri::Window;
 
 mod scene;
-use scene::{read_scene, Assets, Scene, Stage};
+use scene::{read_scene, Assets, Scene};
 
 mod types_dict;
 use types_dict::{read_types, Types};
@@ -70,7 +70,7 @@ pub fn open_project(
                 ),
             }
 
-            window.emit("project-opened", "");
+            _ = window.emit("project-opened", "");
             Ok(p.project_name.clone())
         }
         None => Err("Could not find a project"),
@@ -79,7 +79,7 @@ pub fn open_project(
 
 #[tauri::command]
 pub fn get_assets(
-    window: Window,
+    _window: Window,
     state: tauri::State<ProjectState>,
 ) -> Result<Assets, &'static str> {
     let state_guard = state.0.lock().unwrap();
@@ -100,7 +100,7 @@ pub struct NamedStages {
 
 #[tauri::command]
 pub fn get_project_name(
-    window: Window,
+    _window: Window,
     state: tauri::State<ProjectState>,
 ) -> Result<String, &'static str> {
     let state_guard = state.0.lock().unwrap();
@@ -114,10 +114,10 @@ pub fn get_project_name(
 
 #[tauri::command]
 pub fn get_systems(
-    window: Window,
+    _window: Window,
     state: tauri::State<ProjectState>,
 ) -> Result<Vec<NamedStages>, &'static str> {
-    let mut state_guard = state.0.lock().unwrap();
+    let state_guard = state.0.lock().unwrap();
 
     let mut named_stages: Vec<NamedStages> = Vec::new();
     if let Some(proj) = &(*state_guard) {
