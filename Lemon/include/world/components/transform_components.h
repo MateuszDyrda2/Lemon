@@ -14,34 +14,29 @@ namespace lemon {
 struct LEMON_API dirty_t
 { };
 
-struct LEMON_API transform
+struct LEMON_API [[lemon::component]] transform
 {
-    vec2 position{ 0.0f, 0.0f };
-    vec2 scale{ 1.0f, 1.0f };
-    f32 rotation{ 0.0f };
+    [[lemon::field]] vec2 position{ 0.0f, 0.0f };
+    [[lemon::field]] vec2 scale{ 1.0f, 1.0f };
+    [[lemon::field]] f32 rotation{ 0.0f };
 
-    entity first{ entt::null };
-    entity next{ entt::null };
-    entity parent{ entt::null };
-    std::size_t order{};
-
-    LEMON_REFL(transform, position, scale, rotation, first, next, parent, order);
+    [[lemon::field]] entity first{ entt::null };
+    [[lemon::field]] entity next{ entt::null };
+    [[lemon::field]] entity parent{ entt::null };
+    [[lemon::field]] std::size_t order{};
 };
 
-struct LEMON_API model
+struct LEMON_API [[lemon::component]] model
 {
-    mat4 matrix{ 1.0f };
-
-    LEMON_REFL(model, matrix);
+    [[lemon::field]] mat4 matrix{ 1.0f };
 };
 
-LEMON_TAG(main_camera_t)
+struct LEMON_API [[lemon::tag]] main_camera_t
+{ };
 
-struct LEMON_API camera
+struct LEMON_API [[lemon::component]] camera
 {
-    vec4 viewport{ 0.0f, 0.0f, 1.0f, 1.0f };
-    f32 size{ 10.0f };
-
-    LEMON_REFL(camera, viewport, size);
+    [[lemon::field]] vec4 viewport{ 0.0f, 0.0f, 1.0f, 1.0f };
+    [[lemon::field]] f32 size{ 10.0f };
 };
 }

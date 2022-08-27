@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 
 type Props = {
   name: string;
@@ -14,10 +14,20 @@ type Props = {
   children?: JSX.Element | JSX.Element[];
 };
 
-interface SystemContainer {
-  stage: string;
-  systems: string[];
+interface SystemDef {
+  nameid: number;
+  name: string;
 }
+interface StageDef {
+  id: number;
+  name: string;
+}
+
+interface SystemContainer {
+  stage: StageDef;
+  systems: SystemDef[];
+}
+
 interface IdPair {
   parent: number;
   index: number;
@@ -28,10 +38,26 @@ const Systems = () => {
     undefined
   );
 
+  const [systemDefs, setSystemDefs] = useState<SystemDef[] | undefined>(
+    undefined
+  );
+
+  const saveSystems = () => {
+    invoke("set_systems", { systemlist: systemlist }).catch((error) =>
+      console.log(error)
+    );
+  };
+
   useEffect(() => {
     invoke("get_systems")
       .then((value) => {
         setSystemlist(value as SystemContainer[]);
+      })
+      .catch((error) => console.log(error));
+
+    invoke("get_system_definitions")
+      .then((value) => {
+        setSystemDefs(value as SystemDef[]);
       })
       .catch((error) => console.log(error));
   }, []);
@@ -49,23 +75,36 @@ const Systems = () => {
     let _newSystems = [...(systemlist as SystemContainer[])];
 
     const currentPair = dragItem.current as IdPair;
-    const dragged = _newSystems[currentPair.parent].systems.splice(
-      currentPair.index,
-      1
-    )[0];
+
+    const dragged =
+      currentPair.parent !== -1
+        ? _newSystems[currentPair.parent].systems.splice(
+            currentPair.index,
+            1
+          )[0]
+        : (systemDefs as SystemDef[])[currentPair.index];
 
     const overPair = dragOverItem.current as IdPair;
-    _newSystems[overPair.parent].systems.splice(overPair.index, 0, dragged);
+
+    if (overPair.parent !== -1) {
+      _newSystems[overPair.parent].systems.splice(overPair.index, 0, dragged);
+    }
 
     dragItem.current = null;
     dragOverItem.current = null;
 
     setSystemlist(_newSystems);
+    saveSystems();
   };
 
   const Stage = ({ name, k, children }: Props) => {
-    const [expanded, setExpanded] = useState(true);
-    const onExpand = useCallback(() => setExpanded(!expanded), [expanded]);
+    const [expanded, setExpanded] = useState(
+      (systemlist as SystemContainer[])[k].systems.length !== 0
+    );
+    const onExpand = useCallback(() => {
+      (systemlist as SystemContainer[])[k].systems.length !== 0 &&
+        setExpanded(!expanded);
+    }, [expanded]);
 
     return (
       <div key={k} className="stage-group">
@@ -89,7 +128,6 @@ const Systems = () => {
             />
           )}
           <p className="stage-name">{name}</p>
-          <AddIcon className="stage-more" fontSize="small" />
         </div>
         <div className={expanded ? "system-list" : "system-list--hidden"}>
           {children}
@@ -98,38 +136,74 @@ const Systems = () => {
     );
   };
 
+  const onRemoveSys = (i: number, j: number) => {
+    let _newSystems = [...(systemlist as SystemContainer[])];
+    _newSystems[i].systems.splice(j, 1);
+
+    setSystemlist(_newSystems);
+    saveSystems();
+  };
+
   return (
     <div className="systems">
       <div className="stage-list">
         <>
           {systemlist &&
             systemlist.map((stage, index) => (
-              <Stage name={stage.stage} k={index} key={index}>
+              <Stage name={stage.stage.name} k={index} key={index}>
                 {stage.systems.map((sys, i) => (
                   <div
-                    id={sys}
+                    id={sys.name}
                     key={i}
                     className="system"
                     draggable="true"
-                    onDragStart={(e) => {
+                    onDragStart={() => {
                       onDragStarted(index, i);
                     }}
-                    onDragEnter={(e) => {
+                    onDragEnter={() => {
                       onDragEnter(index, i);
                     }}
-                    onDragEnd={(e) => {
-                      onDragEnded();
-                    }}
+                    onDragEnd={onDragEnded}
                     onDragOver={(e) => e.preventDefault()}
                   >
                     <MenuIcon className="system-icon" fontSize="small" />
-                    <p className="system-name">{sys}</p>
+                    <p className="system-name">{sys.name}</p>
+                    <CloseIcon
+                      className="system-del"
+                      fontSize="small"
+                      onClick={() => onRemoveSys(index, i)}
+                    />
                     <MoreVertIcon className="system-more" fontSize="small" />
                   </div>
                 ))}
               </Stage>
             ))}
         </>
+      </div>
+      <div className="system-definitions">
+        <span>
+          <p>Defined Systems</p>
+        </span>
+        <div className="def-lists">
+          <>
+            {systemDefs &&
+              systemDefs.map((system, index) => (
+                <div
+                  id={system.name}
+                  key={index}
+                  className="system-def"
+                  draggable="true"
+                  onDragStart={() => onDragStarted(-1, index)}
+                  onDragEnter={() => onDragEnter(-1, index)}
+                  onDragEnd={() => onDragEnded()}
+                  onDragOver={(e) => e.preventDefault()}
+                >
+                  <MenuIcon className="systemdef-icon" fontSize="small" />
+                  <p className="systemdef-name">{system.name}</p>
+                </div>
+              ))}
+          </>
+        </div>
       </div>
     </div>
   );

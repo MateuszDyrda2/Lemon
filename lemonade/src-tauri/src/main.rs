@@ -4,7 +4,10 @@
 )]
 mod project;
 
-use project::{get_assets, get_project_name, get_systems, open_project, ProjectState};
+use project::{
+    get_assets, get_project_name, get_system_definitions, get_systems, open_project, set_systems,
+    ProjectState,
+};
 use std::sync::Mutex;
 
 fn main() {
@@ -14,7 +17,9 @@ fn main() {
             open_project,
             get_assets,
             get_systems,
-            get_project_name
+            get_project_name,
+            get_system_definitions,
+            set_systems
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

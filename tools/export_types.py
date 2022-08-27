@@ -2,10 +2,8 @@ import glob
 import json
 import os
 import re
-from sqlite3 import dbapi2
 import sys
 import time
-from zlib import decompressobj
 
 
 def djb2(str):
@@ -52,6 +50,12 @@ def main(argv):
             for m in re.finditer(matchTag, line):
                 string = m.group(1)
                 tags.append(string)
+
+    # second pass
+
+    componentDefs = {}
+    for filename in components:
+        for line in open(filename):
 
     data = {
         'stages': stages,

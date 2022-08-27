@@ -8,12 +8,11 @@
 #include <world/reflection.h>
 
 namespace lemon {
-struct LEMON_API sprite_renderer
+struct LEMON_API
+    [[lemon::component]] sprite_renderer
 {
-    color col{ 1.0f, 1.0f, 1.0f, 1.0f };
-    vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
-    asset<texture> tex{};
-
-    LEMON_REFL(sprite_renderer, col, texCoords, tex);
+    [[lemon::field]] color col{ 1.0f, 1.0f, 1.0f, 1.0f };
+    [[lemon::field]] vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
+    [[lemon::field]] asset<texture> tex{};
 };
 }

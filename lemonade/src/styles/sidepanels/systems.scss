@@ -1,10 +1,22 @@
 @use "../styles.scss";
 
+.sname {
+  margin: 0 5px;
+  text-align: left;
+  @extend .text-fg-ns--sm;
+  float: left;
+}
+
 .systems {
   padding-top: 25px;
-  @include styles.center-children;
+  height: 100vh;
+  padding: 25px 10%;
+  display: flex;
+  flex-direction: column;
 
   .stage-list {
+    height: 50%;
+    overflow: auto;
   }
 }
 .stage-group {
@@ -21,9 +33,7 @@
     overflow: hidden;
 
     .stage-name {
-      margin: 0 5px;
-      float: left;
-      text-align: left;
+      @extend .sname;
       @extend .text-fg-ns--md;
 
       color: styles.$bg0_s;
@@ -38,10 +48,6 @@
       float: left;
     }
 
-    .stage-more {
-      @extend .icon-right;
-      cursor: pointer;
-    }
     .stage-arrow {
       @extend .icon-left;
       cursor: pointer;
@@ -56,20 +62,24 @@
     }
   }
 }
-
-.system {
+.sys {
   margin: 0;
-  padding: 4px 4px;
+  padding: 4px;
   background-color: styles.$bg0;
   border: 1px solid styles.$fg4;
   user-select: all;
   overflow: hidden;
 
+  &:hover {
+    background-color: styles.$bg1;
+  }
+}
+
+.system {
+  @extend .sys;
+
   .system-name {
-    margin: 0 5px;
-    text-align: left;
-    @extend .text-fg-ns--sm;
-    float: left;
+    @extend .sname;
   }
   .system-icon {
     color: styles.$fg0;
@@ -80,5 +90,59 @@
     color: styles.$fg0;
     cursor: pointer;
     float: right;
+  }
+  .system-del {
+    color: styles.$fg0;
+    cursor: pointer;
+    float: right;
+
+    &:hover {
+      color: styles.$red;
+    }
+  }
+}
+
+.system-definitions {
+  height: 40%;
+  margin-top: 10px;
+  position: relative;
+  border: 2px solid styles.$fg2;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    vertical-align: middle;
+    display: inline-block;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid styles.$fg2;
+    padding: 5px;
+    background-color: styles.$fg0;
+
+    p {
+      color: styles.$bg0_s;
+      @extend .text-fg-ns--md;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  .def-lists {
+    overflow-y: auto;
+    position: relative;
+
+    .system-def {
+      @extend .sys;
+
+      .systemdef-name {
+        @extend .sname;
+      }
+      .systemdef-icon {
+        color: styles.$fg0;
+        cursor: grab;
+        float: left;
+      }
+    }
   }
 }

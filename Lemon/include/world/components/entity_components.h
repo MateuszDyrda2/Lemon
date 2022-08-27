@@ -15,12 +15,11 @@ struct LEMON_API enable_m
 struct LEMON_API disable_m
 { };
 
-LEMON_TAG(enabled_t)
+struct LEMON_API [[lemon::tag]] enabled_t
+{ };
 
-struct LEMON_API tag
+struct LEMON_API [[lemon::component]] tag
 {
-    hash_str id;
-
-    LEMON_REFL(tag, id);
+    [[lemon::field]] hash_str id;
 };
 }

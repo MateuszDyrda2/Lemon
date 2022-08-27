@@ -4,7 +4,7 @@ use std::{fs, path::Path, result::Result, sync::Mutex};
 use tauri::Window;
 
 mod scene;
-use scene::{read_scene, Assets, Scene};
+use scene::{read_scene, Assets, Scene, Stage};
 
 mod types_dict;
 use types_dict::{read_types, Types};
@@ -92,10 +92,23 @@ pub fn get_assets(
         None => Result::Err("Failed to get assets / no active project"),
     }
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SysDef {
+    nameid: u32,
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StageDef {
+    id: u32,
+    name: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NamedStages {
-    stage: String,
-    systems: Vec<String>,
+    stage: StageDef,
+    systems: Vec<SysDef>,
 }
 
 #[tauri::command]
@@ -126,16 +139,22 @@ pub fn get_systems(
         let sys = &types.systems;
         if let Some(scene) = &proj.current_scene {
             for stage in scene.systems.iter() {
-                let mut named_systems: Vec<String> = Vec::new();
+                let mut named_systems: Vec<SysDef> = Vec::new();
                 for system in stage.systems.iter() {
                     match sys.get(system) {
-                        Some(val) => named_systems.push(val.clone()),
+                        Some(val) => named_systems.push(SysDef {
+                            nameid: *system,
+                            name: val.clone(),
+                        }),
                         None => panic!("System definition not found!"),
                     }
                 }
                 match stg.get(&stage.stage) {
                     Some(val) => named_stages.push(NamedStages {
-                        stage: val.clone(),
+                        stage: StageDef {
+                            id: stage.stage,
+                            name: val.clone(),
+                        },
                         systems: named_systems,
                     }),
                     None => panic!("Stage definition not found!"),
@@ -145,6 +164,54 @@ pub fn get_systems(
         } else {
             Result::Err("No active scene")
         }
+    } else {
+        Result::Err("No active project")
+    }
+}
+
+#[tauri::command]
+pub fn set_systems(
+    _window: Window,
+    state: tauri::State<ProjectState>,
+    systemlist: Vec<NamedStages>,
+) {
+    let mut state_guard = state.0.lock().unwrap();
+
+    if let Some(proj) = &mut (*state_guard) {
+        if let Some(scene) = &mut proj.current_scene {
+            let mut new_stages: Vec<Stage> = Vec::new();
+            for stage in &systemlist {
+                let mut new_systems: Vec<u32> = Vec::new();
+                for sys in &stage.systems {
+                    new_systems.push(sys.nameid);
+                }
+                new_stages.push(Stage {
+                    stage: stage.stage.id,
+                    systems: new_systems,
+                });
+            }
+            scene.systems = new_stages;
+        }
+    }
+}
+
+#[tauri::command]
+pub fn get_system_definitions(
+    _window: Window,
+    state: tauri::State<ProjectState>,
+) -> Result<Vec<SysDef>, &'static str> {
+    let state_guard = state.0.lock().unwrap();
+
+    if let Some(proj) = &(*state_guard) {
+        let map = &proj.data_set.as_ref().unwrap().systems;
+        let mut defs = Vec::new();
+        for (key, value) in &*map {
+            defs.push(SysDef {
+                nameid: key.clone(),
+                name: value.clone(),
+            });
+        }
+        Ok(defs)
     } else {
         Result::Err("No active project")
     }

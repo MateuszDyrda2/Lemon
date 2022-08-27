@@ -7,7 +7,8 @@ use std::fs;
 pub struct Types {
     pub stages: HashMap<u32, String>,
     pub systems: HashMap<u32, String>,
-    pub components: HashMap<String, Vec<String>>,
+    pub components: HashMap<String, HashMap<String, String>>,
+    pub tags: Vec<String>,
 }
 
 fn read_types_file(path: &str) -> Result<Types> {
