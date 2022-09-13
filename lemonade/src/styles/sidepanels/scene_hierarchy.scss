@@ -1,61 +1,45 @@
 @use "../styles.scss";
 
-.scene_hierarchy {
-  margin: 15px 10%;
-  align-items: center;
-  border: 1px solid styles.$fg0;
-  height: 100%;
-  border-radius: 4px;
+.entities-list {
+  overflow-y: auto;
+  position: relative;
+  height: calc(100vh - 85px);
+  width: 100%;
 
-  .header {
-    flex-shrink: 0;
-    margin: 0;
-    padding: 5px;
-    border-bottom: 1px solid styles.$fg0;
-    background-color: styles.$fg1;
-    .scene-name {
-      margin: 0;
-      text-align: center;
-      @extend .text-fg-ns--md;
-      color: styles.$bg0_s;
+  .entity {
+    &--hidden {
+      display: none;
     }
-  }
-
-  .entities-list {
-    overflow-y: auto;
     position: relative;
-    max-height: 100vh;
+    overflow: hidden;
+    margin-left: 10px;
 
-    .entity {
-      &--hidden {
-        display: none;
+    .entity-container {
+      padding: 2px 4px;
+      display: flex;
+      flex-direction: row;
+
+      &:hover {
+        background-color: styles.$bg2;
       }
-      position: relative;
-      overflow: auto;
-      margin-left: 10px;
+      &:active {
+        background-color: styles.$bg3;
+      }
 
-      .entity-container {
-        padding: 2px 4px;
-        display: flex;
-        flex-direction: row;
+      &--selected {
+        @extend .entity-container;
+        background-color: styles.$bg1;
+      }
 
-        &:hover {
-          background-color: styles.$bg1;
-        }
-        &:active {
-          background-color: styles.$bg3;
-        }
+      p {
+        margin: 0;
+        padding: 0 0 0 25px;
+        @extend .text-fg-ns--sm;
+      }
 
-        p {
-          margin: 0;
-          padding: 0 0 0 25px;
-          @extend .text-fg-ns--sm;
-        }
-
-        .entity-drop {
-          cursor: pointer;
-          position: absolute;
-        }
+      .entity-drop {
+        cursor: pointer;
+        position: absolute;
       }
     }
   }

@@ -1,28 +1,25 @@
 use serde::{Deserialize, Serialize};
-use serde_json::from_str;
+use serde_json::{from_str, Value};
 use std::{fs, path::Path, result::Result, sync::Mutex};
 use tauri::Window;
 
 mod scene;
-use scene::{read_scene, Assets, Scene, Stage};
+use scene::{read_scene, Assets, Project, Scene, Stage};
 
-mod types_dict;
-use types_dict::{read_types, Types};
+use scene::types_dict::read_types;
+
+use self::scene::types_dict::{StageModel, SystemModel};
+
+pub struct ProjectState(pub Mutex<Option<Project>>);
 
 #[derive(Serialize, Deserialize)]
-pub struct Project {
-    project_name: String,
-    assets_path: String,
-    scene_path: String,
-    src_path: String,
-    build_dir: String,
-    scenes: Vec<String>,
-    #[serde(skip)]
-    current_scene: Option<Scene>,
-    #[serde(skip)]
-    data_set: Option<Types>,
+pub enum ProjectErrorCode {
+    NoProjectLoaded,
+    NoSceneOpened,
+    NoDatasetLoaded,
+    NoMatchedStage,
+    NoMatchedSystem,
 }
-pub struct ProjectState(pub Mutex<Option<Project>>);
 
 fn read_file(path: &str) -> Result<Project, serde_json::error::Error> {
     let contents = fs::read_to_string(path).expect("Failed to read the project file");
@@ -53,17 +50,13 @@ pub fn open_project(
             let scene_path = scenes_path.join(scene_name + ".lemon");
 
             match read_scene(scene_path.to_str().unwrap()) {
-                Ok(s) => {
-                    p.current_scene = Some(s);
-                }
+                Ok(s) => p.current_scene = Some(s),
                 Err(e) => println!("Failed to read a scene with: {}", e.to_string()),
             }
             let types = parent.unwrap().join("types.json");
 
             match read_types(types.to_str().unwrap()) {
-                Ok(t) => {
-                    p.data_set = Some(t);
-                }
+                Ok(t) => p.data_set = Some(t),
                 Err(e) => println!(
                     "Failed to read type definition file, Err: {}",
                     e.to_string()
@@ -71,6 +64,7 @@ pub fn open_project(
             }
 
             _ = window.emit("project-opened", "");
+            println!("{:?}", &p.current_scene.as_ref().unwrap().components);
             Ok(p.project_name.clone())
         }
         None => Err("Could not find a project"),
@@ -94,21 +88,9 @@ pub fn get_assets(
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct SysDef {
-    nameid: u32,
-    name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct StageDef {
-    id: u32,
-    name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct NamedStages {
-    stage: StageDef,
-    systems: Vec<SysDef>,
+    stage: StageModel,
+    systems: Vec<SystemModel>,
 }
 
 #[tauri::command]
@@ -129,44 +111,34 @@ pub fn get_project_name(
 pub fn get_systems(
     _window: Window,
     state: tauri::State<ProjectState>,
-) -> Result<Vec<NamedStages>, &'static str> {
+) -> Result<Vec<NamedStages>, ProjectErrorCode> {
     let state_guard = state.0.lock().unwrap();
 
     let mut named_stages: Vec<NamedStages> = Vec::new();
-    if let Some(proj) = &(*state_guard) {
-        let types = proj.data_set.as_ref().unwrap();
-        let stg = &types.stages;
-        let sys = &types.systems;
-        if let Some(scene) = &proj.current_scene {
-            for stage in scene.systems.iter() {
-                let mut named_systems: Vec<SysDef> = Vec::new();
-                for system in stage.systems.iter() {
-                    match sys.get(system) {
-                        Some(val) => named_systems.push(SysDef {
-                            nameid: *system,
-                            name: val.clone(),
-                        }),
-                        None => panic!("System definition not found!"),
-                    }
-                }
-                match stg.get(&stage.stage) {
-                    Some(val) => named_stages.push(NamedStages {
-                        stage: StageDef {
-                            id: stage.stage,
-                            name: val.clone(),
-                        },
-                        systems: named_systems,
-                    }),
-                    None => panic!("Stage definition not found!"),
-                }
+    let proj = (&(*state_guard)).ok_or(ProjectErrorCode::NoProjectLoaded)?;
+    let data_set = (&proj.data_set).ok_or(ProjectErrorCode::NoDatasetLoaded)?;
+
+    let stg = &data_set.stages;
+    let sys = &data_set.systems;
+
+    let scene = (&proj.current_scene).ok_or(ProjectErrorCode::NoProjectLoaded)?;
+    for stage in scene.systems.iter() {
+        let mut named_systems: Vec<SystemModel> = Vec::new();
+        for system in stage.systems.iter() {
+            match sys.into_iter().find(|&x| x.id == *system) {
+                Some(item) => named_systems.push(item.clone()),
+                None => return Err(ProjectErrorCode::NoMatchedSystem),
             }
-            Ok(named_stages)
-        } else {
-            Result::Err("No active scene")
+            match stg.into_iter().find(|&x| x.id == stage.stage) {
+                Some(item) => named_stages.push(NamedStages {
+                    stage: item.clone(),
+                    systems: named_systems,
+                }),
+                None => return Err(ProjectErrorCode::NoMatchedStage),
+            }
         }
-    } else {
-        Result::Err("No active project")
     }
+    Ok(named_stages)
 }
 
 #[tauri::command]
@@ -183,7 +155,7 @@ pub fn set_systems(
             for stage in &systemlist {
                 let mut new_systems: Vec<u32> = Vec::new();
                 for sys in &stage.systems {
-                    new_systems.push(sys.nameid);
+                    new_systems.push(sys.id);
                 }
                 new_stages.push(Stage {
                     stage: stage.stage.id,
@@ -199,20 +171,26 @@ pub fn set_systems(
 pub fn get_system_definitions(
     _window: Window,
     state: tauri::State<ProjectState>,
-) -> Result<Vec<SysDef>, &'static str> {
+) -> Result<Vec<SystemModel>, ProjectErrorCode> {
     let state_guard = state.0.lock().unwrap();
 
-    if let Some(proj) = &(*state_guard) {
-        let map = &proj.data_set.as_ref().unwrap().systems;
-        let mut defs = Vec::new();
-        for (key, value) in &*map {
-            defs.push(SysDef {
-                nameid: key.clone(),
-                name: value.clone(),
-            });
-        }
-        Ok(defs)
-    } else {
-        Result::Err("No active project")
+    match &(*state_guard) {
+        Some(proj) => match &proj.data_set {
+            Some(data_set) => Ok(data_set.systems.clone()),
+            None => Err(ProjectErrorCode::NoDatasetLoaded),
+        },
+        None => Err(ProjectErrorCode::NoProjectLoaded),
     }
+}
+
+#[tauri::command]
+pub fn get_components(
+    _window: Window,
+    state: tauri::State<ProjectState>,
+) -> Result<Vec<String>, ProjectErrorCode> {
+    let state_guard = state.0.lock().unwrap();
+
+    let proj = (&(*state_guard)).ok_or(ProjectErrorCode::NoProjectLoaded)?;
+    let types = &proj.data_set.ok_or(ProjectErrorCode::NoSceneOpened)?;
+    Ok(types.components.iter().map(|&c| c.name).collect())
 }

@@ -28,4 +28,18 @@
       background-color: styles.$bg0_s;
     }
   }
+
+  ::-webkit-scrollbar {
+    background-color: styles.$bg0;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: styles.$bg0;
+    border: 1px solid styles.$fg1;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: styles.$fg1;
+    border-radius: 4px;
+  }
 }

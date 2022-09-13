@@ -10,6 +10,7 @@ import Settings from "./sidepanels/settings";
 
 interface Props {
   child: Tabs;
+  setTab: React.Dispatch<any>;
   leftWidth: number | undefined;
   setLeftWidth: (value: number) => void;
 }
@@ -32,7 +33,7 @@ const TabToName = (tab: Tabs) => {
   }
 };
 
-const Sidepanel = ({ child, leftWidth, setLeftWidth }: Props) => {
+const Sidepanel = ({ child, setTab, leftWidth, setLeftWidth }: Props) => {
   const leftRef = createRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const Sidepanel = ({ child, leftWidth, setLeftWidth }: Props) => {
       <p className="sidepanel-top">{TabToName(child)}</p>
       <div className="content">
         {child === Tabs.Lemon && <Lemon />}
-        {child === Tabs.SceneHierarchy && <SceneHierarchy />}
+        {child === Tabs.SceneHierarchy && <SceneHierarchy setTab={setTab} />}
         {child === Tabs.Systems && <Systems />}
         {child === Tabs.Components && <Components />}
         {child === Tabs.Settings && <Settings />}

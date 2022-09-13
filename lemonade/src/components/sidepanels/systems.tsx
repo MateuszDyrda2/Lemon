@@ -7,6 +7,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import CloseIcon from "@mui/icons-material/Close";
+import Container from "./container";
 
 type Props = {
   name: string;
@@ -113,19 +114,12 @@ const Systems = () => {
           onDragEnter={() => onDragEnter(k, 0)}
           onDragEnd={onDragEnded}
           onDragOver={(e) => e.preventDefault()}
+          onClick={onExpand}
         >
           {expanded ? (
-            <ArrowDropUpIcon
-              className="stage-arrow"
-              fontSize="small"
-              onClick={onExpand}
-            />
+            <ArrowDropUpIcon className="stage-arrow" fontSize="small" />
           ) : (
-            <ArrowDropDownIcon
-              className="stage-arrow"
-              fontSize="small"
-              onClick={onExpand}
-            />
+            <ArrowDropDownIcon className="stage-arrow" fontSize="small" />
           )}
           <p className="stage-name">{name}</p>
         </div>
@@ -142,48 +136,51 @@ const Systems = () => {
 
     setSystemlist(_newSystems);
     saveSystems();
+
+    invoke("get_components")
+      .then((value) => console.log(value))
+      .catch((err) => console.log(err));
   };
 
   return (
     <div className="systems">
-      <div className="stage-list">
-        <>
-          {systemlist &&
-            systemlist.map((stage, index) => (
-              <Stage name={stage.stage.name} k={index} key={index}>
-                {stage.systems.map((sys, i) => (
-                  <div
-                    id={sys.name}
-                    key={i}
-                    className="system"
-                    draggable="true"
-                    onDragStart={() => {
-                      onDragStarted(index, i);
-                    }}
-                    onDragEnter={() => {
-                      onDragEnter(index, i);
-                    }}
-                    onDragEnd={onDragEnded}
-                    onDragOver={(e) => e.preventDefault()}
-                  >
-                    <MenuIcon className="system-icon" fontSize="small" />
-                    <p className="system-name">{sys.name}</p>
-                    <CloseIcon
-                      className="system-del"
-                      fontSize="small"
-                      onClick={() => onRemoveSys(index, i)}
-                    />
-                    <MoreVertIcon className="system-more" fontSize="small" />
-                  </div>
-                ))}
-              </Stage>
-            ))}
-        </>
-      </div>
-      <div className="system-definitions">
-        <span>
-          <p>Defined Systems</p>
-        </span>
+      <Container header="Sandbox" st={{ height: "50%", marginBottom: "25px" }}>
+        <div className="stage-list">
+          <>
+            {systemlist &&
+              systemlist.map((stage, index) => (
+                <Stage name={stage.stage.name} k={index} key={index}>
+                  {stage.systems.map((sys, i) => (
+                    <div
+                      id={sys.name}
+                      key={i}
+                      className="system"
+                      draggable="true"
+                      onDragStart={() => {
+                        onDragStarted(index, i);
+                      }}
+                      onDragEnter={() => {
+                        onDragEnter(index, i);
+                      }}
+                      onDragEnd={onDragEnded}
+                      onDragOver={(e) => e.preventDefault()}
+                    >
+                      <MenuIcon className="system-icon" fontSize="small" />
+                      <p className="system-name">{sys.name}</p>
+                      <CloseIcon
+                        className="system-del"
+                        fontSize="small"
+                        onClick={() => onRemoveSys(index, i)}
+                      />
+                      <MoreVertIcon className="system-more" fontSize="small" />
+                    </div>
+                  ))}
+                </Stage>
+              ))}
+          </>
+        </div>
+      </Container>
+      <Container header="Defined Systems" st={{ height: "40%", bottom: "0" }}>
         <div className="def-lists">
           <>
             {systemDefs &&
@@ -204,7 +201,7 @@ const Systems = () => {
               ))}
           </>
         </div>
-      </div>
+      </Container>
     </div>
   );
 };

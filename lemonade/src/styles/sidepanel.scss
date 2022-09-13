@@ -15,3 +15,7 @@
   @extend .text-fg-ns--md;
   border-bottom: 2px solid styles.$bg0_s;
 }
+
+.content {
+  height: 100vh;
+}

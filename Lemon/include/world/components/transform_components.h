@@ -31,7 +31,7 @@ struct LEMON_API [[lemon::component]] model
     [[lemon::field]] mat4 matrix{ 1.0f };
 };
 
-struct LEMON_API [[lemon::tag]] main_camera_t
+struct LEMON_API [[lemon::component]] main_camera_t
 { };
 
 struct LEMON_API [[lemon::component]] camera

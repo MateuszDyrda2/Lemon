@@ -13,17 +13,17 @@ inline void serialize_component(const T& component, rapidjson::Writer<rapidjson:
 {
     writer.StartArray();
     {
-        reflection::component::for_each(component, [&](const auto& field) {
-            serialize(field, writer);
-        });
+        // reflection::component::for_each(component, [&](const auto& field) {
+        //     serialize(field, writer);
+        // });
     }
     writer.EndArray();
 }
 template<class T>
 inline void deserialize_component(T& component, rapidjson::Value::ConstMemberIterator& iter)
 {
-    reflection::component::for_each(component, [&](auto& field) {
-        deserialize(field, iter->value);
-    });
+    // reflection::component::for_each(component, [&](auto& field) {
+    //     deserialize(field, iter->value);
+    // });
 }
 }

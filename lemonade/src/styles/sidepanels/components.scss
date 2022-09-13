@@ -1,4 +1,11 @@
 @use "../styles.scss";
 
 .components {
+  height: 100vh;
+  .header {
+    height: 100%;
+    p {
+      @extend .text-fg-ns--md;
+    }
+  }
 }

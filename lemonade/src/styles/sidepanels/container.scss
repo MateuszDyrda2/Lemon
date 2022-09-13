@@ -1,0 +1,26 @@
+@use "../styles.scss";
+
+.container {
+  align-items: center;
+  margin: 0px 2px 4px 2px;
+  background-color: styles.$bg0_h;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    background-color: styles.$fg1;
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 5px;
+    margin-bottom: 4px;
+
+    p {
+      margin: 0;
+      text-align: center;
+      @extend .text-fg-ns--md;
+      color: styles.$bg0_s;
+    }
+  }
+}

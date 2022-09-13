@@ -8,17 +8,17 @@
 }
 
 .systems {
-  padding-top: 25px;
-  height: 100vh;
-  padding: 25px 10%;
-  display: flex;
-  flex-direction: column;
-
-  .stage-list {
-    height: 50%;
-    overflow: auto;
-  }
+  height: calc(100vh - 35px);
 }
+
+.stage-list {
+  width: 100%;
+  overflow: auto;
+  background-color: styles.$bg0_h;
+  border-radius: 5px;
+  height: 100%;
+}
+
 .stage-group {
   width: auto;
   .icon {
@@ -27,30 +27,23 @@
   .stage {
     margin: 0;
     padding: 4px 4px;
-    border: 2px solid styles.$bg0_h;
+    border: 1px solid styles.$bg4;
     border-radius: 5px;
-    background-color: styles.$fg1;
+    background-color: styles.$bg0;
     overflow: hidden;
+    cursor: pointer;
 
     .stage-name {
       @extend .sname;
       @extend .text-fg-ns--md;
 
-      color: styles.$bg0_s;
-    }
-
-    .icon-right {
-      @extend .icon;
-      float: right;
-    }
-    .icon-left {
-      @extend .icon;
-      float: left;
+      color: styles.$fg0;
     }
 
     .stage-arrow {
-      @extend .icon-left;
-      cursor: pointer;
+      @extend .icon;
+      color: styles.$fg0;
+      float: left;
     }
   }
   .system-list {
@@ -63,15 +56,16 @@
   }
 }
 .sys {
-  margin: 0;
+  margin: 0 4px;
   padding: 4px;
-  background-color: styles.$bg0;
-  border: 1px solid styles.$fg4;
+  background-color: styles.$bg1;
+  border: 1px solid styles.$bg3;
   user-select: all;
   overflow: hidden;
+  cursor: grab;
 
   &:hover {
-    background-color: styles.$bg1;
+    background-color: styles.$bg2;
   }
 }
 
@@ -83,7 +77,6 @@
   }
   .system-icon {
     color: styles.$fg0;
-    cursor: grab;
     float: left;
   }
   .system-more {
@@ -102,47 +95,21 @@
   }
 }
 
-.system-definitions {
-  height: 40%;
-  margin-top: 10px;
+.def-lists {
+  overflow-y: auto;
   position: relative;
-  border: 2px solid styles.$fg2;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
 
-  span {
-    vertical-align: middle;
-    display: inline-block;
-    align-items: center;
-    width: 100%;
-    border-bottom: 1px solid styles.$fg2;
-    padding: 5px;
-    background-color: styles.$fg0;
+  .system-def {
+    @extend .sys;
 
-    p {
-      color: styles.$bg0_s;
-      @extend .text-fg-ns--md;
-      margin: 0;
-      text-align: center;
+    .systemdef-name {
+      @extend .sname;
     }
-  }
-
-  .def-lists {
-    overflow-y: auto;
-    position: relative;
-
-    .system-def {
-      @extend .sys;
-
-      .systemdef-name {
-        @extend .sname;
-      }
-      .systemdef-icon {
-        color: styles.$fg0;
-        cursor: grab;
-        float: left;
-      }
+    .systemdef-icon {
+      color: styles.$fg0;
+      cursor: grab;
+      float: left;
     }
   }
 }

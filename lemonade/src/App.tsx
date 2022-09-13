@@ -7,17 +7,19 @@ import Midpanel from "./components/midpanel";
 import darkTheme from "./theme";
 import ScopedCssBaseline from "@mui/material/ScopedCssBaseline/ScopedCssBaseline";
 import { ThemeProvider } from "@emotion/react";
+import projectContext from "./project_context";
 
 const MIN_WIDTH = 50;
 
 function App() {
-  const [currentTab, setTab] = React.useState<Tabs>(Tabs.None);
+  const [currentTab, setTab] = useState<Tabs>(Tabs.None);
   const splitAppRef = createRef<HTMLDivElement>();
   const [leftWidth, setLeftWidth] = useState<number | undefined>(200);
   const [separatorXPosition, setSeparatorXPosition] = useState<
     number | undefined
   >(undefined);
   const [dragging, setDragging] = useState(false);
+  const [projectName, setProjetName] = useState<string | undefined>(undefined);
 
   const onMouseDown = (e: React.MouseEvent) => {
     setSeparatorXPosition(e.clientX);
@@ -47,22 +49,27 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <ScopedCssBaseline enableColorScheme>
-        <div className="App" ref={splitAppRef}>
-          <Sidebar currentTab={currentTab} setTab={setTab} />
-          <Sidepanel
-            child={currentTab}
-            leftWidth={leftWidth}
-            setLeftWidth={setLeftWidth}
-          />
-          <div
-            className="vertDiv-container"
-            onMouseDown={onMouseDown}
-            style={{ display: currentTab === Tabs.None ? "none" : "block" }}
-          >
-            <div className="vertDiv" />
+        <projectContext.Provider
+          value={{ context: projectName, setContext: setProjetName }}
+        >
+          <div className="App" ref={splitAppRef}>
+            <Sidebar currentTab={currentTab} setTab={setTab} />
+            <Sidepanel
+              child={currentTab}
+              setTab={setTab}
+              leftWidth={leftWidth}
+              setLeftWidth={setLeftWidth}
+            />
+            <div
+              className="vertDiv-container"
+              onMouseDown={onMouseDown}
+              style={{ display: currentTab === Tabs.None ? "none" : "block" }}
+            >
+              <div className="vertDiv" />
+            </div>
+            <Midpanel />
           </div>
-          <Midpanel />
-        </div>
+        </projectContext.Provider>
       </ScopedCssBaseline>
     </ThemeProvider>
   );
