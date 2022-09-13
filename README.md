@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="data/lemon.svg" width=200 >
+	<img src="data/lemon2.svg" width=300 >
 </p>
 
 <p><h1 align="center">Lemon Game Engine</h1></p>
