@@ -3,6 +3,7 @@
 #include "type_erased_array.h"
 #include "world_primitives.h"
 
+#include <algorithm>
 #include <array>
 #include <unordered_map>
 #include <vector>
@@ -12,10 +13,10 @@ template<std::size_t PageSize = 128>
 class component_pool
 {
   public:
-    component_pool(componentid componentId, std::size_t componentSize);
+    component_pool(componentdef def);
 
     void* add_component(entityid entity);
-    void* add_component(entityid entity, void* component);
+    void* cadd_component(entityid entity, void* component);
     template<class T, class... Args>
     T& add_component(entityid entity, Args&&... args);
     template<class T>
@@ -40,9 +41,8 @@ class component_pool
     std::size_t get_count() const;
 
   private:
-    componentid componentId;
-    std::size_t componentSize;
-    std::vector<std::array<PageSize, uint32_t>> pages;
+    componentdef componentDef;
+    std::vector<std::array<uint32_t, PageSize>> pages;
     std::vector<entityid> entityArray;
     type_erased_array componentArray;
 
@@ -58,7 +58,7 @@ class component_pool
     void add_page()
     {
         pages.emplace_back();
-        pages.back().fill(null_entity);
+        pages.back().fill(entityid::null);
     }
     auto& entity_for(entityid entity)
     {
@@ -69,7 +69,8 @@ class component_pool
         if(diff >= 0)
         {
             pages.resize(pageid + 1ULL);
-            std::for_each(pages.end() - (diff + 1), pages.end(), [](auto& page) { page.fill(null_entity); });
+            std::for_each(pages.end() - (diff + 1), pages.end(),
+                          [](auto& page) { page.fill(entityid::null); });
         }
         return pages[pageid][index];
     }
@@ -84,8 +85,8 @@ class component_pool
 };
 
 template<std::size_t PageSize>
-component_pool<PageSize>::component_pool(componentid componentId, std::size_t componentSize):
-    componentId(componentId), componentSize(componentSize)
+component_pool<PageSize>::component_pool(componentdef def):
+    componentDef(def), componentArray(def.stride)
 {
 }
 
@@ -98,11 +99,11 @@ void* component_pool<PageSize>::add_component(entityid entity)
 }
 
 template<std::size_t PageSize>
-void* component_pool<PageSize>::add_component(entityid entity, void* component)
+void* component_pool<PageSize>::cadd_component(entityid entity, void* component)
 {
     entity_for(entity) = entityArray.size();
     entityArray.push_back(entity);
-    return componentArray.push(component);
+    return componentArray.cpush(component);
 }
 template<std::size_t PageSize>
 template<class T, class... Args>
@@ -204,6 +205,7 @@ const void* const component_pool<PageSize>::get_all() const
 {
     return componentArray.get();
 }
+template<std::size_t PageSize>
 std::size_t component_pool<PageSize>::get_count() const
 {
     return entityArray.size();

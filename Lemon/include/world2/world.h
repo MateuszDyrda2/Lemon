@@ -2,13 +2,19 @@
 
 #include "component_pool.h"
 
+#include <core/defines.h>
 #include <core/lemon_types.h>
 
 #include <atomic>
 #include <memory>
 
 namespace lemon {
-class world
+struct cquery
+{
+    void* elements;
+    int stride;
+};
+class LEMON_API world
 {
   public:
     static constexpr std::size_t PoolSize = 128;
@@ -17,12 +23,18 @@ class world
     template<class T>
     struct type
     {
-        inline static std::size_t id() { return reinterpret_cast<std::size_t>(&type::id); }
+        inline static componentid id() { return reinterpret_cast<componentid>(&type::id); }
+        static constexpr u32 stride() { return sizeof(T); }
+        inline static componentdef get()
+        {
+            return componentdef{ .id = id(), .stride = stride() };
+        }
     };
 
     entityid create();
     void destroy(entityid entity);
-    void* add(entityid entity, componentid component, std::size_t componentSize);
+    void* add(entityid entity, componentdef def);
+    void* add(entityid entity, void* componentValue, componentdef def);
     bool all(entityid entity, std::initializer_list<componentid> components);
     bool any(entityid entity, std::initializer_list<componentid> components);
     void remove(entityid entity, componentid component);
@@ -33,6 +45,7 @@ class world
     bool enable(entityid entity);
     bool disable(entityid entity);
     bool kill(entityid entity);
+    void* query(componentid component);
 
     template<class... Args>
     entityid create(Args&&... args);
@@ -73,7 +86,7 @@ entityid world::create(Args&&... args)
 template<class T>
 T& world::add(entityid entity)
 {
-    return add(entity, type<T>::id(), sizeof(T));
+    return *static_cast<T*>(add(entity, type<T>::get()));
 }
 
 template<class T, class... Args>
@@ -87,9 +100,8 @@ T& world::add(entityid entity, Args&&... args)
     }
     else
     {
-        auto res = pools.insert(std::make_pair(
-            component,
-            component_pool(component, sizeof(T)));
+        auto res = pools.emplace(
+            component, component_pool(component, sizeof(T)));
 
         return res.first->second.add_component<T>(entity, std::forward<Args>(args)...);
     }
@@ -105,9 +117,8 @@ T& world::add(entityid entity, const T& component)
     }
     else
     {
-        auto res = pools.insert(std::make_pair(
-            componentId,
-            component_pool(componentId, sizeof(T)));
+        auto res = pools.emplace(
+            componentId, component_pool(componentId, sizeof(T)));
 
         return res.first->second.add_component<T>(entity, component);
     }
@@ -124,9 +135,8 @@ T& world::add(entityid entity, T&& component)
     }
     else
     {
-        auto res = pools.insert(std::make_pair(
-            componentId,
-            component_pool(componentId, sizeof(T)));
+        auto res = pools.emplace(
+            componentId, component_pool(componentId, sizeof(T)));
 
         return res.first->second.add_component<T>(entity, std::move(component));
     }

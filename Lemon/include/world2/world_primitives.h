@@ -5,9 +5,13 @@
 #include <limits>
 
 namespace lemon {
-// using entityid                        = u32;
 using componentid = u32;
-// static constexpr entityid null_entity = std::numeric_limits<entityid>::max();
+
+struct componentdef
+{
+    componentid id;
+    u32 stride;
+};
 
 struct entityid
 {
@@ -29,17 +33,17 @@ struct entityid
     explicit constexpr entityid(type value):
         id(value), alive(1), enabled(1), version(0) { }
 
-    explicit operator bool()
+    explicit operator bool() const
     {
         return id != null;
     }
 
-    constexpr bool operator==(const entityid& other)
+    constexpr bool operator==(const entityid& other) const
     {
         return id == other.id && version == other.version;
     }
 
-    constexpr bool operator!=(const entityid& other)
+    constexpr bool operator!=(const entityid& other) const
     {
         return !(*this == other);
     }

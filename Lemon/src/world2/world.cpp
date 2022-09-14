@@ -19,49 +19,64 @@ void world::destroy(entityid entity)
         });
 }
 
-void* world::add(entityid entity, componentid component, std::size_t componentSize)
+void* world::add(entityid entity, componentdef def)
 {
-    if(auto iter = pools.find(component);
+    if(auto iter = pools.find(def.id);
        iter != pools.end())
     {
         return iter->second.add_component(entity);
     }
     else
     {
-        auto res = pools.insert(make_pair(
-            component,
-            component_pool(component, componentSize)));
-
+        auto res = pools.emplace(
+            def.id, component_pool(def));
         return res.first->second.add_component(entity);
+    }
+}
+
+void* world::add(entityid entity, void* element, componentdef def)
+{
+    if(auto iter = pools.find(def.id);
+       iter != pools.end())
+    {
+        return iter->second.cadd_component(entity, element);
+    }
+    else
+    {
+        auto res = pools.emplace(
+            def.id, component_pool(def));
+        return res.first->second.cadd_component(entity, element);
     }
 }
 
 bool world::all(entityid entity, std::initializer_list<componentid> components)
 {
-    std::all_of(
+    return std::all_of(
         components.begin(), components.end(),
         [entity, this](auto component) {
-            return pools[component].has_component(entity);
+            return pools.contains(component)
+                   && pools.at(component).has_component(entity);
         });
 }
 
 bool world::any(entityid entity, std::initializer_list<componentid> components)
 {
-    std::any_of(
+    return std::any_of(
         components.begin(), components.end(),
         [entity, this](auto component) {
-            return pools[component].has_component(entity);
+            return pools.contains(component)
+                   && pools.at(component).has_component(entity);
         });
 }
 
 void world::remove(entityid entity, componentid component)
 {
-    pools[component].remove_component(entity);
+    pools.at(component).remove_component(entity);
 }
 
 void* world::get(entityid entity, componentid component)
 {
-    return pools[component].get_component(entity);
+    return pools.at(component).get_component(entity);
 }
 
 entityid world::get_updated(entityid entity) const
@@ -71,12 +86,12 @@ entityid world::get_updated(entityid entity) const
 
 bool world::is_alive(entityid entity) const
 {
-    return entities[entity.id].alive;
+    return entities[entity.id].id != entityid::null && entities[entity.id].alive;
 }
 
 bool world::is_enabled(entityid entity) const
 {
-    return entities[entity.id].enabled;
+    return entities[entity.id].id != entityid::null && entities[entity.id].enabled;
 }
 
 bool world::enable(entityid entity)
@@ -119,5 +134,15 @@ entityid world::get_next()
 void world::remove_entity(entityid entity)
 {
     std::swap(entities[entity.id], next);
+}
+
+void* world::query(componentid component)
+{
+    if(auto iter = pools.find(component);
+       iter != pools.end())
+    {
+        return iter->second.get_all();
+    }
+    return nullptr;
 }
 }
