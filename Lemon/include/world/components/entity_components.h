@@ -22,4 +22,7 @@ struct LEMON_API [[lemon::component]] tag
 {
     [[lemon::field]] hash_str id;
 };
+
+LEMON_REFL(tag, id);
+LEMON_TAG(enabled_t);
 }

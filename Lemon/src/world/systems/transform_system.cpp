@@ -20,7 +20,7 @@ void transform_system::update()
     });
 
     _registry.view<dirty_t>().each(
-        [this](const auto ent) {
+        [this](const entity ent) {
             auto&& [_transform, _model] =
                 _registry.get<transform, model>(ent);
 

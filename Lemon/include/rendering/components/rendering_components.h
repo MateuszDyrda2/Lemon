@@ -15,4 +15,6 @@ struct LEMON_API
     [[lemon::field]] vec4 texCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
     [[lemon::field]] asset<texture> tex{};
 };
+
+LEMON_REFL(sprite_renderer, col, texCoords, tex);
 }

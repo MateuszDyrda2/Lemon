@@ -180,7 +180,7 @@ const Systems = () => {
           </>
         </div>
       </Container>
-      <Container header="Defined Systems" st={{ height: "40%", bottom: "0" }}>
+      <Container header="Defined Systems" st={{ height: "45%", bottom: "0" }}>
         <div className="def-lists">
           <>
             {systemDefs &&

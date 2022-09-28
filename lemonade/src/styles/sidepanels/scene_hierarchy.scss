@@ -7,40 +7,26 @@
   width: 100%;
 
   .entity {
-    &--hidden {
-      display: none;
-    }
     position: relative;
     overflow: hidden;
-    margin-left: 10px;
+    margin: 0px 10px;
 
-    .entity-container {
-      padding: 2px 4px;
-      display: flex;
-      flex-direction: row;
+    &:hover {
+      background-color: styles.$bg2;
+    }
+    &:active {
+      background-color: styles.$bg3;
+    }
 
-      &:hover {
-        background-color: styles.$bg2;
-      }
-      &:active {
-        background-color: styles.$bg3;
-      }
+    &--selected {
+      @extend .entity;
+      background-color: styles.$bg1;
+    }
 
-      &--selected {
-        @extend .entity-container;
-        background-color: styles.$bg1;
-      }
-
-      p {
-        margin: 0;
-        padding: 0 0 0 25px;
-        @extend .text-fg-ns--sm;
-      }
-
-      .entity-drop {
-        cursor: pointer;
-        position: absolute;
-      }
+    p {
+      margin: 0;
+      padding: 0 0 0 25px;
+      @extend .text-fg-ns--sm;
     }
   }
 }

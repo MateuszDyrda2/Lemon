@@ -26,6 +26,7 @@ project "Lemon"
     includedirs
     {
         "include/",
+        "generated/",
         includes["concurrentqueue"],
         includes["fmt"],
         includes["glad"],
@@ -67,3 +68,38 @@ project "Lemon"
         runtime "Release"
         optimize "On"
         symbols "Off"
+
+    filter 'files:**components.h'
+        -- message
+        buildmessage 'Generating serialization data for %{file.relpath}'
+
+        buildcommands {
+        'py.exe %{wks.location}/tools/export_components.py "_generated/types.json" "%{file.relpath}"'
+        }
+
+        buildoutputs {
+            '_generated/types.json'
+        }
+
+    filter 'files:**system.h'
+        -- message
+        buildmessage 'Generating serialization data for %{file.relpath}'
+
+        buildcommands {
+        'py.exe %{wks.location}/tools/export_systems.py "_generated/types.json" "%{file.relpath}"'
+        }
+
+        buildoutputs {
+            '_generated/types.json'
+        }
+
+    filter 'files:_generated/types.json'
+        buildmessage 'Generating _generated/components.h'
+
+        buildcommands {
+        'py.exe %{wks.location}/tools/write_component_file.py "%{file.relpath}" "_generated/components.h"'
+        }
+        buildoutputs {
+            '_generated/components.h'
+        }
+

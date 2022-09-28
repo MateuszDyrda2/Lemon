@@ -2,6 +2,7 @@
 
 #include <core/defines.h>
 #include <string>
+#include <world/reflection.h>
 #include <world/scene.h>
 
 #include <serialization/component_serializer.h>
@@ -43,8 +44,12 @@ struct LEMON_API output_archive
     template<class T>
     inline void operator()(entity ent, const T& component)
     {
+        writer.StartObject();
+        writer.Key("id");
         writer.Uint(static_cast<std::underlying_type_t<entity>>(ent));
+        writer.Key(reflection::component::name<T>());
         serialize_component<T>(component, writer);
+        writer.EndObject();
     }
 };
 

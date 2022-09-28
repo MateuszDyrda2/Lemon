@@ -20,37 +20,53 @@ void output_archive::start()
 void output_archive::end()
 {
     writer.EndArray();
+    writer.EndObject();
     writer.EndArray();
     writer.EndObject();
 }
 
 void output_archive::operator()(entity ent)
 {
+    writer.StartObject();
+    writer.Key("id");
     writer.Uint(static_cast<underlying_type_t<entity>>(ent));
+    writer.EndObject();
 }
 
 void output_archive::operator()(underlying_type_t<entity> size)
 {
-    if(!started)
+    switch(started)
     {
+    case 0:
         writer.Key("entities");
+        writer.StartObject();
+        writer.Key("count");
+        writer.Uint(size);
+        writer.Key("ids");
         writer.StartArray();
         ++started;
-    }
-    else if(started == 1)
-    {
+        break;
+    case 1:
         writer.EndArray();
-        writer.EndArray();
+        writer.EndObject();
+        writer.Key("components");
+        writer.StartArray();
+        writer.StartObject();
+        writer.Key("count");
+        writer.Uint(size);
         writer.Key("components");
         writer.StartArray();
         ++started;
-    }
-    else
-    {
+        break;
+    case 2:
         writer.EndArray();
+        writer.EndObject();
+        writer.StartObject();
+        writer.Key("count");
+        writer.Uint(size);
+        writer.Key("components");
+        writer.StartArray();
     }
-    writer.Uint(size);
-    writer.StartArray();
 }
 
 input_archive::input_archive(vector<char>& buffer):

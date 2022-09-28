@@ -14,7 +14,7 @@ const MIN_WIDTH = 50;
 function App() {
   const [currentTab, setTab] = useState<Tabs>(Tabs.None);
   const splitAppRef = createRef<HTMLDivElement>();
-  const [leftWidth, setLeftWidth] = useState<number | undefined>(200);
+  const [leftWidth, setLeftWidth] = useState<number | undefined>(300);
   const [separatorXPosition, setSeparatorXPosition] = useState<
     number | undefined
   >(undefined);

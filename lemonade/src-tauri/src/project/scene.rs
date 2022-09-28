@@ -1,9 +1,6 @@
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use serde_json::{from_str, Value};
-use std::fs;
-
-mod basic_types;
-use basic_types::BasicTypes;
+use std::{collections::HashMap, fs};
 
 pub mod types_dict;
 use types_dict::Types;
@@ -17,7 +14,7 @@ pub struct Stage {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entities {
     pub count: u32,
-    pub entities: Vec<u32>,
+    pub ids: Vec<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -33,23 +30,18 @@ pub struct Assets {
     pub shaders: Vec<Asset>,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct Field {
-    name: String,
-    values: Vec<BasicTypes>,
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Component {
-    name: String,
-    fields: Vec<Field>,
+    pub name: String,
+    pub count: u32,
+    pub entities: HashMap<u32, HashMap<String, Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Scene {
     pub systems: Vec<Stage>,
     pub entities: Entities,
-    pub components: Vec<Value>,
+    pub components: Vec<Component>,
     pub assets: Assets,
 }
 

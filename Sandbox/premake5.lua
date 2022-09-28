@@ -16,6 +16,7 @@ project "Sandbox"
     includedirs 
     {
         "%{wks.location}/Lemon/include",
+        "%{wks.location}/Lemon/_generated",
         includes["concurrentqueue"],
         includes["fmt"],
         includes["glm"],

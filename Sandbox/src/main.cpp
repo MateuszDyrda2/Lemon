@@ -6,7 +6,7 @@
 #include <world/systems/entity_system.h>
 #include <world/systems/transform_system.h>
 
-#include "../_generated/_components.h"
+#include <components.h>
 
 using namespace lemon;
 class Sandbox : public engine

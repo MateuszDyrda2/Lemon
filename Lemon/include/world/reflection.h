@@ -16,10 +16,9 @@
 #define PREFIX(...)                                        0, ##__VA_ARGS__
 
 #define LEMON_TAG(_class)                                       \
-    struct LEMON_API _class                                     \
+    template<>                                                  \
+    struct reflection::refl<_class>                             \
     {                                                           \
-      private:                                                  \
-        friend class reflection::component;                     \
         using field_n = std::integral_constant<std::size_t, 0>; \
         inline static const char* name()                        \
         {                                                       \
@@ -31,22 +30,23 @@
         }                                                       \
     };
 
-#define LEMON_REFL(_class, ...)                                                      \
-  private:                                                                           \
-    friend class reflection::component;                                              \
-    using field_n = std::integral_constant<std::size_t, GET_ARG_COUNT(__VA_ARGS__)>; \
-    inline static const char* name()                                                 \
-    {                                                                                \
-        return #_class;                                                              \
-    }                                                                                \
-    static constexpr hash_str nameid()                                               \
-    {                                                                                \
-        return hash_string(#_class);                                                 \
-    }                                                                                \
-    template<class T, std::size_t I>                                                 \
-    struct field;                                                                    \
-    REFL_N(_class, __VA_ARGS__)                                                      \
-  public:
+#define LEMON_REFL(_class, ...)                                                          \
+    template<>                                                                           \
+    struct reflection::refl<_class>                                                      \
+    {                                                                                    \
+        using field_n = std::integral_constant<std::size_t, GET_ARG_COUNT(__VA_ARGS__)>; \
+        inline static const char* name()                                                 \
+        {                                                                                \
+            return #_class;                                                              \
+        }                                                                                \
+        static constexpr hash_str nameid()                                               \
+        {                                                                                \
+            return hash_string(#_class);                                                 \
+        }                                                                                \
+        template<class T, std::size_t I>                                                 \
+        struct field;                                                                    \
+        REFL_N(_class, __VA_ARGS__)                                                      \
+    };
 
 #define REFL_FIELD(_class, _field, _i)            \
     template<class T>                             \
@@ -138,31 +138,45 @@ class system
     }
 };
 
+template<class T>
+struct refl
+{
+    using field_n = std::integral_constant<std::size_t, 0>;
+    inline static const char* name()
+    {
+        return "";
+    }
+    static constexpr hash_str nameid()
+    {
+        return 0;
+    }
+};
+
 class component
 {
   public:
     template<class T>
     inline static const char* name()
     {
-        return T::name();
+        return typename refl<T>::name();
     }
 
     template<class T>
     static constexpr hash_str nameid()
     {
-        return T::nameid();
+        return typename refl<T>::nameid();
     }
 
     template<class T>
     static consteval std::size_t field_n()
     {
-        return T::field_n::value;
+        return refl<T>::field_n::value;
     }
 
     template<std::size_t I, class T>
     static constexpr decltype(auto) get_field(T& comp)
     {
-        using field = typename T::template field<T, I>;
+        using field = typename refl<T>::template field<T, I>;
         field f(comp);
         return f.get();
     }
@@ -170,31 +184,38 @@ class component
     template<std::size_t I, class T>
     static constexpr decltype(auto) get_field(const T& comp)
     {
-        using field = typename T::template field<const T, I>;
+        using field = typename refl<T>::template field<const T, I>;
         const field f(comp);
         return f.get();
     }
 
-    template<class T, class F, std::size_t I = 0>
-    static void for_each(T& comp, F&& callable) requires(I < T::field_n::value)
+    template<std::size_t I, class T>
+    static const char* get_field_name()
     {
-        callable(get_field<I, T>(comp));
+        using field = typename refl<T>::template field<T, I>;
+        return field::name();
+    }
+
+    template<class T, class F, std::size_t I = 0>
+    static void for_each(T& comp, F&& callable) requires(I < refl<T>::field_n::value)
+    {
+        callable(get_field<I, T>(comp), get_field_name<I, T>());
         for_each<T, F, I + 1>(comp, std::forward<F>(callable));
     }
 
     template<class T, class F, std::size_t I = 0>
-    static void for_each(T& comp, F&& callable) requires(I == T::field_n::value)
+    static void for_each(T& comp, F&& callable) requires(I == refl<T>::field_n::value)
     { }
 
     template<class T, class F, std::size_t I = 0>
-    static void for_each(const T& comp, F&& callable) requires(I < T::field_n::value)
+    static void for_each(const T& comp, F&& callable) requires(I < refl<T>::field_n::value)
     {
-        callable(get_field<I, T>(comp));
+        callable(get_field<I, T>(comp), get_field_name<I, T>());
         for_each<T, F, I + 1>(comp, std::forward<F>(callable));
     }
 
     template<class T, class F, std::size_t I = 0>
-    static void for_each(const T& comp, F&& callable) requires(I == T::field_n::value)
+    static void for_each(const T& comp, F&& callable) requires(I == refl<T>::field_n::value)
     { }
 };
 

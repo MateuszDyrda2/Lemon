@@ -1,36 +1,18 @@
 import "../../styles/sidepanels/scene_hierarchy.scss";
 
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs } from "../../props/tabs";
 import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 import { actionCreators } from "../../state";
 import { State } from "../../state/reducers";
 import Container from "./container";
+import { invoke } from "@tauri-apps/api/tauri";
 
 interface Entity {
   id: number;
   name: string;
-  children: Entity[];
 }
-
-const entities: Entity[] = [
-  { id: 0, name: "mainCamera", children: [] },
-  {
-    id: 1,
-    name: "player",
-    children: [
-      {
-        id: 2,
-        name: "sword",
-        children: [{ id: 4, name: "tip", children: [] }],
-      },
-      { id: 3, name: "shield", children: [] },
-    ],
-  },
-];
 
 const sceneName = "Sandbox";
 
@@ -41,40 +23,27 @@ interface Props {
 const SceneHierarchy = ({ setTab }: Props) => {
   const dispatch = useDispatch();
   const { selectEntity } = bindActionCreators(actionCreators, dispatch);
+  const [entities, setEntities] = useState<Entity[] | undefined>(undefined);
 
   const entityPressed = (ent: Entity) => selectEntity(ent.id);
   const state = useSelector((state: State) => state.entity);
 
   const entityDoublePressed = (ent: Entity) => setTab(Tabs.Components);
+  useEffect(() => {
+    invoke("get_entities")
+      .then((value) => setEntities(value as Entity[]))
+      .catch((err) => console.log(err));
+  });
 
-  const Ent = (ent: Entity, expFromParent: boolean) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+  const Ent = (ent: Entity) => {
     return (
-      <div className={expFromParent ? "entity" : "entity--hidden"} key={ent.id}>
-        <div
-          className={
-            ent.id === state ? "entity-container--selected" : "entity-container"
-          }
-          onDoubleClick={() => entityDoublePressed(ent)}
-          onClick={() => entityPressed(ent)}
-        >
-          {ent.children.length !== 0 &&
-            (!isExpanded ? (
-              <ArrowDropDownIcon
-                className="entity-drop"
-                fontSize="small"
-                onClick={() => setIsExpanded(true)}
-              />
-            ) : (
-              <ArrowDropUpIcon
-                className="entity-drop"
-                fontSize="small"
-                onClick={() => setIsExpanded(false)}
-              />
-            ))}
-          <p>{ent.name}</p>
-        </div>
-        {ent.children.map((key, index) => Ent(key, isExpanded))}
+      <div
+        className={ent.id == state ? "entity--selected" : "entity"}
+        key={ent.id}
+        onClick={() => entityPressed(ent)}
+        onDoubleClick={() => entityDoublePressed(ent)}
+      >
+        <p>{ent.name}</p>
       </div>
     );
   };
@@ -82,7 +51,7 @@ const SceneHierarchy = ({ setTab }: Props) => {
   return (
     <Container header={sceneName}>
       <div className="entities-list">
-        {entities.map((key, index) => Ent(key, true))}
+        {entities && entities.map((key, index) => Ent(key))}
       </div>
     </Container>
   );

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, Result};
-use std::fs;
+use std::{collections::HashMap, fs};
 
 #[derive(Deserialize, Debug)]
 #[serde(untagged, rename_all = "lowercase")]
@@ -64,9 +64,9 @@ pub struct ComponentModel {
 
 #[derive(Deserialize, Debug)]
 pub struct Types {
-    pub stages: Vec<StageModel>,
-    pub systems: Vec<SystemModel>,
-    pub components: Vec<ComponentModel>,
+    pub stages: HashMap<u32, String>,
+    pub systems: HashMap<u32, String>,
+    pub components: HashMap<String, HashMap<String, String>>,
 }
 
 fn read_types_file(path: &str) -> Result<Types> {

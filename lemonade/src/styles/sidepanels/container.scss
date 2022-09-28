@@ -9,7 +9,7 @@
   flex-direction: column;
 
   .header {
-    background-color: styles.$fg1;
+    background-color: styles.$bg0_h;
     width: 100%;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -20,7 +20,7 @@
       margin: 0;
       text-align: center;
       @extend .text-fg-ns--md;
-      color: styles.$bg0_s;
+      color: styles.$fg0;
     }
   }
 }

@@ -15,9 +15,6 @@ project "Unit"
         "core/logger_test.cpp",
         "events/events_test.cpp",
         "threading/scheduler_test.cpp",
-        "world/component_pool_test.cpp",
-        "world/type_erased_array_test.cpp",
-        "world/world_test.cpp",
     }
 
     targetdir ("%{wks.location}/build/%{prj.name}")

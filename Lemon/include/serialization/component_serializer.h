@@ -11,19 +11,20 @@ namespace lemon {
 template<class T>
 inline void serialize_component(const T& component, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-    writer.StartArray();
+    writer.StartObject();
     {
-        // reflection::component::for_each(component, [&](const auto& field) {
-        //     serialize(field, writer);
-        // });
+        reflection::component::for_each(component, [&](const auto& field, const char* name) {
+            writer.Key(name);
+            serialize(field, writer);
+        });
     }
-    writer.EndArray();
+    writer.EndObject();
 }
 template<class T>
 inline void deserialize_component(T& component, rapidjson::Value::ConstMemberIterator& iter)
 {
-    // reflection::component::for_each(component, [&](auto& field) {
-    //     deserialize(field, iter->value);
-    // });
+    reflection::component::for_each(component, [&](auto& field, const char* name) {
+        deserialize(field, iter->value);
+    });
 }
 }
