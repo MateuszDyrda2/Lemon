@@ -1,3 +1,6 @@
+/** @file scene.h
+ * @brief Class representing a scene
+ */
 #pragma once
 
 #include "service_container.h"
@@ -14,6 +17,7 @@
 #include <vector>
 
 namespace lemon {
+/** @brief Execution stage of a system */
 enum class execution_stage
 {
     early_update,

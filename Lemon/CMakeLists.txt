@@ -9,7 +9,6 @@ set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_
 
 # ---------------- Description -----------------
 set(lemon_DESC "2D game engine written in C++")
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(Lemon DESCRIPTION ${lemon_DESC} LANGUAGES CXX)
 # ----------------------------------------------

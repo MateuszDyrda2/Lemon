@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.22)
 
+# ---------- Unit test project -----------
 project(Unit)
+# ----------------------------------------
 
+# ----------------------------------------
 set(CMAKE_CXX_STANDARD 20)
+# ----------------------------------------
 
+# ----------------------------------------
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# ----------------------------------------
 
 enable_testing()
 add_subdirectory(googletest)
 
+# ----------------------------------------
 include(GoogleTest)
 set(TEST_LIST
     assets/assets_test.cpp
@@ -24,4 +31,5 @@ target_link_libraries(lemon_tests
     lemon::lemon
 )
 gtest_discover_tests(lemon_tests)
+# ----------------------------------------
 
