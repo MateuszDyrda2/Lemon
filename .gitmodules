@@ -1,6 +1,3 @@
-[submodule "tests/googletest"]
-	path = Lemon/libs/googletest
-	url = https://github.com/google/googletest.git
 [submodule "Lemon/LemonCore/libs/rapidjson"]
 	path = Lemon/libs/rapidjson
 	url = https://github.com/Tencent/rapidjson.git

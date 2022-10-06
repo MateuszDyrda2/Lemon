@@ -11,9 +11,9 @@
 
 #define CONCAT(arg1, arg2) arg1##arg2
 #define ARG_NAME(arg)      CONCAT(_, arg)
-#define LOCATOR_NAME(arg)  CONCAT(locator., ARG_NAME(arg))
+#define LOCATOR_NAME(arg)  locator.ARG_NAME(arg)
 
-#define ARGUMENT(arg) CONCAT(arg&, ARG_NAME(arg))
+#define ARGUMENT(arg) arg& ARG_NAME(arg)
 
 #define SYSTEM0(_NAME)                              \
     _NAME(service_container&& locator): _NAME() { } \
@@ -41,21 +41,36 @@
 
 #define GET_MACRO(_0, _1, _2, _3, _4, _5, NAME, ...) NAME
 #define EXPAND(x)                                    x
-#define SYSTEM(_NAME, ...)                                                                              \
-    struct refl                                                                                         \
-    {                                                                                                   \
-        refl()                                                                                          \
-        {                                                                                               \
-            detail::system_registry::systems()[hash_string(#_NAME)] = &_NAME::create;                   \
-        }                                                                                               \
-    } _refl;                                                                                            \
-    inline static const char* name() { return #_NAME; }                                                 \
-    inline static constexpr hash_str nameid() { return hash_string(#_NAME); }                           \
-    const char* get_name() const override { return name(); }                                            \
-    hash_str get_nameid() const override { return nameid(); }                                           \
-    inline static system* create(service_container&& locator) { return new _NAME(std::move(locator)); } \
-    EXPAND(GET_MACRO(_0, __VA_ARGS__, SYSTEM5, SYSTEM4, SYSTEM3, SYSTEM2, SYSTEM1, SYSTEM0))            \
-    EXPAND((_NAME, __VA_ARGS__))
+#define SYSTEM(_NAME, ...)                                                            \
+    struct refl                                                                       \
+    {                                                                                 \
+        refl()                                                                        \
+        {                                                                             \
+            detail::system_registry::systems()[hash_string(#_NAME)] = &_NAME::create; \
+        }                                                                             \
+    } _refl;                                                                          \
+    inline static const char* name()                                                  \
+    {                                                                                 \
+        return #_NAME;                                                                \
+    }                                                                                 \
+    inline static constexpr hash_str nameid()                                         \
+    {                                                                                 \
+        return hash_string(#_NAME);                                                   \
+    }                                                                                 \
+    const char* get_name() const override                                             \
+    {                                                                                 \
+        return name();                                                                \
+    }                                                                                 \
+    hash_str get_nameid() const override                                              \
+    {                                                                                 \
+        return nameid();                                                              \
+    }                                                                                 \
+    inline static system* create(service_container&& locator)                         \
+    {                                                                                 \
+        return new _NAME(std::move(locator));                                         \
+    }                                                                                 \
+    GET_MACRO(_0, __VA_ARGS__, SYSTEM5, SYSTEM4, SYSTEM3, SYSTEM2, SYSTEM1, SYSTEM0)  \
+    (_NAME, __VA_ARGS__)
 
 namespace lemon {
 struct LEMON_API service_container

@@ -5,6 +5,7 @@ project "Lemon"
     language "C++"
     cppdialect "C++20"
     dependson { "fmt", "glm", "glfw" }
+    location ("../build/Lemon")
     
     targetdir ("%{wks.location}/build/%{prj.name}")
     objdir ("%{wks.location}/build/obj/%{prj.name}")
@@ -15,6 +16,7 @@ project "Lemon"
     {
         {"{COPY} %{cfg.buildtarget.relpath} %{wks.location}/build/Sandbox"},
         {"{COPY} %{cfg.buildtarget.relpath} %{wks.location}/build/Unit"},
+        {'%{python} %{wks.location}/tools/write_component_file.py "%{wks.location}/Lemon/_generated" "%{wks.location}/Lemon/_generated/types.json"'}
     }
 
     files
@@ -52,9 +54,11 @@ project "Lemon"
             "LEMON_EXPORTS"
         }
         buildoptions { "/wd4251" }
+        python = 'py.exe'
 
     elseif os.ishost("linux") then
         defines { "LEMON_LINUX" }
+        python = 'python3'
     end
 
     filter "configurations:Debug"
@@ -74,11 +78,11 @@ project "Lemon"
         buildmessage 'Generating serialization data for %{file.relpath}'
 
         buildcommands {
-        'py.exe %{wks.location}/tools/export_components.py "_generated/types.json" "%{file.relpath}"'
+        '%{python} %{wks.location}/tools/export_components.py "%{wks.location}/Lemon/_generated/%{file.basename}.json" "%{file.relpath}"'
         }
 
         buildoutputs {
-            '_generated/types.json'
+            '_generated/%{file.basename}.json'
         }
 
     filter 'files:**system.h'
@@ -86,20 +90,9 @@ project "Lemon"
         buildmessage 'Generating serialization data for %{file.relpath}'
 
         buildcommands {
-        'py.exe %{wks.location}/tools/export_systems.py "_generated/types.json" "%{file.relpath}"'
+        '%{python} %{wks.location}/tools/export_systems.py "%{wks.location}/Lemon/_generated/%{file.basename}.json" "%{file.relpath}"'
         }
 
         buildoutputs {
-            '_generated/types.json'
+            '_generated/%{file.basename}.json'
         }
-
-    filter 'files:_generated/types.json'
-        buildmessage 'Generating _generated/components.h'
-
-        buildcommands {
-        'py.exe %{wks.location}/tools/write_component_file.py "%{file.relpath}" "_generated/components.h"'
-        }
-        buildoutputs {
-            '_generated/components.h'
-        }
-

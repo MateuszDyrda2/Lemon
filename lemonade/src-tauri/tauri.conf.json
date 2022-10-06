@@ -68,7 +68,15 @@
         "width": 1080,
         "height": 720,
         "resizable": true,
-        "title": "Lemonade"
+        "title": "Lemonade",
+        "visible": false
+      },
+      {
+        "width": 400,
+        "height": 200,
+        "decorations": false,
+        "url": "splashscreen.html",
+        "label": "splashscreen"
       }
     ]
   }

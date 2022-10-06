@@ -6,10 +6,16 @@ import reportWebVitals from "./reportWebVitals";
 import "./fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf";
 import { Provider } from "react-redux";
 import { store } from "./state/index";
+import { invoke } from "@tauri-apps/api/tauri";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+document.addEventListener("DOMContentLoaded", () => {
+  invoke("close_splashscreen");
+  console.log("loaded");
+});
+
 root.render(
   <React.StrictMode>
     <Provider store={store}>

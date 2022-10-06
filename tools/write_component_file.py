@@ -1,3 +1,4 @@
+import glob
 import json
 import sys
 import time
@@ -7,24 +8,26 @@ def main(argv):
     startTime: float = time.time()
     srcPath: str = argv[1]
     outPath: str = argv[2]
-    includeString: str = "#include <{}>\n"
+    components = {}
+    systems = {}
+    stages = {0: "earlyUpdate", 1: "update", 2: "lateUpdate", 3: "render"}
 
-    with open(srcPath, 'r') as f:
-        data = json.load(f)
-        componentList = data['components'].keys()
-        includeList = [includeString.format(
-            include) for include in data['includes']]
+    componentFiles = glob.glob(srcPath + "/*components*")
+    systemFiles = glob.glob(srcPath + "/*system*")
 
-        fileString: str = """#pragma once
-        #include <serialization/scene_serializer.h>
-        {}
-        namespace lemon {{
-            static component_list_t<{}> componentList;
-        }}
-        """.format(''.join(includeList), ','.join(componentList))
+    for componentFile in componentFiles:
+        with open(componentFile, 'r') as f:
+            data = json.load(f)
+            components.update(data)
 
-        with open(outPath, 'w') as w:
-            w.write(fileString)
+    for systemFile in systemFiles:
+        with open(systemFile, 'r') as f:
+            data = json.load(f)
+            systems.update(data)
+
+    with open(outPath, 'w') as f:
+        json.dump({'stages': stages, 'systems': systems,
+                  'components': components}, f, indent=2)
 
     print('Execution took {:.2}s'.format(time.time() - startTime))
 

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import CloseIcon from "@mui/icons-material/Close";
@@ -52,26 +52,34 @@ const RenderObject = ({ obj }: ObjectProps) => {
 };
 
 const Field = ({ name, value }: field) => {
-  const [val, setVal] = useState<unknown>(value);
   return (
     <div className="field">
       <p>{name}</p>
       <div className="values">
-        <RenderObject obj={val as object} />
+        <RenderObject obj={value as object} />
       </div>
     </div>
   );
 };
 
 const Component = ({ name, fields }: ComponentProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const onExpand = useCallback(() => setExpanded(!expanded), [expanded]);
+
   return (
     <div className="component">
-      <div className="component-name">
-        <ArrowDropDownIcon className="drop-icon" />
+      <div className="component-name" onClick={onExpand}>
+        {expanded ? (
+          <ArrowDropUpIcon className="drop-icon" />
+        ) : (
+          <ArrowDropDownIcon className="drop-icon" />
+        )}
         <p>{name}</p>
         <CloseIcon className="close-icon" />
       </div>
-      <div className="component-values">
+      <div
+        className={expanded ? "component-values" : "component-values--hidden"}
+      >
         {Object.keys(fields).map((key, index) => (
           <Field name={key} value={fields[key]} />
         ))}

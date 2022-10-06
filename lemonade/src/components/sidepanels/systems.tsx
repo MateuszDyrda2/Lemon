@@ -105,7 +105,7 @@ const Systems = () => {
     const onExpand = useCallback(() => {
       (systemlist as SystemContainer[])[k].systems.length !== 0 &&
         setExpanded(!expanded);
-    }, [expanded]);
+    }, [expanded, k]);
 
     return (
       <div key={k} className="stage-group">

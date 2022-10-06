@@ -3,6 +3,7 @@
 #include "../texture.h"
 
 #include <assets/asset.h>
+#include <core/hash_string.h>
 #include <core/math/color.h>
 #include <core/math/vec4.h>
 #include <world/reflection.h>

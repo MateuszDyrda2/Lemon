@@ -1,21 +1,8 @@
 import "../styles/assets.scss";
-import { invoke } from "@tauri-apps/api/tauri";
 import React from "react";
 import FolderIcon from "@mui/icons-material/Folder";
 
-interface path {
-  name: string;
-  path: string;
-}
-interface AssetData {
-  textures: path[];
-  sounds: path[];
-  shaders: path[];
-}
-
 const Assets = () => {
-  const [assets, setAssets] = React.useState<AssetData | undefined>(undefined);
-
   return (
     <div className="assets">
       <div className="grid-parent">

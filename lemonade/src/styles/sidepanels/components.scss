@@ -47,24 +47,30 @@
       }
 
       .component-values {
-        display: flex;
-        flex-direction: column;
+        &--hidden {
+          display: none;          
+        }
+
         .field {
+          overflow: hidden;
+
           p {
             @extend .text-fg-ns--sm;
             padding-left: 10px;
-            float: left;
+            float:left;
           }
 
           .values {
-            float: left;
             margin: 10px 20px;
+            overflow: hidden;
+            float:right;
 
             .object {
-              width: 3rem;
+              display: inline;
 
               input {
-                width: 100%;
+                margin: 2px;
+                width: 4rem;
                 @extend .text-fg--sm;
 
                 &::-webkit-outer-spin-button,

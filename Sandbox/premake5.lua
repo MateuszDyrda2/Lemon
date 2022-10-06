@@ -5,6 +5,7 @@ project "Sandbox"
 
     targetdir ("%{wks.location}/build/%{prj.name}")
     objdir ("%{wks.location}/build/obj/%{prj.name}")
+    location ("../build/Sandbox")
 
     files 
     { 

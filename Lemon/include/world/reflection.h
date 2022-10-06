@@ -2,6 +2,8 @@
 
 #include "scene.h"
 
+#include <core/hash_string.h>
+
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -69,9 +71,9 @@
         }                                         \
     };
 
-#define REFL_N(_comp, ...)                                                                                                             \
-    EXP(GET_REFL(_0, ##__VA_ARGS__, REFL_11, REFL_10, REFL_9, REFL_8, REFL_7, REFL_6, REFL_5, REFL_4, REFL_3, REFL_2, REFL_1, REFL_0)) \
-    EXP((_comp, ##__VA_ARGS__))
+#define REFL_N(_comp, ...)                                                                                                        \
+    GET_REFL(_0, ##__VA_ARGS__, REFL_11, REFL_10, REFL_9, REFL_8, REFL_7, REFL_6, REFL_5, REFL_4, REFL_3, REFL_2, REFL_1, REFL_0) \
+    (_comp, ##__VA_ARGS__)
 
 #define GET_REFL(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, NAME, ...) NAME
 

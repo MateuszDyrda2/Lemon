@@ -38,7 +38,7 @@ const SceneHierarchy = ({ setTab }: Props) => {
   const Ent = (ent: Entity) => {
     return (
       <div
-        className={ent.id == state ? "entity--selected" : "entity"}
+        className={ent.id === state ? "entity--selected" : "entity"}
         key={ent.id}
         onClick={() => entityPressed(ent)}
         onDoubleClick={() => entityDoublePressed(ent)}

@@ -18,7 +18,7 @@ def djb2(str):
 def save_definitions(jsonPath, systems, filepath):
     if not os.path.exists(jsonPath):
         stages = {0: "earlyUpdate", 1: "update", 2: "lateUpdate", 3: "render"}
-        with open(jsonPath, 'w') as f:
+        with open(jsonPath, 'w+') as f:
             json.dump({'stages': stages, 'systems': {}, 'includes': [],
                       'components': {}}, f, indent=2)
 
@@ -44,7 +44,8 @@ def main(argv):
             nameid = djb2(name)
             systems[nameid] = name
 
-    save_definitions(jsonPath, systems, srcPath)
+    with open(jsonPath, 'w+') as f:
+        json.dump(systems, f)
 
 
 if __name__ == '__main__':

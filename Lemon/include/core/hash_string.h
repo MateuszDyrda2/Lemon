@@ -36,7 +36,7 @@ static consteval hash_str hash_string_impl(const char* str, hash_str val) noexce
  * @param str null terminated string
  * @return hashed id
  */
-[[nodiscard]] static hash_str hash_string_d(const char* str) noexcept
+[[nodiscard]] static __attribute__ ((unused)) hash_str hash_string_d(const char* str) noexcept
 {
     if(*str == 0) return 0;
     hash_str hash = 5381;

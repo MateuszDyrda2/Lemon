@@ -10,21 +10,7 @@
     "4124121830": "entity_system",
     "2282876357": "transform_system"
   },
-  "includes": [
-    "rendering\\components\\rendering_components.h",
-    "world\\components\\entity_components.h",
-    "world\\components\\transform_components.h"
-  ],
   "components": {
-    "sprite_renderer": {
-      "col": "color",
-      "texCoords": "vec4",
-      "tex": "asset<texture>"
-    },
-    "enabled_t": {},
-    "tag": {
-      "id": "hash_str"
-    },
     "transform": {
       "position": "vec2",
       "scale": "vec2",
@@ -41,6 +27,15 @@
     "camera": {
       "viewport": "vec4",
       "size": "f32"
+    },
+    "enabled_t": {},
+    "tag": {
+      "id": "hash_str"
+    },
+    "sprite_renderer": {
+      "col": "color",
+      "texCoords": "vec4",
+      "tex": "asset<texture>"
     }
   }
 }

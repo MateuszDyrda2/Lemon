@@ -81,7 +81,7 @@ void scene_serializer::serialize(scene* scene, const std::string& path, componen
     output.start();
     snapshot
         .entities(output)
-        .component<Args...>(output);
+        .template component<Args...>(output);
     output.end();
 
     std::ofstream f;
@@ -96,7 +96,7 @@ registry&& scene_serializer::deserialize(const std::string& path, component_list
     std::ifstream file;
     file.open(path, std::ios::binary | std::ios::in | std::ios::ate);
     std::size_t size = file.tellg();
-    file.seekg(file.beg, 0);
+    file.seekg(0, file.beg);
     std::vector<char> buffer(size);
     file.read(buffer.data(), size);
     file.close();
@@ -107,7 +107,7 @@ registry&& scene_serializer::deserialize(const std::string& path, component_list
     entt::basic_snapshot_loader loader(reg);
     loader
         .entities(input)
-        .component<Args...>(input)
+        .template component<Args...>(input)
         .orphans();
 
     return std::move(reg);
