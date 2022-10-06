@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
 
-# -------  --------------------------
+# -------------- Library version ---------------
 set(lemon_VERSION_MAJOR 0)
 set(lemon_VERSION_MINOR 1)
 set(lemon_VERSION_PATCH 0)
 set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_PATCH})
 # ----------------------------------------------
 
+# ---------------- Description -----------------
 set(lemon_DESC "2D game engine written in C++")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -25,6 +26,7 @@ option(LEMON_PROFILE "Profile execution" ON)
 find_package(Python COMPONENTS Interpreter)
 # ----------------------------------------------
 find_package(Threads REQUIRED)
+# ----------------------------------------------
 
 # ------------- Platform specific --------------
 if (WIN32)
@@ -37,8 +39,6 @@ elseif (UNIX)
     # platform linux
     set(LEMON_PLATFORM LEMON_LINUX)
 endif()
-# ----------------------------------------------
-
 # ----------------------------------------------
 
 # --------------- Add library ------------------
@@ -91,15 +91,16 @@ add_library(lemon ${lemon_SRC})
 add_library(lemon::lemon ALIAS lemon)
 target_include_directories(lemon PUBLIC include/)
 target_link_libraries(lemon
-    PUBLIC Threads::Threads
-    PUBLIC concurrentqueue
-    PUBLIC fmt
-    PUBLIC glad
-    PUBLIC glm::glm
-    PUBLIC glfw
-    PUBLIC rapidjson
-    PUBLIC stb
-    PUBLIC EnTT::EnTT
+  PUBLIC
+    Threads::Threads
+    concurrentqueue
+    fmt
+    glad
+    glm::glm
+    glfw
+    rapidjson
+    stb
+    EnTT::EnTT
 )
 # ----------------------------------------------
 
@@ -108,17 +109,19 @@ target_compile_features(lemon PUBLIC cxx_std_20)
 set_target_properties(lemon PROPERTIES CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
-    target_compile_options(lemon PUBLIC
+    target_compile_options(lemon
+      PUBLIC
         "/W4" "/Zc:preprocessor" "$<$<CONFIG:Debug>:/O2>"
     )
 else()
-    target_compile_options(lemon PUBLIC
+    target_compile_options(lemon 
+      PUBLIC
         "-Wall" "-Wextra" "-Wformat=2" "-Wunused" "-fvisibility=hidden" "-Wno-attributes" "$<$<CONFIG:Debug>:-O3>"
     )
 endif(MSVC)
 
-target_compile_definitions(
-    lemon PUBLIC
+target_compile_definitions(lemon 
+  PUBLIC
     "$<$<CONFIG:Debug>:LEMON_DEBUG>"
     "${LEMON_PLATFORM}"
     "$<$<BOOL:${LEMON_PROFILE}>:LEMON_PROFILE>"
@@ -187,15 +190,10 @@ add_systems(
     "include/world/systems/transform_system.h"
     "include/rendering/systems/rendering_system.h"
 )
-
 # ----------------------------------------------
 
 
 # ---------------- Post build ------------------
-#add_custom_command(TARGET lemon POST_BUILD
-    #COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/write_component_file.py "${CMAKE_CURRENT_SOURCE_DIR}/_generated" "${CMAKE_CURRENT_SOURCE_DIR}/_generated/types.json"
-    #COMMENT "Generated types.json"
-#)
 add_custom_command(
     OUTPUT _generated/types.json
     DEPENDS ${COMPONENT_DEFINITIONS} ${SYSTEM_DEFINITIONS}
@@ -203,7 +201,6 @@ add_custom_command(
     COMMENT "Generated types.json"
 )
 add_custom_target(lemon_generated ALL DEPENDS _generated/types.json)
-
 # ----------------------------------------------
 
 

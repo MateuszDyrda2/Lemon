@@ -16,3 +16,6 @@
 [submodule "Lemon/libs/entt"]
 	path = Lemon/libs/entt
 	url = https://github.com/skypjack/entt.git
+[submodule "tests/googletest"]
+	path = tests/googletest
+	url = https://github.com/google/googletest.git

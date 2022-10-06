@@ -21,7 +21,4 @@ target_include_directories(rapidjson INTERFACE rapidjson/include/)
 
 add_subdirectory(stb)
 
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-add_subdirectory(googletest)
-
 add_subdirectory(entt)
