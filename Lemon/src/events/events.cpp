@@ -1,7 +1,5 @@
 #include <events/events.h>
 
-#include <core/logger.h>
-
 namespace lemon {
 event_queue::listener_handle::listener_handle():
     listeners{}, iter{}

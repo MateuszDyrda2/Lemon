@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assets/asset.h>
+#include <core/defines.h>
 #include <events/events.h>
 #include <platform/window.h>
 #include <threading/scheduler.h>
@@ -9,9 +10,8 @@
 
 #include <unordered_map>
 
-#define CONCAT(arg1, arg2) arg1##arg2
-#define ARG_NAME(arg)      CONCAT(_, arg)
-#define LOCATOR_NAME(arg)  locator.ARG_NAME(arg)
+#define ARG_NAME(arg)     CONCAT(_, arg)
+#define LOCATOR_NAME(arg) locator.ARG_NAME(arg)
 
 #define ARGUMENT(arg) arg& ARG_NAME(arg)
 
@@ -40,7 +40,6 @@
     _NAME(ARGUMENT(_1), ARGUMENT(_2), ARGUMENT(_3), ARGUMENT(_4), ARGUMENT(_5))
 
 #define GET_MACRO(_0, _1, _2, _3, _4, _5, NAME, ...) NAME
-#define EXPAND(x)                                    x
 #define SYSTEM(_NAME, ...)                                                            \
     struct refl                                                                       \
     {                                                                                 \

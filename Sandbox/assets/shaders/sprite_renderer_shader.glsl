@@ -23,6 +23,6 @@ uniform vec4 spriteColor;
 
 void main()
 {
-    color = spriteColor * texture(image, TexCoords);
+    color = texture(image, TexCoords) * spriteColor;
 }
 #endif

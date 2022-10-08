@@ -1,11 +1,7 @@
 #include <engine/engine.h>
 
-#include <core/hash_string.h>
-#include <core/lemon_types.h>
-#include <core/logger.h>
-
 namespace lemon {
-engine::engine(int argc, char** argv, const std::string& assetPath):
+engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
     _eventQueue{}, _window("engine", { 1080, 720 }),
     _input(_window, _eventQueue), _renderingContext{},
     _assertStorage(assetPath),

@@ -18,7 +18,7 @@ def main(argv):
                 filepaths[n].append({"name": _name, "path": _path})
 
     with open(os.path.join(argv[1], 'assets.json'), 'w') as outfile:
-        outfile.write(json.dumps(filepaths))
+        outfile.write(json.dumps(filepaths, indent=4))
 
 
 if __name__ == "__main__":

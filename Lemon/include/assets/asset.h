@@ -121,17 +121,18 @@ class LEMON_API asset_storage
 template<class T>
 asset<T> asset_storage::get_asset(hash_str nameid)
 {
-    if(auto res = cachedAssets.find(nameid); res != cachedAssets.end())
+    lemon_assert(nameid);
+    auto res = cachedAssets.find(nameid);
+    if(res == cachedAssets.end() && loader->resource_exists(nameid))
     {
-        res->second->increment();
-        return asset<T>(nameid, this);
-    }
-    else if(loader->resource_exists(nameid))
-    {
+        lemon_assert(loader->resource_exists(nameid));
+
         cachedAssets.insert(std::make_pair(nameid, loader->load_resource<T>(nameid)));
         return asset<T>(nameid, this);
     }
-    logger::fatal("Resource {} not found", nameid);
+
+    res->second->increment();
+    return asset<T>(nameid, this);
 }
 template<class T>
 T* asset_storage::get_mock_asset() const
@@ -142,14 +143,12 @@ T* asset_storage::get_mock_asset() const
 template<class T>
 T* asset_storage::get_asset_ptr(hash_str nameid) const
 {
-    if(auto res = cachedAssets.find(nameid); res != cachedAssets.end())
-    {
-        return static_cast<T*>(res->second.get());
-    }
-    else
-    {
-        return get_mock_asset<T>();
-    }
+    if(!nameid) return nullptr;
+
+    auto res = cachedAssets.find(nameid);
+    if(res == cachedAssets.end()) return get_mock_asset<T>();
+
+    return static_cast<T*>(res->second.get());
 }
 template<class T>
 asset<T>::asset():
@@ -161,7 +160,7 @@ asset<T>::asset(hash_str name, asset_storage* storage):
 { }
 template<class T>
 asset<T>::asset(const asset<T>& other):
-    storage(other.storage), res(storage->clone_asset(other.res))
+    storage(other.storage), res(storage ? storage->clone_asset(other.res) : other.res)
 { }
 template<class T>
 asset<T>&
@@ -170,7 +169,8 @@ asset<T>::operator=(const asset<T>& other)
     if(this != &other)
     {
         if(res) storage->release_asset(res);
-        res = storage->clone_asset(other.res);
+        if(storage)
+            res = storage->clone_asset(other.res);
     }
     return *this;
 }
@@ -187,23 +187,28 @@ asset<T>::operator=(asset<T>&& other) noexcept
     if(this != &other)
     {
         std::swap(res, other.res);
+        std::swap(storage, other.storage);
     }
     return *this;
 }
 template<class T>
 asset<T>::~asset()
 {
-    if(res) storage->release_asset(res);
+    if(!storage || !res) return;
+
+    storage->release_asset(res);
 }
 template<class T>
 const T*
 asset<T>::get() const noexcept
 {
+    lemon_assert(storage && res);
     return storage->get_asset_ptr<T>(res);
 }
 template<class T>
 T* asset<T>::get() noexcept
 {
+    lemon_assert(storage && res);
     return storage->get_asset_ptr<T>(res);
 }
 template<class T>

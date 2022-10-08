@@ -3,7 +3,7 @@
 #include "service_container.h"
 
 namespace lemon {
-using entity   = entt::entity;
+using entity_t = entt::entity;
 using registry = entt::registry;
 
 class LEMON_API system

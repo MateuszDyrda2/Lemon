@@ -1,9 +1,9 @@
 #include <rendering/shader.h>
 
-#include <core/logger.h>
-
 #include <fstream>
 #include <sstream>
+
+#include <rendering/gl_errors.h>
 
 namespace lemon {
 using namespace std;
@@ -11,24 +11,19 @@ shader::shader(hash_str name, const std::string& shaderPath):
     resource(name)
 {
     string shaderCode;
-    ifstream shaderFile;
+    ifstream shaderFile(shaderPath, ios::binary);
 
-    shaderFile.exceptions(ifstream::badbit);
-    try
+    if(!shaderFile)
     {
-        shaderFile.open(shaderPath);
-        std::stringstream shaderStream;
-
-        shaderStream << shaderFile.rdbuf();
-
-        shaderFile.close();
-
-        shaderCode = shaderStream.str();
+        logger::error("Shader read failure: {}", shaderPath);
+        return;
     }
-    catch(ifstream::failure& /* e */)
-    {
-        logger::error("Shader read failure! {}", shaderPath);
-    }
+    shaderFile.open(shaderPath);
+    std::stringstream shaderStream;
+
+    shaderStream << shaderFile.rdbuf();
+    shaderFile.close();
+    shaderCode = shaderStream.str();
 
     const char* vShaderCode[2] = { "#version 330\n#define VERTEX_PROGRAM\n",
                                    shaderCode.c_str() };
@@ -41,8 +36,8 @@ shader::shader(hash_str name, const std::string& shaderPath):
 
     // vertex shader
     unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 2, vShaderCode, NULL);
-    glCompileShader(vertex);
+    GL_CHECK(glShaderSource(vertex, 2, vShaderCode, NULL));
+    GL_CHECK(glCompileShader(vertex));
 
     // print compile errors if any
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
@@ -53,8 +48,8 @@ shader::shader(hash_str name, const std::string& shaderPath):
     }
     // fragment shader
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 2, fShaderCode, NULL);
-    glCompileShader(fragment);
+    GL_CHECK(glShaderSource(fragment, 2, fShaderCode, NULL));
+    GL_CHECK(glCompileShader(fragment));
 
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
@@ -64,9 +59,9 @@ shader::shader(hash_str name, const std::string& shaderPath):
         logger::error("Fragment shader compilation failure!: {}", infoLog);
     }
     ID = glCreateProgram();
-    glAttachShader(ID, vertex);
-    glAttachShader(ID, fragment);
-    glLinkProgram(ID);
+    GL_CHECK(glAttachShader(ID, vertex));
+    GL_CHECK(glAttachShader(ID, fragment));
+    GL_CHECK(glLinkProgram(ID));
 
     // print errors
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
@@ -94,8 +89,8 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
 
     // vertex shader
     unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 2, vShaderCode, NULL);
-    glCompileShader(vertex);
+    GL_CHECK(glShaderSource(vertex, 2, vShaderCode, NULL));
+    GL_CHECK(glCompileShader(vertex));
 
     // print compile errors if any
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
@@ -106,8 +101,8 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
     }
     // fragment shader
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 2, fShaderCode, NULL);
-    glCompileShader(fragment);
+    GL_CHECK(glShaderSource(fragment, 2, fShaderCode, NULL));
+    GL_CHECK(glCompileShader(fragment));
 
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
@@ -117,9 +112,9 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
         logger::error("Fragment shader compilation failure!: {}", infoLog);
     }
     ID = glCreateProgram();
-    glAttachShader(ID, vertex);
-    glAttachShader(ID, fragment);
-    glLinkProgram(ID);
+    GL_CHECK(glAttachShader(ID, vertex));
+    GL_CHECK(glAttachShader(ID, fragment));
+    GL_CHECK(glLinkProgram(ID));
 
     // print errors
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
@@ -153,95 +148,94 @@ shader& shader::operator=(shader&& other) noexcept
 }
 void shader::use()
 {
-    glUseProgram(ID);
+    GL_CHECK(glUseProgram(ID));
 }
 void shader::set_uniform(const char* name, f32 v1)
 {
-    glUniform1f(glGetUniformLocation(ID, name), v1);
+    GL_CHECK(glUniform1f(glGetUniformLocation(ID, name), v1));
 }
 void shader::set_uniform(const char* name, f32 v1, f32 v2)
 {
-    glUniform2f(glGetUniformLocation(ID, name), v1, v2);
+    GL_CHECK(glUniform2f(glGetUniformLocation(ID, name), v1, v2));
 }
 void shader::set_uniform(const char* name, f32 v1, f32 v2, f32 v3)
 {
-    glUniform3f(glGetUniformLocation(ID, name), v1, v2, v3);
+    GL_CHECK(glUniform3f(glGetUniformLocation(ID, name), v1, v2, v3));
 }
 void shader::set_uniform(const char* name, f32 v1, f32 v2, f32 v3, f32 v4)
 {
-    glUniform4f(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+    GL_CHECK(glUniform4f(glGetUniformLocation(ID, name), v1, v2, v3, v4));
 }
 void shader::set_uniform(const char* name, i32 v1)
 {
-    glUniform1i(glGetUniformLocation(ID, name), v1);
+    GL_CHECK(glUniform1i(glGetUniformLocation(ID, name), v1));
 }
 void shader::set_uniform(const char* name, i32 v1, i32 v2)
 {
-    glUniform2i(glGetUniformLocation(ID, name), v1, v2);
+    GL_CHECK(glUniform2i(glGetUniformLocation(ID, name), v1, v2));
 }
 void shader::set_uniform(const char* name, i32 v1, i32 v2, i32 v3)
 {
-    glUniform3i(glGetUniformLocation(ID, name), v1, v2, v3);
+    GL_CHECK(glUniform3i(glGetUniformLocation(ID, name), v1, v2, v3));
 }
 void shader::set_uniform(const char* name, i32 v1, i32 v2, i32 v3, i32 v4)
 {
-    glUniform4i(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+    GL_CHECK(glUniform4i(glGetUniformLocation(ID, name), v1, v2, v3, v4));
 }
 void shader::set_uniform(const char* name, u32 v1)
 {
-    glUniform1ui(glGetUniformLocation(ID, name), v1);
+    GL_CHECK(glUniform1ui(glGetUniformLocation(ID, name), v1));
 }
 void shader::set_uniform(const char* name, u32 v1, u32 v2)
 {
-    glUniform2ui(glGetUniformLocation(ID, name), v1, v2);
+    GL_CHECK(glUniform2ui(glGetUniformLocation(ID, name), v1, v2));
 }
 void shader::set_uniform(const char* name, u32 v1, u32 v2, u32 v3)
 {
-    glUniform3ui(glGetUniformLocation(ID, name), v1, v2, v3);
+    GL_CHECK(glUniform3ui(glGetUniformLocation(ID, name), v1, v2, v3));
 }
 void shader::set_uniform(const char* name, u32 v1, u32 v2, u32 v3, u32 v4)
 {
-    glUniform4ui(glGetUniformLocation(ID, name), v1, v2, v3, v4);
+    GL_CHECK(glUniform4ui(glGetUniformLocation(ID, name), v1, v2, v3, v4));
 }
 void shader::set_uniform(const char* name, const vec2& value)
 {
-    glUniform2fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform2fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const ivec2& value)
 {
-    glUniform2iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform2iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const uvec2& value)
 {
-    glUniform2uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform2uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const vec3& value)
 {
-    glUniform3fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform3fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const ivec3& value)
 {
-    glUniform3iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform3iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const uvec3& value)
 {
-    glUniform3uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform3uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const vec4& value)
 {
-    glUniform4fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform4fv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const ivec4& value)
 {
-    glUniform4iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform4iv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const uvec4& value)
 {
-    glUniform4uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value));
+    GL_CHECK(glUniform4uiv(glGetUniformLocation(ID, name), 1, glm::value_ptr(value)));
 }
 void shader::set_uniform(const char* name, const mat4& value)
 {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, glm::value_ptr(value));
+    GL_CHECK(glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, glm::value_ptr(value)));
 }
-
 } // namespace lemon

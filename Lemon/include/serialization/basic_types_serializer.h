@@ -27,7 +27,7 @@ void LEMON_API serialize(const vec2& value, rapidjson::Writer<rapidjson::StringB
 void LEMON_API serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void LEMON_API serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void LEMON_API serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
-void LEMON_API serialize(entity value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+void LEMON_API serialize(entity_t value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 void LEMON_API serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
 template<class T>
 inline void serialize(const std::vector<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
@@ -57,7 +57,7 @@ void LEMON_API deserialize(vec2& value, const rapidjson::Value& iter);
 void LEMON_API deserialize(vec3& value, const rapidjson::Value& iter);
 void LEMON_API deserialize(vec4& value, const rapidjson::Value& iter);
 void LEMON_API deserialize(mat4& value, const rapidjson::Value& iter);
-void LEMON_API deserialize(entity& value, const rapidjson::Value& iter);
+void LEMON_API deserialize(entity_t& value, const rapidjson::Value& iter);
 void LEMON_API deserialize(color& value, const rapidjson::Value& iter);
 template<class T>
 inline void deserialize(std::vector<T>& value, const rapidjson::Value& iter)

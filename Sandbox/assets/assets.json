@@ -1,10 +1,15 @@
 {
-    "textures": [],
+    "textures": [
+        {
+            "name": "tile",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/tile.png"
+        }
+    ],
     "sounds": [],
     "shaders": [
         {
             "name": "sprite_renderer_shader",
-            "path": "D:\\custom\\Lemon\\Sandbox\\assets\\shaders\\sprite_renderer_shader.glsl"
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/shaders/sprite_renderer_shader.glsl"
         }
     ]
 }

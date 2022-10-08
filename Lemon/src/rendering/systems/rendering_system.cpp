@@ -43,8 +43,9 @@ void rendering_system::update()
     renderer.start_render(viewProj);
 
     _registry.view<sprite_renderer, model>().each(
-        [this](const auto ent, auto& sr, auto& m) {
-            renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);
+        [this](const auto, auto& sr, auto& m) {
+            if(sr.tex)
+                renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);
         });
     renderer.end_render();
 }

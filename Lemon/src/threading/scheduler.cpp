@@ -1,8 +1,5 @@
 #include <threading/scheduler.h>
 
-#include <core/assert.h>
-#include <core/logger.h>
-
 #include <ctime>
 
 namespace lemon {
@@ -25,10 +22,10 @@ scheduler::scheduler(std::size_t threadCount)
     {
         workers.emplace_back(
             [&](std::size_t threadIndex) {
-                auto& globalQueue      = globalQueues[threadIndex];
-                auto& localQueue       = localQueues[threadIndex];
-                auto& localMtx         = *localMtxs[threadIndex];
-                auto& localCvar        = *localCvars[threadIndex];
+                auto& globalQueue = globalQueues[threadIndex];
+                auto& localQueue  = localQueues[threadIndex];
+                auto& localMtx    = *localMtxs[threadIndex];
+                auto& localCvar   = *localCvars[threadIndex];
                 get_thread_index(threadIndex);
 
                 while(!shouldEnd.load())
@@ -158,8 +155,8 @@ void scheduler::wait(waitable* sig)
     if(sig->counter.load() != 0)
     {
         auto threadIndex = get_thread_index();
-        auto& localMtx  = *localMtxs[threadIndex];
-        auto& localCvar = *localCvars[threadIndex];
+        auto& localMtx   = *localMtxs[threadIndex];
+        auto& localCvar  = *localCvars[threadIndex];
         std::unique_lock lock(localMtx);
         localCvar.wait(lock, [&] { return sig->counter.load() == 0; });
     }

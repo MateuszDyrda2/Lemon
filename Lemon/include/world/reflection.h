@@ -2,20 +2,12 @@
 
 #include "scene.h"
 
+#include <core/defines.h>
 #include <core/hash_string.h>
 
 #include <string>
 #include <type_traits>
 #include <unordered_map>
-
-#define EXP(x)                x
-#define CONCAT_IMPL(_a1, _a2) _a1##_a2
-#define CONCAT(_a1, _a2)      CONCAT_IMPL(_a1, _a2)
-
-#define GET_ARG_COUNT(...)                                 _NARGS(PREFIX(__VA_ARGS__))
-#define _NARGS(...)                                        EXP(LASTOF(__VA_ARGS__, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-#define LASTOF(a, b, c, d, e, f, g, h, i, j, k, l, m, ...) m
-#define PREFIX(...)                                        0, ##__VA_ARGS__
 
 #define LEMON_TAG(_class)                                       \
     template<>                                                  \
@@ -206,7 +198,7 @@ class component
     }
 
     template<class T, class F, std::size_t I = 0>
-    static void for_each(T& comp, F&& callable) requires(I == refl<T>::field_n::value)
+    static void for_each(T&, F&&) requires(I == refl<T>::field_n::value)
     { }
 
     template<class T, class F, std::size_t I = 0>
@@ -217,9 +209,8 @@ class component
     }
 
     template<class T, class F, std::size_t I = 0>
-    static void for_each(const T& comp, F&& callable) requires(I == refl<T>::field_n::value)
+    static void for_each(const T&, F&&) requires(I == refl<T>::field_n::value)
     { }
 };
-
 }
 }

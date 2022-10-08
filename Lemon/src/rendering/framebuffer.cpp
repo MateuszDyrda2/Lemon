@@ -1,7 +1,5 @@
 #include <rendering/framebuffer.h>
 
-#include <core/logger.h>
-
 namespace lemon {
 framebuffer::framebuffer(const ivec2& size):
     size(size)

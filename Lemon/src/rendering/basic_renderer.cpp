@@ -2,6 +2,8 @@
 
 #include <rendering/rendering_context.h>
 
+#include <rendering/gl_errors.h>
+
 #include <core/math/mat4.h>
 #include <core/math/math.h>
 #include <core/math/vec2.h>
@@ -26,14 +28,14 @@ basic_renderer::basic_renderer(asset_storage& storage):
         -0.5f, 0.5f,
         -0.5f, -0.5f
     };
-    glBindBuffer(GL_ARRAY_BUFFER, vbo1);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 12, nullptr, GL_STREAM_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, (void*)0);
-    glEnableVertexAttribArray(1);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo1));
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+    GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0));
+    GL_CHECK(glEnableVertexAttribArray(0));
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo2));
+    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 12, nullptr, GL_STREAM_DRAW));
+    GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, (void*)0));
+    GL_CHECK(glEnableVertexAttribArray(1));
     glBindVertexArray(0);
 }
 void basic_renderer::start_render(const mat4& viewProj)
@@ -50,8 +52,7 @@ void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asse
     auto shader               = _shader.get();
     auto texture              = tex.get();
     shader->use();
-    mat4 model = m;
-    //    model      = scale(model, vec3(texture->get_size(), 1.0f));
+    auto model         = m;
     const auto texSize = texture->get_size();
     const auto texW    = f32(texSize.x) / ppx;
     const auto texH    = f32(texSize.y) / ppx;
@@ -62,9 +63,9 @@ void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asse
     shader->set_uniform("model", model);
 
     texture->bind();
-    glBindVertexArray(vao);
+    GL_CHECK(glBindVertexArray(vao));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo2));
     f32 tc[] = {
         texCoords.x, texCoords.y,
         texCoords.z, texCoords.y,
@@ -73,7 +74,7 @@ void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asse
         texCoords.x, texCoords.w,
         texCoords.x, texCoords.y
     };
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tc), tc);
+    GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tc), tc));
     rendering_context::draw_arrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }

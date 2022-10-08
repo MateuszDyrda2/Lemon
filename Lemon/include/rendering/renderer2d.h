@@ -13,7 +13,7 @@ namespace lemon {
 class LEMON_API renderer2d
 {
   public:
-    renderer2d(asset_storage& storage) { }
+    renderer2d(asset_storage&) { }
     virtual ~renderer2d() = default;
     /** @brief Prepares for rendering in this frame
      * @param viewProj view-project matrix of the main camera

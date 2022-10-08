@@ -21,7 +21,7 @@ class LEMON_API rendering_system : public system
 
     event_queue::listener_handle framebufferSize;
     basic_renderer renderer;
-    entity mainCamera;
+    entity_t mainCamera;
     ivec2 viewport;
 };
 }

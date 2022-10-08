@@ -3,8 +3,9 @@
  */
 #pragma once
 
+#include "core/hash_string.h"
+#include "entity.h"
 #include "service_container.h"
-#include "system.h"
 
 #include <core/assert.h>
 #include <core/defines.h>
@@ -16,14 +17,16 @@
 #include <string>
 #include <vector>
 
+#define ENT_NAME(_name) _name, _name##_hs
+
 namespace lemon {
 /** @brief Execution stage of a system */
 enum class execution_stage
 {
-    early_update,
-    update,
-    late_update,
-    render,
+    early_update, ///< 0
+    update,       ///< 1
+    late_update,  ///< 2
+    render,       ///< 3
     none
 };
 
@@ -46,6 +49,19 @@ class LEMON_API scene
     registry& get_registry() { return _registry; }
     const registry& get_registry() const { return _registry; }
 
+    entity create_entity(const char* name, hash_str nameid);
+    entity create_entity(const char* name, hash_str nameid, vec2 position);
+    service_container get_services()
+    {
+        return service_container{
+            ._asset_storage = _assetStorage,
+            ._scheduler     = _scheduler,
+            ._event_queue   = _eventQueue,
+            ._registry      = _registry,
+            ._window        = _window,
+        };
+    }
+
   private:
     hash_str nameid;
     asset_storage& _assetStorage;
@@ -59,7 +75,7 @@ class LEMON_API scene
 template<class S>
 scene& scene::register_system(execution_stage stage)
 {
-    lemon_assert(enum_undelying(stage) < systems.size());
+    lemon_assert(enum_undelying(stage) < (int)systems.size());
     systems[enum_undelying(stage)].push_back(
         std::make_unique<S>(
             service_container{

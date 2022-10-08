@@ -1,1 +1,0 @@
-{"transform": {"position": "vec2", "scale": "vec2", "rotation": "f32", "first": "entity", "next": "entity", "parent": "entity", "order": "std::size_t"}, "model": {"matrix": "mat4"}, "main_camera_t": {}, "camera": {"viewport": "vec4", "size": "f32"}}

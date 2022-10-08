@@ -77,7 +77,7 @@ void serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.EndArray();
 }
 
-void serialize(entity value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void serialize(entity_t value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     serialize(entt::to_entity(value), writer);
 }
@@ -131,24 +131,24 @@ void deserialize(vec2& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
-              a[1].GetDouble() };
+               a[1].GetDouble() };
 }
 
 void deserialize(vec3& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
-              a[1].GetDouble(),
-              a[2].GetDouble() };
+               a[1].GetDouble(),
+               a[2].GetDouble() };
 }
 
 void deserialize(vec4& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
-              a[1].GetDouble(),
-              a[2].GetDouble(),
-              a[3].GetDouble() };
+               a[1].GetDouble(),
+               a[2].GetDouble(),
+               a[3].GetDouble() };
 }
 
 void deserialize(mat4& value, const rapidjson::Value& iter)
@@ -159,35 +159,35 @@ void deserialize(mat4& value, const rapidjson::Value& iter)
     auto d = a[2].GetArray();
     auto e = a[3].GetArray();
     value  = {
-        {
-            b[0].GetDouble(),
-            b[1].GetDouble(),
-            b[2].GetDouble(),
-            b[3].GetDouble(),
+         {
+             b[0].GetDouble(),
+             b[1].GetDouble(),
+             b[2].GetDouble(),
+             b[3].GetDouble(),
         },
-        {
-            c[0].GetDouble(),
-            c[1].GetDouble(),
-            c[2].GetDouble(),
-            c[3].GetDouble(),
+         {
+             c[0].GetDouble(),
+             c[1].GetDouble(),
+             c[2].GetDouble(),
+             c[3].GetDouble(),
         },
-        {
-            d[0].GetDouble(),
-            d[1].GetDouble(),
-            d[2].GetDouble(),
-            d[3].GetDouble(),
+         {
+             d[0].GetDouble(),
+             d[1].GetDouble(),
+             d[2].GetDouble(),
+             d[3].GetDouble(),
         },
-        {
-            e[0].GetDouble(),
-            e[1].GetDouble(),
-            e[2].GetDouble(),
-            e[3].GetDouble(),
+         {
+             e[0].GetDouble(),
+             e[1].GetDouble(),
+             e[2].GetDouble(),
+             e[3].GetDouble(),
         },
     };
 }
-void deserialize(entity& value, const rapidjson::Value& iter)
+void deserialize(entity_t& value, const rapidjson::Value& iter)
 {
-    value = entity(iter.GetUint());
+    value = entity_t(iter.GetUint());
 }
 
 void deserialize(color& value, const rapidjson::Value& iter)

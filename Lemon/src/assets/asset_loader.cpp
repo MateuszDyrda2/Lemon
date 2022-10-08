@@ -1,6 +1,5 @@
+#include "core/logger.h"
 #include <assets/asset_loader.h>
-
-#include <core/logger.h>
 
 #include <rapidjson/document.h>
 
@@ -12,7 +11,6 @@ using namespace rapidjson;
 asset_loader::asset_loader(const string& path):
     path(path + "/assets.json")
 {
-    using namespace rapidjson;
     ifstream stream(this->path, ios::binary | ios::ate);
     if(!stream)
     {
@@ -61,35 +59,29 @@ asset_loader::asset_loader(const string& path):
         auto path                          = sh["path"].GetString();
         resourcePaths[hash_string_d(name)] = path;
     }
-
-    // for(auto a = document.Begin(); a != document.End(); ++a)
-    //{
-    //     auto iter = a->MemberBegin();
-    //     auto name = iter->value.GetString();
-    //     ++iter;
-    //     auto path                          = iter->value.GetString();
-    //     resourcePaths[hash_string_d(name)] = path;
-    // }
 }
 asset_loader::~asset_loader()
 {
 }
-bool asset_loader::resource_exists(hash_str name) const noexcept
+bool asset_loader::resource_exists(hash_str nameid) const noexcept
 {
-    return resourcePaths.contains(name);
+    return resourcePaths.contains(nameid);
 }
 std::vector<char> asset_loader::load_from_file(const string& path)
 {
     vector<char> buff;
     ifstream stream(path, ios::binary | ios::ate);
-    if(stream)
+    if(!stream)
     {
-        std::size_t nBytes = stream.tellg();
-        stream.seekg(0, stream.beg);
-        buff.reserve(nBytes + 1ULL);
-        stream.read(buff.data(), nBytes);
-        stream.close();
+        logger::error("Failed to load file: {}", path);
+        return buff;
     }
+
+    std::size_t nBytes = stream.tellg();
+    stream.seekg(0, stream.beg);
+    buff.reserve(nBytes + 1ULL);
+    stream.read(buff.data(), nBytes);
+    stream.close();
     return buff;
 }
 } // namespace lemon

@@ -151,11 +151,11 @@ function(add_components)
     foreach(path IN LISTS ARGN)
         set(filename)
         get_filename_component(filename ${path} NAME_WE)
-        set(output "_generated/${filename}.json")
+        set(output "${CMAKE_CURRENT_BINARY_DIR}/_generated/${filename}.json")
         add_custom_command(
             OUTPUT ${output}
             DEPENDS ${path}
-            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${CMAKE_CURRENT_SOURCE_DIR}/${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
             COMMENT "Generated editor data for ${filename}"
         )
         set(COMPONENT_DEFINITIONS ${COMPONENT_DEFINITIONS} ${output})
@@ -167,11 +167,11 @@ function(add_systems)
     foreach(path IN LISTS ARGN)
         set(filename)
         get_filename_component(filename ${path} NAME_WE)
-        set(output "_generated/${filename}.json")
+        set(output "${CMAKE_CURRENT_BINARY_DIR}/_generated/${filename}.json")
         add_custom_command(
             OUTPUT ${output}
             DEPENDS ${path}
-            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${CMAKE_CURRENT_SOURCE_DIR}/${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
             COMMENT "Generated editor data for ${filename}"
         )
         set(SYSTEM_DEFINITIONS ${SYSTEM_DEFINITIONS} ${output})
@@ -194,12 +194,14 @@ add_systems(
 
 # ---------------- Post build ------------------
 add_custom_command(
-    OUTPUT _generated/types.json
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json
     DEPENDS ${COMPONENT_DEFINITIONS} ${SYSTEM_DEFINITIONS}
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/write_component_file.py "${CMAKE_CURRENT_SOURCE_DIR}/_generated" "${CMAKE_CURRENT_SOURCE_DIR}/_generated/types.json"
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/write_component_file.py "${CMAKE_CURRENT_BINARY_DIR}/_generated" "${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json"
     COMMENT "Generated types.json"
 )
-add_custom_target(lemon_generated ALL DEPENDS _generated/types.json)
+add_custom_target(lemon_generated ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/_generated)
 # ----------------------------------------------
 
 

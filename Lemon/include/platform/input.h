@@ -33,7 +33,7 @@ class LEMON_API input
 
   public:
     /** @brief Create an input instance
-     * @param wnd main applicatio window
+     * @param wnd main application window
      */
     input(window& wnd, event_queue& queue);
     ~input();

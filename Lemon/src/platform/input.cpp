@@ -1,12 +1,8 @@
 #include <platform/input.h>
 
-#include <core/lemon_types.h>
-#include <core/logger.h>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <algorithm>
 #include <array>
 #include <map>
 

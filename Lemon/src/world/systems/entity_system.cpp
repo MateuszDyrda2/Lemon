@@ -14,12 +14,12 @@ void entity_system::update()
     _registry.destroy(toDestroy.begin(), toDestroy.end());
 
     _registry.view<disable_m>()
-        .each([this](const entity entity) {
+        .each([this](const auto entity) {
             _registry.remove<enabled_t>(entity);
         });
 
     _registry.view<enable_m>()
-        .each([this](const entity entity) {
+        .each([this](const auto entity) {
             _registry.emplace_or_replace<enabled_t>(entity);
         });
 }

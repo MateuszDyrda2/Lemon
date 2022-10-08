@@ -25,7 +25,7 @@ def main(argv):
             data = json.load(f)
             systems.update(data)
 
-    with open(outPath, 'w') as f:
+    with open(outPath, 'w+') as f:
         json.dump({'stages': stages, 'systems': systems,
                   'components': components}, f, indent=2)
 

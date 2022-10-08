@@ -39,14 +39,14 @@ struct LEMON_API output_archive
     output_archive(scene* sc);
     void start();
     void end();
-    void operator()(entity ent);
-    void operator()(std::underlying_type_t<entity> size);
+    void operator()(entity_t ent);
+    void operator()(std::underlying_type_t<entity_t> size);
     template<class T>
-    inline void operator()(entity ent, const T& component)
+    inline void operator()(entity_t ent, const T& component)
     {
         writer.StartObject();
         writer.Key("id");
-        writer.Uint(static_cast<std::underlying_type_t<entity>>(ent));
+        writer.Uint(static_cast<std::underlying_type_t<entity_t>>(ent));
         writer.Key(reflection::component::name<T>());
         serialize_component<T>(component, writer);
         writer.EndObject();
@@ -61,13 +61,13 @@ struct LEMON_API input_archive
     int started;
 
     input_archive(std::vector<char>& buffer);
-    void operator()(entity& ent);
-    void operator()(std::underlying_type_t<entity>& size);
+    void operator()(entity_t& ent);
+    void operator()(std::underlying_type_t<entity_t>& size);
     template<class T>
-    inline void operator()(entity& ent, T& component)
+    inline void operator()(entity_t& ent, T& component)
     {
         auto val                                  = (componentIterator++)->GetUint();
-        ent                                       = entity(val);
+        ent                                       = entity_t(val);
         rapidjson::Value::ConstMemberIterator itr = (componentIterator++)->MemberBegin();
         deserialize_component<T>(component, itr);
     }

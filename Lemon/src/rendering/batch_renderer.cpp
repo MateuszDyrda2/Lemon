@@ -1,6 +1,5 @@
 #include <rendering/batch_renderer.h>
 
-#include <algorithm>
 #include <memory>
 
 namespace lemon {
@@ -17,9 +16,9 @@ void batch_renderer::batch::add_quad(
     const mat4& trans, color col, vec4 texCoords)
 {
     vec2 pos[4]   = { { -0.5f, -0.5f },
-                    { 0.5f, -0.5f },
-                    { 0.5f, 0.5f },
-                    { -0.5f, 0.5f } };
+                      { 0.5f, -0.5f },
+                      { 0.5f, 0.5f },
+                      { -0.5f, 0.5f } };
     auto texSize  = _texture->get_size();
     auto texTrans = scale(trans, vec3(texSize.x, texSize.y, 1.0f));
     pos[0]        = texTrans * vec4(pos[0].x, pos[0].y, 0.f, 0.f);
