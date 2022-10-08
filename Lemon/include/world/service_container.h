@@ -3,6 +3,7 @@
 #include <assets/asset.h>
 #include <core/defines.h>
 #include <events/events.h>
+#include <platform/input.h>
 #include <platform/window.h>
 #include <threading/scheduler.h>
 
@@ -79,6 +80,7 @@ struct LEMON_API service_container
     event_queue& _event_queue;
     entt::registry& _registry;
     window& _window;
+    input& _input;
 };
 
 class system;

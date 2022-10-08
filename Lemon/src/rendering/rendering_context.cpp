@@ -12,6 +12,8 @@ rendering_context::rendering_context()
     {
         logger::fatal("Failed to initialize GLAD");
     }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     logger::info("Rendering context created");
 }
 rendering_context::~rendering_context()

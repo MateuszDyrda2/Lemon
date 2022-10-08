@@ -1,6 +1,10 @@
 {
     "textures": [
         {
+            "name": "player",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player.png"
+        },
+        {
             "name": "tile",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/tile.png"
         }

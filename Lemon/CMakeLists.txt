@@ -21,9 +21,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 option(LEMON_PROFILE "Profile execution" ON)
 # ----------------------------------------------
 
-# ------------------ Python --------------------
-find_package(Python COMPONENTS Interpreter)
-# ----------------------------------------------
+
 find_package(Threads REQUIRED)
 # ----------------------------------------------
 
@@ -131,63 +129,48 @@ target_precompile_headers(lemon
 # ----------------------------------------------
 
 # --------------- Build step -------------------
-set(COMPONENT_DEFINITIONS)
-set(SYSTEM_DEFINITIONS)
-function(add_components)
-    foreach(path IN LISTS ARGN)
-        set(filename)
-        get_filename_component(filename ${path} NAME_WE)
-        set(output "${CMAKE_CURRENT_BINARY_DIR}/_generated/${filename}.json")
-        add_custom_command(
-            OUTPUT ${output}
-            DEPENDS ${path}
-            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-            COMMENT "Generated editor data for ${filename}"
-        )
-        set(COMPONENT_DEFINITIONS ${COMPONENT_DEFINITIONS} ${output})
-    endforeach(path in LISTS ARGN)
-    set(COMPONENT_DEFINITIONS ${COMPONENT_DEFINITIONS} PARENT_SCOPE)
-endfunction(add_components)
-
-function(add_systems)
-    foreach(path IN LISTS ARGN)
-        set(filename)
-        get_filename_component(filename ${path} NAME_WE)
-        set(output "${CMAKE_CURRENT_BINARY_DIR}/_generated/${filename}.json")
-        add_custom_command(
-            OUTPUT ${output}
-            DEPENDS ${path}
-            COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-            COMMENT "Generated editor data for ${filename}"
-        )
-        set(SYSTEM_DEFINITIONS ${SYSTEM_DEFINITIONS} ${output})
-    endforeach(path in LISTS ARGN)
-    set(SYSTEM_DEFINITIONS ${SYSTEM_DEFINITIONS} PARENT_SCOPE)
-endfunction(add_systems)
-
-add_components(
+set(COMPONENTS_LIST
     "include/world/components/entity_components.h"
     "include/world/components/transform_components.h"
     "include/rendering/components/rendering_components.h"
 )
-add_systems(
+set(SYSTEMS_LIST
     "include/world/systems/entity_system.h"
     "include/world/systems/transform_system.h"
     "include/rendering/systems/rendering_system.h"
 )
-# ----------------------------------------------
 
+foreach(path IN LISTS COMPONENTS_LIST)
+    set(filename)
+    get_filename_component(filename ${path} NAME_WE)
+    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
+    add_custom_command(
+        OUTPUT ${output}
+        DEPENDS ${path}
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+        COMMENT "Generated editor data for ${filename}")
+    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
+endforeach(path in LISTS ARGN)
 
-# ---------------- Post build ------------------
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json
-    DEPENDS ${COMPONENT_DEFINITIONS} ${SYSTEM_DEFINITIONS}
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/write_component_file.py "${CMAKE_CURRENT_BINARY_DIR}/_generated" "${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json"
-    COMMENT "Generated types.json"
+foreach(path IN LISTS SYSTEMS_LIST)
+    set(filename)
+    get_filename_component(filename ${path} NAME_WE)
+    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
+    add_custom_command(
+        OUTPUT ${output}
+        DEPENDS ${path}
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+        COMMENT "Generated editor data for ${filename}"
+    )
+    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
+endforeach(path in LISTS ARGN)
+set(ENGINE_TYPES ${ENGINE_TYPES} PARENT_SCOPE)
+
+add_custom_target(lemon_engine_types
+  ALL DEPENDS
+    ${ENGINE_TYPES}
 )
-add_custom_target(lemon_generated ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/_generated/types.json)
 
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/_generated)
 # ----------------------------------------------
 
 
