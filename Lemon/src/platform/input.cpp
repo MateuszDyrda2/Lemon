@@ -103,13 +103,13 @@ class input::impl
                                  reinterpret_cast<void*>(this));
         glfwSetKeyCallback(
             reinterpret_cast<GLFWwindow*>(wnd.get_handle()),
-            [](GLFWwindow* wnd, int key, int scancode, int action, int mods) {
+            [](GLFWwindow* wnd, int key, int /*scancode*/, int action, int /*mods*/) {
                 auto in            = reinterpret_cast<impl*>(glfwGetWindowUserPointer(wnd));
                 in->keyStates[key] = key_action(1 << action);
             });
         glfwSetMouseButtonCallback(
             reinterpret_cast<GLFWwindow*>(wnd.get_handle()),
-            [](GLFWwindow* wnd, int button, int action, int mods) {
+            [](GLFWwindow* wnd, int button, int action, int /*mods*/) {
                 auto in                 = reinterpret_cast<impl*>(glfwGetWindowUserPointer(wnd));
                 in->mouseStates[button] = key_action(1 << action);
             });

@@ -48,14 +48,13 @@ void basic_renderer::start_render(const mat4& viewProj)
 void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asset<texture>& tex,
                                    const mat4& m)
 {
-    static constexpr auto ppx = 100.f;
-    auto shader               = _shader.get();
-    auto texture              = tex.get();
+    auto shader  = _shader.get();
+    auto texture = tex.get();
     shader->use();
     auto model         = m;
     const auto texSize = texture->get_size();
-    const auto texW    = f32(texSize.x) / ppx;
-    const auto texH    = f32(texSize.y) / ppx;
+    const f32 texW     = f32(texSize.x);
+    const f32 texH     = f32(texSize.y);
 
     model = scale(model, vec3(texW, texH, 1.f));
 

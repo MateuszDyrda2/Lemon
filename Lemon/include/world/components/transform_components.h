@@ -43,7 +43,7 @@ struct LEMON_API [[lemon::component]] main_camera_t
 struct LEMON_API [[lemon::component]] camera
 {
     [[lemon::field]] vec4 viewport{ 0.0f, 0.0f, 1.0f, 1.0f };
-    [[lemon::field]] f32 size{ 10.0f };
+    [[lemon::field]] f32 size{ 1.0f };
 };
 
 LEMON_TAG(main_camera_t);

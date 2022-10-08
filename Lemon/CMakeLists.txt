@@ -104,20 +104,6 @@ target_link_libraries(lemon
 # ----------------------------------------------
 
 # -------------- Compile options ---------------
-target_compile_features(lemon PUBLIC cxx_std_20)
-set_target_properties(lemon PROPERTIES CXX_STANDARD_REQUIRED ON)
-
-if(MSVC)
-    target_compile_options(lemon
-      PUBLIC
-        "/W4" "/Zc:preprocessor" "$<$<CONFIG:Debug>:/O2>"
-    )
-else()
-    target_compile_options(lemon 
-      PUBLIC
-        "-Wall" "-Wextra" "-Wformat=2" "-Wunused" "-fvisibility=hidden" "-Wno-attributes" "$<$<CONFIG:Debug>:-O3>"
-    )
-endif(MSVC)
 
 target_compile_definitions(lemon 
   PUBLIC
