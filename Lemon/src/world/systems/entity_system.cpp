@@ -1,14 +1,19 @@
 #include <world/systems/entity_system.h>
 
 namespace lemon {
-entity_system::entity_system(registry& _registry):
-    _registry(_registry) { }
+entity_system::entity_system(scene& _scene, event_queue& eventQueue):
+    _registry(_scene.get_registry())
+{
+    update = eventQueue["EarlyUpdate"_hs] += [this](event_args* e) {
+        this->onEarlyUpdate(e);
+    };
+}
 
 entity_system::~entity_system()
 {
 }
 
-void entity_system::update()
+void entity_system::onEarlyUpdate([[maybe_unused]] event_args* e)
 {
     auto&& toDestroy = _registry.view<destroy_m>();
     _registry.destroy(toDestroy.begin(), toDestroy.end());

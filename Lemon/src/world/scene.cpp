@@ -18,23 +18,6 @@ scene::scene(hash_str nameid,
 scene::~scene()
 { }
 
-void scene::on_load()
-{ }
-
-void scene::update()
-{
-    for(auto& sys : systems)
-    {
-        for(auto& s : sys)
-        {
-            s->update();
-        }
-    }
-}
-
-void scene::on_unload()
-{ }
-
 entity scene::create_entity(const char* name, hash_str nameid)
 {
     auto ent = _registry.create();
@@ -53,5 +36,10 @@ entity scene::create_entity(const char* name, hash_str nameid, vec2 position)
     _registry.emplace<dirty_t>(ent);
     _registry.emplace<model>(ent);
     return entity(&_registry, ent);
+}
+
+entity scene::get_entity(entity_t handle)
+{
+    return entity(&_registry, handle);
 }
 }

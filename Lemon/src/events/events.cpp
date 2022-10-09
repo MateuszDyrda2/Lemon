@@ -62,16 +62,19 @@ event_queue::~event_queue()
 }
 void event_queue::process()
 {
-    while(!eventQueue.empty())
+    std::queue<event_pair> currentQueue;
+    eventQueue.swap(currentQueue);
+
+    while(!currentQueue.empty())
     {
-        auto&& front = eventQueue.front();
+        auto&& front = currentQueue.front();
         auto& l      = listeners[front.first];
         std::for_each(l.begin(), l.end(),
                       [&](auto& callback) {
                           callback(front.second);
                       });
         delete front.second;
-        eventQueue.pop();
+        currentQueue.pop();
     }
 }
 event_queue::event_sink event_queue::event(event_handle eventId)

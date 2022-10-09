@@ -24,8 +24,6 @@ class LEMON_API scene_manager
     scene_manager(const scene_manager&)            = delete;
     scene_manager& operator=(const scene_manager&) = delete;
 
-    /** @brief Update active scene */
-    void update();
     /** @brief Create a new scene with a name
      * @param sceneId hashed scene name
      */

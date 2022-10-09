@@ -38,7 +38,7 @@ class LEMON_API event_queue
       public:
         listener_handle();
         ~listener_handle();
-        listener_handle(const listener_handle&) = delete;
+        listener_handle(const listener_handle&)            = delete;
         listener_handle& operator=(const listener_handle&) = delete;
         listener_handle(listener_handle&& other) noexcept;
         listener_handle& operator=(listener_handle&& other) noexcept;

@@ -12,13 +12,14 @@ namespace lemon {
 class LEMON_API rendering_system : public system
 {
   public:
-    SYSTEM(rendering_system, registry, event_queue, asset_storage, window);
+    SYSTEM(rendering_system, scene, event_queue, asset_storage, window);
     ~rendering_system();
-    void update() override;
+    void onRender(event_args* e);
 
   private:
     registry& _registry;
 
+    event_queue::listener_handle update;
     event_queue::listener_handle framebufferSize;
     basic_renderer renderer;
     entity_t mainCamera;

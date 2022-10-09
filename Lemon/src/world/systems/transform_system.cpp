@@ -2,14 +2,17 @@
 #include <world/systems/transform_system.h>
 
 namespace lemon {
-transform_system::transform_system(registry& _registry):
-    _registry(_registry)
+transform_system::transform_system(scene& _scene, event_queue& _eventQueue):
+    _registry(_scene.get_registry())
 {
+    update = _eventQueue["Update"_hs] += [this](event_args* e) {
+        this->onUpdate(e);
+    };
 }
 
 transform_system::~transform_system() { }
 
-void transform_system::update()
+void transform_system::onUpdate([[maybe_unused]] event_args* e)
 {
     _registry.sort<dirty_t>([this](const auto lhs, const auto rhs) {
         const auto& clhs = _registry.get<transform>(lhs);

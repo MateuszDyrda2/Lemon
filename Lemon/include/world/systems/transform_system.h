@@ -3,6 +3,7 @@
 #include "../components/transform_components.h"
 #include "../entity.h"
 #include "../system.h"
+#include "events/events.h"
 
 #include <core/math/vec2.h>
 
@@ -10,9 +11,9 @@ namespace lemon {
 class LEMON_API transform_system : public system
 {
   public:
-    SYSTEM(transform_system, registry);
+    SYSTEM(transform_system, scene, event_queue);
     ~transform_system();
-    void update() override;
+    void onUpdate(event_args* e);
 
     static void move_to(entity& _entity, vec2 newPosition);
     static void move_by(entity& _entity, vec2 distance);
@@ -23,5 +24,6 @@ class LEMON_API transform_system : public system
 
   private:
     registry& _registry;
+    event_queue::listener_handle update;
 };
 }

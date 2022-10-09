@@ -6,11 +6,14 @@
 
 namespace lemon {
 rendering_system::rendering_system(
-    registry& _registry, event_queue& _eventQueue, asset_storage& _assetStorage, window& _window):
-    _registry(_registry),
+    scene& _scene, event_queue& _eventQueue, asset_storage& _assetStorage, window& _window):
+    _registry(_scene.get_registry()),
     renderer(_assetStorage),
     viewport(_window.get_size())
 {
+    update = _eventQueue["Render"_hs] += [this](event_args* e) {
+        this->onRender(e);
+    };
     framebufferSize = _eventQueue["FramebufferSize"_hs] += [this](event_args* e) {
         auto&& [width, height] = get_event<framebuffer_size>(e);
         viewport.x             = width;
@@ -21,7 +24,7 @@ rendering_system::rendering_system(
 rendering_system::~rendering_system()
 { }
 
-void rendering_system::update()
+void rendering_system::onRender([[maybe_unused]] event_args* e)
 {
     mainCamera        = _registry.view<main_camera_t>().front();
     auto&& [cam, mod] = _registry.get<const camera, const model>(mainCamera);

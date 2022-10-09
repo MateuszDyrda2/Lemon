@@ -7,11 +7,12 @@ namespace lemon {
 class LEMON_API entity_system : public system
 {
   public:
-    SYSTEM(entity_system, registry);
+    SYSTEM(entity_system, scene, event_queue);
     ~entity_system();
-    void update() override;
+    void onEarlyUpdate(event_args* e);
 
   private:
     registry& _registry;
+    event_queue::listener_handle update;
 };
 }

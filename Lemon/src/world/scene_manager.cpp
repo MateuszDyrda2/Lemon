@@ -14,11 +14,6 @@ scene_manager::scene_manager(asset_storage& _assetStorage,
 scene_manager::~scene_manager()
 { }
 
-void scene_manager::update()
-{
-    currentScene->update();
-}
-
 void scene_manager::create_scene(hash_str sceneid)
 {
     scenes.emplace(
@@ -30,10 +25,10 @@ scene& scene_manager::load_scene(hash_str sceneid)
 {
     if(currentScene)
     {
-        currentScene->on_unload();
+        //        currentScene->on_unload();
     }
     currentScene = scenes.at(sceneid).get();
-    currentScene->on_load();
+    //   currentScene->on_load();
     return *currentScene;
 }
 

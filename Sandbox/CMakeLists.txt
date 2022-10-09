@@ -4,7 +4,10 @@ project(Sandbox DESCRIPTION "Test project" LANGUAGES CXX)
 
 set(sandbox_SRC 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/input_system.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/input_system.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement_system.cpp
+
+)
 
 add_executable(sandbox ${sandbox_SRC})
 target_link_libraries(sandbox PUBLIC lemon::lemon)
@@ -16,6 +19,10 @@ target_compile_definitions(
 
 set(SYSTEMS_LIST
     "src/input_system.h"
+    "src/movement_system.h"
+)
+set(COMPONENTS_LIST
+    "src/player_components.h"
 )
 
 foreach(path IN LISTS SYSTEMS_LIST)

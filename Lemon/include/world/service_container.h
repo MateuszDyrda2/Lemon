@@ -78,7 +78,7 @@ struct LEMON_API service_container
     asset_storage& _asset_storage;
     scheduler& _scheduler;
     event_queue& _event_queue;
-    entt::registry& _registry;
+    class scene& _scene;
     window& _window;
     input& _input;
 };
