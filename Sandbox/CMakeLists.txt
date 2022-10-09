@@ -25,6 +25,18 @@ set(COMPONENTS_LIST
     "src/player_components.h"
 )
 
+foreach(path IN LISTS COMPONENTS_LIST)
+    set(filename)
+    get_filename_component(filename ${path} NAME_WE)
+    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
+    add_custom_command(
+        OUTPUT ${output}
+        DEPENDS ${path}
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+        COMMENT "Generated editor data for ${filename}")
+    set(GAME_TYPES ${ENGINE_TYPES} ${output})
+endforeach(path in LISTS ARGN)
+
 foreach(path IN LISTS SYSTEMS_LIST)
     set(filename)
     get_filename_component(filename ${path} NAME_WE)

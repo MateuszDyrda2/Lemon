@@ -42,4 +42,12 @@ entity scene::get_entity(entity_t handle)
 {
     return entity(&_registry, handle);
 }
+void scene::destroy(const entity_t entity)
+{
+    _registry.destroy(entity);
+}
+void scene::destroy_entity(const entity entity)
+{
+    _registry.destroy(entity.get_handle());
+}
 }

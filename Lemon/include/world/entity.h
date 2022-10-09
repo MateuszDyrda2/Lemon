@@ -10,6 +10,8 @@ class LEMON_API entity
 {
   public:
     entity() = default;
+    entity(registry* reg, entity_t handle);
+    entity(class scene& _scene, entity_t handle);
     template<class T, class... Args>
     decltype(auto) emplace(Args&&... args);
     template<class T, class... Args>
@@ -37,10 +39,6 @@ class LEMON_API entity
     void set_dirty();
 
   private:
-    friend class scene;
-    entity(registry* reg, entity_t handle):
-        handle(handle), reg(reg) { }
-
     entity_t handle{ entt::null };
     registry* reg{ nullptr };
 };

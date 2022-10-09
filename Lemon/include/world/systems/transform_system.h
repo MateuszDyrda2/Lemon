@@ -23,7 +23,7 @@ class LEMON_API transform_system : public system
     static void scale_by(entity& _entity, vec2 scale);
 
   private:
-    registry& _registry;
+    scene& _scene;
     event_queue::listener_handle update;
 };
 }

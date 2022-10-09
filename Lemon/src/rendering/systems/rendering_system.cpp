@@ -7,7 +7,7 @@
 namespace lemon {
 rendering_system::rendering_system(
     scene& _scene, event_queue& _eventQueue, asset_storage& _assetStorage, window& _window):
-    _registry(_scene.get_registry()),
+    _scene(_scene),
     renderer(_assetStorage),
     viewport(_window.get_size())
 {
@@ -26,8 +26,8 @@ rendering_system::~rendering_system()
 
 void rendering_system::onRender([[maybe_unused]] event_args* e)
 {
-    mainCamera        = _registry.view<main_camera_t>().front();
-    auto&& [cam, mod] = _registry.get<const camera, const model>(mainCamera);
+    mainCamera        = _scene.view<main_camera_t>().front();
+    auto&& [cam, mod] = _scene.get<const camera, const model>(mainCamera);
     auto newViewport  = vec4{
         cam.viewport.x * viewport.x,
         cam.viewport.y * viewport.y,
@@ -51,7 +51,7 @@ void rendering_system::onRender([[maybe_unused]] event_args* e)
     rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
     renderer.start_render(viewProj);
 
-    _registry.view<sprite_renderer, model>().each(
+    _scene.view<sprite_renderer, model>().each(
         [this](const auto, auto& sr, auto& m) {
             if(sr.tex)
                 renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);

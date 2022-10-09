@@ -17,7 +17,7 @@ class LEMON_API rendering_system : public system
     void onRender(event_args* e);
 
   private:
-    registry& _registry;
+    scene& _scene;
 
     event_queue::listener_handle update;
     event_queue::listener_handle framebufferSize;

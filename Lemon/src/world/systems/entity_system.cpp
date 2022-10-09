@@ -2,7 +2,7 @@
 
 namespace lemon {
 entity_system::entity_system(scene& _scene, event_queue& eventQueue):
-    _registry(_scene.get_registry())
+    _scene(_scene)
 {
     update = eventQueue["EarlyUpdate"_hs] += [this](event_args* e) {
         this->onEarlyUpdate(e);
@@ -15,17 +15,19 @@ entity_system::~entity_system()
 
 void entity_system::onEarlyUpdate([[maybe_unused]] event_args* e)
 {
-    auto&& toDestroy = _registry.view<destroy_m>();
-    _registry.destroy(toDestroy.begin(), toDestroy.end());
+    auto&& toDestroy = _scene.view<destroy_m>();
+    _scene.destroy(toDestroy.begin(), toDestroy.end());
 
-    _registry.view<disable_m>()
-        .each([this](const auto entity) {
-            _registry.remove<enabled_t>(entity);
+    _scene.view<disable_m>()
+        .each([this](const auto handle) {
+            entity(_scene, handle)
+                .remove_component<enabled_t>();
         });
 
-    _registry.view<enable_m>()
-        .each([this](const auto entity) {
-            _registry.emplace_or_replace<enabled_t>(entity);
+    _scene.view<enable_m>()
+        .each([this](const auto handle) {
+            entity(_scene, handle)
+                .emplace_or_replace<enabled_t>();
         });
 }
 }

@@ -17,25 +17,8 @@ project(Lemon DESCRIPTION ${lemon_DESC} LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 # ----------------------------------------------
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
-option(LEMON_PROFILE "Profile execution" ON)
-# ----------------------------------------------
-
 
 find_package(Threads REQUIRED)
-# ----------------------------------------------
-
-# ------------- Platform specific --------------
-if (WIN32)
-    # platform windows
-    set(LEMON_PLATFORM LEMON_WINDOWS)
-elseif (APPLE)
-    # platform macos
-    set(LEMON_PLATFORM LEMON_APPLE)
-elseif (UNIX)
-    # platform linux
-    set(LEMON_PLATFORM LEMON_LINUX)
-endif()
 # ----------------------------------------------
 
 # --------------- Add library ------------------
@@ -68,10 +51,15 @@ set(lemon_THREADING_SRC
     src/threading/scheduler.cpp
 )
 set(lemon_WORLD_SRC
+    src/world/entity.cpp
     src/world/scene.cpp
     src/world/scene_manager.cpp
     src/world/systems/entity_system.cpp
     src/world/systems/transform_system.cpp
+)
+set(lemon_PHYSICS_SRC
+    src/physics/bvh_tree.cpp
+    src/physics/sat_algorithm.cpp
 )
 
 set(lemon_SRC
@@ -82,6 +70,7 @@ set(lemon_SRC
     ${lemon_RENDERING_SRC}
     ${lemon_THREADING_SRC}
     ${lemon_WORLD_SRC}
+    ${lemon_PHYSICS_SRC}
 )
 
 add_library(lemon ${lemon_SRC})

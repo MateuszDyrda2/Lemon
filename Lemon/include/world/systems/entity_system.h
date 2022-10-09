@@ -12,7 +12,7 @@ class LEMON_API entity_system : public system
     void onEarlyUpdate(event_args* e);
 
   private:
-    registry& _registry;
+    scene& _scene;
     event_queue::listener_handle update;
 };
 }
