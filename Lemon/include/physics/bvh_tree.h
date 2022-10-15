@@ -1,25 +1,22 @@
 #pragma once
 
+#include "detail/physics_utils.h"
+
 #include <core/defines.h>
 #include <core/lemon_types.h>
-#include <core/math/vec2.h>
 
 #include <list>
 #include <unordered_map>
 #include <vector>
 
 namespace lemon {
-/** Axis Aligned Bounding Box */
-struct AABB
-{
-    vec2 min, max;
-};
 /** Bounding Volume Hierarchy tree implementation
  * https://en.wikipedia.org/wiki/Bounding_volume_hierarchy
  */
 class LEMON_API bvh_tree
 {
     using index_t                      = i32;
+    using AABB                         = detail::AABB;
     static constexpr index_t nullIndex = -1;
     static constexpr f32 fattenBy      = 0.05f;
     struct node
@@ -29,17 +26,36 @@ class LEMON_API bvh_tree
         index_t parentIndex;
         index_t childA;
         index_t childB;
+        index_t nextFree;
         bool isLeaf;
+        bool isActive;
         i32 height;
     };
 
   public:
+    /** @brief Creates the tree */
     bvh_tree();
     ~bvh_tree();
+    /** @brief Inserts a single bounding box for entity
+     * @param entityId id of the inserted leaf
+     * @param box Bounding box of the entity */
     void insert_leaf(u32 entityId, const AABB& box);
+    /** @brief Removes entity from the tree
+     * @param entityId id of the entity to remove */
     void remove_leaf(u32 entityId);
+    /** @brief Update the bounding box of the entity
+     * @param entityId id of the entity to update
+     * @param box new bounding box */
     void update_leaf(u32 entityId, const AABB& box);
+    /** @brief Get a list of colliding bounding boxes
+     * @param entityId entity to check against
+     * @return list of colliding entities */
     std::list<u32> query_tree(u32 entityId);
+    /** @brief Get a list of entities colliding with a point
+     * @param position position to intersect
+     * @return list of colliding entities */
+    std::list<u32> raycast(vec2 position);
+    /** @return Get number of nodes */
     std::size_t get_node_count() const { return nodeCount; }
 
   private:
