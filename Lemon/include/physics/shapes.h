@@ -20,4 +20,7 @@ struct circle_shape
     vec2 center;
     f32 radius;
 };
+
+box_shape create_box(vec2 hSize, vec2 center, f32 degrees);
+circle_shape create_circle(f32 radius, vec2 center);
 }

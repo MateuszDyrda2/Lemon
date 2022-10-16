@@ -1,5 +1,6 @@
-#include <core/math/math.h>
 #include <world/systems/transform_system.h>
+
+#include <core/math/math.h>
 
 namespace lemon {
 transform_system::transform_system(scene& _scene, event_queue& _eventQueue):

@@ -47,7 +47,7 @@ void bvh_tree::remove_leaf(u32 entityId)
     }
 
     auto index = entityNodeMap[entityId];
-    remove_leaf(index);
+    remove_node(index);
     deallocate_node(index);
     entityNodeMap.erase(entityId);
 }

@@ -126,8 +126,9 @@ TEST(PhysicsBVHTest, QueryTreeOverlappingMultiple)
     tree.insert_leaf(2, { .min = { 5, 2 }, .max = { 8, 4 } });
     tree.insert_leaf(3, { .min = { 4, 1 }, .max = { 10, 5 } });
     auto res = tree.query_tree(0);
-    ASSERT_EQ(res.size(), 1);
-    ASSERT_EQ(res.front(), 1);
+    ASSERT_EQ(res.size(), 2);
+    ASSERT_TRUE(std::find(res.begin(), res.end(), 1) != res.end());
+    ASSERT_TRUE(std::find(res.begin(), res.end(), 3) != res.end());
     auto res2 = tree.query_tree(1);
     ASSERT_EQ(res2.size(), 3);
     ASSERT_TRUE(std::find(res2.begin(), res2.end(), 0) != res2.end());
@@ -138,7 +139,8 @@ TEST(PhysicsBVHTest, QueryTreeOverlappingMultiple)
     ASSERT_TRUE(std::find(res3.begin(), res3.end(), 1) != res3.end());
     ASSERT_TRUE(std::find(res3.begin(), res3.end(), 3) != res3.end());
     auto res4 = tree.query_tree(3);
-    ASSERT_EQ(res4.size(), 2);
+    ASSERT_EQ(res4.size(), 3);
+    ASSERT_TRUE(std::find(res4.begin(), res4.end(), 0) != res4.end());
     ASSERT_TRUE(std::find(res4.begin(), res4.end(), 1) != res4.end());
     ASSERT_TRUE(std::find(res4.begin(), res4.end(), 2) != res4.end());
 }

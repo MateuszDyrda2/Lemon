@@ -1,5 +1,7 @@
 #pragma once
 
+#include "events/events.h"
+#include "world/system.h"
 #include <core/lemon_types.h>
 #include <core/math/vec2.h>
 
@@ -38,4 +40,11 @@ inline bool intersects(const AABB& lhs, const AABB& rhs)
     return (lhs.max.x >= rhs.min.x && rhs.max.x >= lhs.min.x)
            && (lhs.max.y >= rhs.min.y && rhs.max.y >= lhs.min.y);
 }
+
+struct LEMON_API collision_event : event_args
+{
+    entity_t a, b;
+    collision_event(entity_t a, entity_t b):
+        a(a), b(b) { }
+};
 }
