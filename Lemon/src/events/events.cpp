@@ -1,3 +1,4 @@
+#include "world/system.h"
 #include <events/events.h>
 
 namespace lemon {
@@ -76,6 +77,32 @@ void event_queue::process()
         delete front.second;
         currentQueue.pop();
     }
+
+    auto& earlyUpdateListeners   = listeners["EarlyUpdate"_hs];
+    auto& physicsUpdateListeners = listeners["PhysicsUpdate"_hs];
+    auto& updateListeners        = listeners["Update"_hs];
+    auto& renderListeners        = listeners["Render"_hs];
+
+    auto updateEvent = update_event();
+    std::for_each(earlyUpdateListeners.begin(), earlyUpdateListeners.end(),
+                  [](auto& callback) {
+                      callback(&updateEvent);
+                  });
+
+    std::for_each(physicsUpdateListeners.begin(), physicsUpdateListeners.end(),
+                  [](auto& callback) {
+                      callback(&updateEvent);
+                  });
+
+    std::for_each(updateListeners.begin(), updateListeners.end(),
+                  [](auto& callback) {
+                      callback(&updateEvent);
+                  });
+
+    std::for_each(renderListeners.begin(), renderListeners.end(),
+                  [](auto& callback) {
+                      callback(&updateEvent);
+                  });
 }
 event_queue::event_sink event_queue::event(event_handle eventId)
 {

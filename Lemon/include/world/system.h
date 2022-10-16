@@ -8,9 +8,12 @@ using registry = entt::registry;
 
 struct LEMON_API update_event : public event_args
 {
-    update_event(f32 deltaTime):
-        deltaTime(deltaTime) { }
+    update_event(f32 deltaTime, f32 fixedDelta, f32 alpha):
+        deltaTime(deltaTime), fixedDelta(fixedDelta), alpha(alpha) { }
+
     f32 deltaTime;
+    f32 fixedDelta;
+    f32 alpha;
 };
 
 class LEMON_API system
