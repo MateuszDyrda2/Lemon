@@ -41,10 +41,20 @@ event_queue::listener_handle event_queue::event_sink::operator+=(const callback&
     listeners.push_back(callable);
     return listener_handle(listeners, std::prev(listeners.end()));
 }
+
 void event_queue::event_sink::fire(event_args* e)
 {
     eventQueue.push({ handle, e });
 }
+
+void event_queue::event_sink::fire_immediate(event_args* e)
+{
+    std::for_each(listeners.begin(), listeners.end(),
+                  [&](auto& callback) {
+                      callback(e);
+                  });
+}
+
 event_queue::event_sink::event_sink(event_handle handle,
                                     std::list<callback>& listeners,
                                     std::queue<event_pair>& eventQueue):
@@ -77,32 +87,6 @@ void event_queue::process()
         delete front.second;
         currentQueue.pop();
     }
-
-    auto& earlyUpdateListeners   = listeners["EarlyUpdate"_hs];
-    auto& physicsUpdateListeners = listeners["PhysicsUpdate"_hs];
-    auto& updateListeners        = listeners["Update"_hs];
-    auto& renderListeners        = listeners["Render"_hs];
-
-    auto updateEvent = update_event();
-    std::for_each(earlyUpdateListeners.begin(), earlyUpdateListeners.end(),
-                  [](auto& callback) {
-                      callback(&updateEvent);
-                  });
-
-    std::for_each(physicsUpdateListeners.begin(), physicsUpdateListeners.end(),
-                  [](auto& callback) {
-                      callback(&updateEvent);
-                  });
-
-    std::for_each(updateListeners.begin(), updateListeners.end(),
-                  [](auto& callback) {
-                      callback(&updateEvent);
-                  });
-
-    std::for_each(renderListeners.begin(), renderListeners.end(),
-                  [](auto& callback) {
-                      callback(&updateEvent);
-                  });
 }
 event_queue::event_sink event_queue::event(event_handle eventId)
 {

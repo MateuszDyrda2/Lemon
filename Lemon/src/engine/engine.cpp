@@ -20,21 +20,45 @@ engine::~engine()
 int engine::run()
 {
     using namespace std::chrono;
-    auto lastFrame = high_resolution_clock::now();
+
+    auto lastFrame  = high_resolution_clock::now();
+    f32 delta       = 0.016,
+        fixedDelta  = 0.020f,
+        accumulator = {},
+        alpha       = {};
 
     while(_window.update())
     {
         auto currentFrame = high_resolution_clock::now();
-        auto deltaTime    = duration_cast<duration<f32>>(currentFrame - lastFrame).count();
-        lastFrame         = currentFrame;
+        delta =
+            duration_cast<duration<f32>>(
+                currentFrame - lastFrame)
+                .count();
+        lastFrame = currentFrame;
+
         // poll current input state
         _input.update();
         // run all pending events
-        _eventQueue["EarlyUpdate"_hs].fire(new update_event(deltaTime));
-        _eventQueue["Update"_hs].fire(new update_event(deltaTime));
-        _eventQueue["LateUpdate"_hs].fire(new update_event(deltaTime));
-        _eventQueue["Render"_hs].fire(new update_event(deltaTime));
         _eventQueue.process();
+        // run update
+        update_event eu(delta, alpha);
+        _eventQueue["EarlyUpdate"_hs]
+            .fire_immediate(&eu);
+
+        accumulator += delta;
+        while(accumulator >= fixedDelta)
+        {
+            fixed_update_event fe(fixedDelta);
+            _eventQueue["PhysicsUpdate"_hs]
+                .fire_immediate(&fe);
+            accumulator -= fixedDelta;
+        }
+        alpha = accumulator / fixedDelta;
+        update_event e(delta, alpha);
+        _eventQueue["Update"_hs]
+            .fire_immediate(&e);
+        _eventQueue["Render"_hs]
+            .fire_immediate(&e);
         // clean unused assets
         _assertStorage.update();
     }

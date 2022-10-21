@@ -57,19 +57,20 @@ class LEMON_API event_queue
         /** @brief Subscribe to an event
          * @param callable function to be called when an event is fired
          * @return handle for unsubscribing from event
-         * @warning listeners handle destructor unsubscribes from the event
-         */
+         * @warning listeners handle destructor unsubscribes from the event */
         [[nodiscard]] listener_handle subscribe(const callback& callable);
         /** @brief Subscribe to an event
          * @param callable function to be called when an event is fired
          * @return handle for unsubscribing from event
-         * @warning listeners handle destructor unsubscribes from the event
-         */
+         * @warning listeners handle destructor unsubscribes from the event */
         [[nodiscard]] listener_handle operator+=(const callback& callable);
         /** @brief Fire the event
-         * @param e event arguments
-         */
+         * @param e event arguments */
         void fire(event_args* e);
+        /** brief Fire the event synchronously
+         * @param e event arguments */
+        void fire_immediate(event_args* e);
+
         event_sink(const event_sink&) = delete;
 
       private:
