@@ -12,4 +12,10 @@ constexpr inline std::underlying_type_t<E> enum_undelying(const E& val)
 {
     return static_cast<typename std::underlying_type_t<E>>(val);
 }
+
+template<class T>
+constexpr inline bool in_range(const T& val, const T& low, const T& high)
+{
+    return !(val < low) && !(high < val);
+}
 }

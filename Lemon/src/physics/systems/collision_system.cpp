@@ -6,48 +6,84 @@
 #include <physics/systems/collision_system.h>
 
 #include <physics/components/physics_components.h>
+#include <type_traits>
 #include <world/components/transform_components.h>
 #include <world/system.h>
 
 namespace lemon {
+std::optional<detail::AABB>
+collision_system::get_aabb(const entity_t _entity, const rigidbody& _rigidbody)
+{
+    switch (_rigidbody.colliderType)
+    {
+    case collider_type::box:
+    {
+        auto& box = _scene.get<box_collider>(_entity);
+        return detail::AABB{
+            .min = { _rigidbody.position + box.offset - box.hSize },
+            .max = { _rigidbody.position + box.offset + box.hSize },
+        };
+    }
+    case collider_type::circle:
+    {
+        auto& circle = _scene.get<circle_collider>(_entity);
+        return detail::AABB{
+            .min = { _rigidbody.position + circle.offset - circle.radius },
+            .max = { _rigidbody.position + circle.offset + circle.radius },
+        };
+    }
+    default:
+        return {};
+    }
+}
+
 collision_system::collision_system(scene& _scene, event_queue& _eventQueue):
     _scene(_scene), _eventQueue(_eventQueue)
 {
-    update = _eventQueue["Update"_hs] += [this](event_args* e) {
+    update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
         this->onUpdate(e);
     };
 }
 
 collision_system::~collision_system() { }
 
-void collision_system::onUpdate(event_args* e)
+void collision_system::onUpdate([[maybe_unused]] event_args* e)
 {
-    auto delta = static_cast<update_event*>(e)->deltaTime;
     collision_set newSet;
+    auto&& [fixedDelta] = get_event<fixed_update_event>(e);
 
-    auto boxColliders = _scene.group<rigidbody>(
-        entt::get<const box_collider>);
-    auto circleColliders = _scene.group<rigidbody>(
-        entt::get<const circle_collider>);
-    auto capsuleColliders = _scene.group<rigidbody>(
-        entt::get<const capsule_collider>);
-
-    for(auto&& [_entity, _rigidbody, _box] : boxColliders.each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t>().each())
     {
-        auto collisions = tree.query_tree(u32(_entity));
-        handle_box_collisions(newSet, _entity, _rigidbody, _box, collisions);
+        if (auto aabb = get_aabb(_entity, _rigidbody))
+            tree.update_leaf(std::underlying_type_t<typeof(_entity)>(_entity), *aabb);
     }
 
-    for(auto&& [_entity, _rigidbody, _circle] : circleColliders.each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody>().each())
     {
         auto collisions = tree.query_tree(u32(_entity));
-        handle_circle_collisions(newSet, _entity, _rigidbody, _circle, collisions);
-    }
-
-    for(auto&& [_entity, _rigidbody, _capsule] : capsuleColliders.each())
-    {
-        auto collisions = tree.query_tree(u32(_entity));
-        handle_capsule_collisions(newSet, _entity, _rigidbody, _capsule, collisions);
+        switch (_rigidbody.colliderType)
+        {
+        case collider_type::box:
+        {
+            auto _box = _scene.get<box_collider>(_entity);
+            handle_box_collisions(fixedDelta, newSet, _entity, _rigidbody, _box, collisions);
+        }
+        break;
+        case collider_type::circle:
+        {
+            auto _circle = _scene.get<circle_collider>(_entity);
+            handle_circle_collisions(fixedDelta, newSet, _entity, _rigidbody, _circle, collisions);
+        }
+        break;
+        case collider_type::capsule:
+        {
+            auto _capsule = _scene.get<capsule_collider>(_entity);
+            handle_capsule_collisions(fixedDelta, newSet, _entity, _rigidbody, _capsule, collisions);
+        }
+        break;
+        default:
+            break;
+        }
     }
 
     // clear collisions
@@ -59,7 +95,7 @@ void collision_system::onUpdate(event_args* e)
 
 void collision_system::collision_events(entity_t a, entity_t b)
 {
-    if(set.has(a, b))
+    if (set.has(a, b))
     {
         // collision repeated
         _eventQueue["CollisionRepeated"_hs].fire(
@@ -73,14 +109,15 @@ void collision_system::collision_events(entity_t a, entity_t b)
     }
 }
 
-void collision_system::physics_reponse(f32 bounciness, const mtv& vec,
+void collision_system::physics_reponse(f32 fixedDelta,
+                                       f32 bounciness, const mtv& vec,
                                        rigidbody& aRigidbody, rigidbody& bRigidbody)
 {
     // J = (-(1 + e)Vab * n) / (n * n(1/ma + 1/mb))
     // Va+ = Va- + J/ma * n
     // Vb+ = Vb- - J/mb * n
-    const auto oma = int(aRigidbody.isKinetic) * 1.f / aRigidbody.mass;
-    const auto omb = int(bRigidbody.isKinetic) * 1.f / bRigidbody.mass;
+    const auto oma = i32(aRigidbody.isKinetic) * 1.f / aRigidbody.mass;
+    const auto omb = i32(bRigidbody.isKinetic) * 1.f / bRigidbody.mass;
 
     const auto Vab  = (aRigidbody.velocity - bRigidbody.velocity);
     const auto rVel = glm::dot(Vab, vec.axis);
@@ -91,9 +128,13 @@ void collision_system::physics_reponse(f32 bounciness, const mtv& vec,
 
     aRigidbody.velocity = Va;
     bRigidbody.velocity = Vb;
+
+    aRigidbody.position = aRigidbody.velocity * fixedDelta;
+    bRigidbody.position = bRigidbody.velocity * fixedDelta;
 }
 
 void collision_system::handle_box_collisions(
+    f32 fixedDelta,
     collision_set& newSet,
     entity_t a,
     rigidbody& rb,
@@ -101,35 +142,39 @@ void collision_system::handle_box_collisions(
     const std::list<u32>& collisions)
 {
 
-    for(const auto& other : collisions)
+    for (const auto& other : collisions)
     {
         auto otherEntity      = _scene.get_entity(entity_t(other));
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
-        if(otherEntity.has<box_collider>())
+        if (otherEntity.has<box_collider>())
         {
             // box x box collision
             auto&& otherBox = otherEntity.get<box_collider>();
-            if(auto coll = box_box_collision(rb, collider, otherRigidbody, otherBox))
+            if (auto coll = box_box_collision(rb, collider, otherRigidbody, otherBox))
             {
-                if(!newSet.push(a, entity_t(other))) continue;
+                if (!newSet.push(a, entity_t(other))) continue;
                 collision_events(a, entity_t(other));
-                physics_reponse(std::min(collider.bounciness, otherBox.bounciness), *coll, rb, otherRigidbody);
+                physics_reponse(
+                    fixedDelta, std::min(collider.bounciness, otherBox.bounciness),
+                    *coll, rb, otherRigidbody);
             }
         }
-        else if(otherEntity.has<circle_collider>())
+        else if (otherEntity.has<circle_collider>())
         {
             // box x circle collision
             auto&& otherCircle = otherEntity.get<circle_collider>();
-            if(auto coll = box_circle_collision(rb, collider, otherRigidbody, otherCircle))
+            if (auto coll = box_circle_collision(rb, collider, otherRigidbody, otherCircle))
             {
-                if(!newSet.push(a, entity_t(other))) continue;
+                if (!newSet.push(a, entity_t(other))) continue;
                 collision_events(a, entity_t(other));
 
-                physics_reponse(std::min(collider.bounciness, otherCircle.bounciness), *coll, rb, otherRigidbody);
+                physics_reponse(
+                    fixedDelta, std::min(collider.bounciness, otherCircle.bounciness),
+                    *coll, rb, otherRigidbody);
             }
         }
-        else if(otherEntity.has<capsule_collider>())
+        else if (otherEntity.has<capsule_collider>())
         {
             // box x capsule collision
         }
@@ -137,42 +182,47 @@ void collision_system::handle_box_collisions(
 }
 
 void collision_system::handle_circle_collisions(
+    f32 fixedDelta,
     collision_set& newSet,
     entity_t a,
     rigidbody& rb,
     const circle_collider& collider,
     const std::list<u32>& collisions)
 {
-    for(const auto& other : collisions)
+    for (const auto& other : collisions)
     {
         auto otherEntity      = _scene.get_entity(entity_t(other));
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
-        if(otherEntity.has<box_collider>())
+        if (otherEntity.has<box_collider>())
         {
             // circle x box collision
             auto&& otherBox = otherEntity.get<box_collider>();
-            if(auto coll = box_circle_collision(otherRigidbody, otherBox, rb, collider))
+            if (auto coll = box_circle_collision(otherRigidbody, otherBox, rb, collider))
             {
-                if(!newSet.push(a, entity_t(other))) continue;
+                if (!newSet.push(a, entity_t(other))) continue;
                 collision_events(a, entity_t(other));
-                physics_reponse(std::min(collider.bounciness, otherBox.bounciness),
-                                *coll, rb, otherRigidbody);
+                physics_reponse(
+                    fixedDelta,
+                    std::min(collider.bounciness, otherBox.bounciness),
+                    *coll, rb, otherRigidbody);
             }
         }
-        else if(otherEntity.has<circle_collider>())
+        else if (otherEntity.has<circle_collider>())
         {
             // circle x circle collision
             auto&& otherCircle = otherEntity.get<circle_collider>();
-            if(auto coll = circle_circle_collision(rb, collider, otherRigidbody, otherCircle))
+            if (auto coll = circle_circle_collision(rb, collider, otherRigidbody, otherCircle))
             {
-                if(!newSet.push(a, entity_t(other))) continue;
+                if (!newSet.push(a, entity_t(other))) continue;
                 collision_events(a, entity_t(other));
-                physics_reponse(std::min(collider.bounciness, otherCircle.bounciness),
-                                *coll, rb, otherRigidbody);
+                physics_reponse(
+                    fixedDelta,
+                    std::min(collider.bounciness, otherCircle.bounciness),
+                    *coll, rb, otherRigidbody);
             }
         }
-        else if(otherEntity.has<capsule_collider>())
+        else if (otherEntity.has<capsule_collider>())
         {
             // circle x capsule collision
         }
@@ -180,26 +230,27 @@ void collision_system::handle_circle_collisions(
 }
 
 void collision_system::handle_capsule_collisions(
+    [[maybe_unused]] f32 fixedDelta,
     [[maybe_unused]] collision_set& newSet,
     [[maybe_unused]] entity_t a,
     [[maybe_unused]] rigidbody& rb,
     [[maybe_unused]] const capsule_collider& collider,
     [[maybe_unused]] const std::list<u32>& collisions)
 {
-    for(const auto& other : collisions)
+    for (const auto& other : collisions)
     {
         auto otherEntity                       = _scene.get_entity(entity_t(other));
         [[maybe_unused]] auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
-        if(otherEntity.has<box_collider>())
+        if (otherEntity.has<box_collider>())
         {
             // capsule x box collision
         }
-        else if(otherEntity.has<circle_collider>())
+        else if (otherEntity.has<circle_collider>())
         {
             // capsule x circle collision
         }
-        else if(otherEntity.has<capsule_collider>())
+        else if (otherEntity.has<capsule_collider>())
         {
             // capsule x capsule collision
         }

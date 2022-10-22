@@ -73,6 +73,13 @@ class LEMON_API input
      */
     void add_axis(pair_keycodes axis, hash_str actionId);
 
+    bool check_key(keycode key, key_action action);
+    bool check_key(mouse button, key_action action);
+    bool check_key(gamepad button, key_action action);
+    f32 check_axis(pair_keycodes axis);
+    f32 check_axis(gamepad_axis gamepad);
+    f32 check_axis(mouse_axis mouse);
+
   private:
     std::unique_ptr<impl> pImpl;
 };

@@ -33,25 +33,31 @@ class LEMON_API collision_system : public system
     event_queue::listener_handle update;
 
   private:
+    std::optional<detail::AABB> get_aabb(
+        const entity_t _entity, const rigidbody& _rigidbody);
     void collision_events(entity_t a, entity_t b);
     void physics_reponse(
+        f32 fixedDelta,
         f32 bounciness,
         const mtv& vec,
         rigidbody& aRigidbody,
         rigidbody& bRigidbody);
     void handle_box_collisions(
+        f32 fixedDelta,
         collision_set& newSet,
         entity_t a,
         rigidbody& rb,
         const box_collider& collider,
         const std::list<u32>& collisions);
     void handle_circle_collisions(
+        f32 fixedDelta,
         collision_set& newSet,
         entity_t a,
         rigidbody& rb,
         const circle_collider& collider,
         const std::list<u32>& collisions);
     void handle_capsule_collisions(
+        f32 fixedDelta,
         collision_set& newSet,
         entity_t a,
         rigidbody& rb,

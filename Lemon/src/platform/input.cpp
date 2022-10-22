@@ -43,8 +43,8 @@ class input::impl
         device dev;
         constexpr bool operator==(const input_action& other) const noexcept
         {
-            if(dev != other.dev) return false;
-            switch(dev)
+            if (dev != other.dev) return false;
+            switch (dev)
             {
             case device::keyboard:
                 return keyAction.action == other.keyAction.action
@@ -72,7 +72,7 @@ class input::impl
     {
         std::size_t operator()(const input_action& act) const
         {
-            switch(act.dev)
+            switch (act.dev)
             {
             case device::keyboard:
                 return std::hash<u64>{}(u64(act.keyAction.key) << 32 | u64(act.keyAction.action));
@@ -122,21 +122,21 @@ class input::impl
             });
         initialize_events(wnd);
 
-        for(int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
+        for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
         {
             glfwSetJoystickUserPointer(i, reinterpret_cast<void*>(this));
-            if(glfwJoystickIsGamepad(i) == GLFW_TRUE)
+            if (glfwJoystickIsGamepad(i) == GLFW_TRUE)
             {
                 jid = std::size_t(i);
             }
         }
         glfwSetJoystickCallback([](int jid, int event) {
             auto in = reinterpret_cast<impl*>(glfwGetJoystickUserPointer(jid));
-            if(event == GLFW_CONNECTED)
+            if (event == GLFW_CONNECTED)
             {
                 in->jid = jid;
             }
-            else if(event == GLFW_DISCONNECTED)
+            else if (event == GLFW_DISCONNECTED)
             {
                 in->jid = -1;
             }
@@ -209,34 +209,34 @@ class input::impl
     }
     void update()
     {
-        if(jid != -1)
+        if (jid != -1)
         {
             GLFWgamepadstate newState;
             glfwGetGamepadState(jid, &newState);
-            for(std::size_t i = 0; i < GAMEPAD_COUNT; ++i)
+            for (std::size_t i = 0; i < GAMEPAD_COUNT; ++i)
             {
-                if(gamepadStates[i] != key_action(newState.buttons[i]))
+                if (gamepadStates[i] != key_action(newState.buttons[i]))
                 {
                     gamepadStates[i] = key_action(1 << newState.buttons[i]);
                 }
-                else if(newState.buttons[i] == GLFW_RELEASE)
+                else if (newState.buttons[i] == GLFW_RELEASE)
                 {
                     gamepadStates[i] = key_action::up;
                 }
             }
-            for(std::size_t i = 0; i < GAMEPAD_AXIS_COUNT; ++i)
+            for (std::size_t i = 0; i < GAMEPAD_AXIS_COUNT; ++i)
             {
                 gamepadAxisStates[i] = f32(newState.axes[i]);
             }
         }
-        for(auto&& [inp, acts] : actions)
+        for (auto&& [inp, acts] : actions)
         {
-            switch(inp.dev)
+            switch (inp.dev)
             {
             case device::keyboard:
             {
                 auto&& [key, action] = inp.keyAction;
-                if(i32(action) & i32(keyStates[int(key)]))
+                if (i32(action) & i32(keyStates[i32(key)]))
                     queue[acts].fire(new input_event);
             }
             break;
@@ -253,7 +253,7 @@ class input::impl
             case device::mouse:
             {
                 auto&& [key, action] = inp.mouseAction;
-                if(i32(action) & i32(mouseStates[i32(key) - i32(MOUSE_FIRST)]))
+                if (i32(action) & i32(mouseStates[i32(key) - i32(MOUSE_FIRST)]))
                     queue[acts].fire(new input_event);
             }
             break;
@@ -265,7 +265,7 @@ class input::impl
             case device::gamepad:
             {
                 auto&& [key, action] = inp.gamepadAction;
-                if(i32(action) & i32(keyStates[i32(key) - i32(GAMEPAD_FIRST)]))
+                if (i32(action) & i32(keyStates[i32(key) - i32(GAMEPAD_FIRST)]))
                     queue[acts].fire(new input_event);
             }
             break;
@@ -278,10 +278,10 @@ class input::impl
                 break;
             }
         }
-        for(auto& k : keyStates)
+        for (auto& k : keyStates)
         {
-            if(k == key_action::pressed) k = key_action::down;
-            if(k == key_action::released) k = key_action::up;
+            if (k == key_action::pressed) k = key_action::down;
+            if (k == key_action::released) k = key_action::up;
         }
         mouseStates.fill(key_action::up);
     }
@@ -333,6 +333,38 @@ class input::impl
         };
         actions[in] = actionId;
     }
+    bool check_key(keycode key, key_action action)
+    {
+        return keyStates[i32(key)] == action;
+    }
+    bool check_key(mouse button, key_action action)
+    {
+        return mouseStates[i32(button) - i32(MOUSE_FIRST)] == action;
+    }
+    bool check_key(gamepad button, key_action action)
+    {
+        return gamepadStates[i32(button) - i32(GAMEPAD_FIRST)] == action;
+    }
+    f32 check_axis(pair_keycodes axis)
+    {
+
+        auto&& [first, second] = axis;
+        auto f                 = f32(keyStates[i32(first)] == key_action::pressed
+                                     || keyStates[i32(first)] == key_action::down);
+        auto s                 = f32(keyStates[i32(second)] == key_action::pressed
+                                     || keyStates[i32(second)] == key_action::down);
+        return s - f;
+    }
+
+    f32 check_axis(gamepad_axis gamepad)
+    {
+        return gamepadAxisStates[i32(gamepad) - i32(GAMEPAD_AXIS_FIRST)];
+    }
+
+    f32 check_axis(mouse_axis mouse)
+    {
+        return mousePos[i32(mouse) - i32(MOUSE_AXIS_FIRST)];
+    }
 
   private:
     std::array<key_action, KEYBOARD_COUNT> keyStates;
@@ -352,36 +384,74 @@ input::input(window& wnd, event_queue& queue):
 {
     logger::info("Input created");
 }
+
 input::~input()
 {
     logger::info("Input destroyed");
 }
+
 void input::update()
 {
     pImpl->update();
 }
+
 void input::add_key(keycode key, key_action action, hash_str actionId)
 {
     pImpl->add_key(key, action, actionId);
 }
+
 void input::add_key(mouse button, key_action action, hash_str actionId)
 {
     pImpl->add_key(button, action, actionId);
 }
+
 void input::add_key(gamepad button, key_action action, hash_str actionId)
 {
     pImpl->add_key(button, action, actionId);
 }
+
 void input::add_axis(mouse_axis mouse, hash_str actionId)
 {
     pImpl->add_axis(mouse, actionId);
 }
+
 void input::add_axis(gamepad_axis gamepad, hash_str actionId)
 {
     pImpl->add_axis(gamepad, actionId);
 }
+
 void input::add_axis(pair_keycodes axis, hash_str actionId)
 {
     pImpl->add_axis(axis, actionId);
+}
+
+bool input::check_key(keycode key, key_action action)
+{
+    return pImpl->check_key(key, action);
+}
+
+bool input::check_key(mouse button, key_action action)
+{
+    return pImpl->check_key(button, action);
+}
+
+bool input::check_key(gamepad button, key_action action)
+{
+    return pImpl->check_key(button, action);
+}
+
+f32 input::check_axis(pair_keycodes axis)
+{
+    return pImpl->check_axis(axis);
+}
+
+f32 input::check_axis(gamepad_axis gamepad)
+{
+    return pImpl->check_axis(gamepad);
+}
+
+f32 input::check_axis(mouse_axis mouse)
+{
+    return pImpl->check_axis(mouse);
 }
 } // namespace lemon

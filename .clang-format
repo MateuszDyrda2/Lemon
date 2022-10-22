@@ -60,7 +60,7 @@ SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: Never
+SpaceBeforeParens: ControlStatements
 SpaceBeforeSquareBrackets: false
 SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false

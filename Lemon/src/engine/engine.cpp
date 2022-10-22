@@ -23,11 +23,11 @@ int engine::run()
 
     auto lastFrame  = high_resolution_clock::now();
     f32 delta       = 0.016,
-        fixedDelta  = 0.020f,
+        fixedDelta  = 0.010f,
         accumulator = {},
         alpha       = {};
 
-    while(_window.update())
+    while (_window.update())
     {
         auto currentFrame = high_resolution_clock::now();
         delta =
@@ -46,7 +46,7 @@ int engine::run()
             .fire_immediate(&eu);
 
         accumulator += delta;
-        while(accumulator >= fixedDelta)
+        while (accumulator >= fixedDelta)
         {
             fixed_update_event fe(fixedDelta);
             _eventQueue["PhysicsUpdate"_hs]

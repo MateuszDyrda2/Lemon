@@ -56,10 +56,15 @@ set(lemon_WORLD_SRC
     src/world/scene_manager.cpp
     src/world/systems/entity_system.cpp
     src/world/systems/transform_system.cpp
+    src/world/systems/interpolate_system.cpp
 )
 set(lemon_PHYSICS_SRC
     src/physics/bvh_tree.cpp
     src/physics/sat_algorithm.cpp
+    src/physics/systems/collision_system.cpp
+    src/physics/systems/physics_system.cpp
+    src/physics/shapes.cpp
+    src/physics/detail/collision_set.cpp
 )
 
 set(lemon_SRC

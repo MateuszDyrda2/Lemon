@@ -5,15 +5,25 @@
 #include <world/reflection.h>
 
 namespace lemon {
+enum class collider_type
+{
+    none,
+    box,
+    circle,
+    capsule,
+};
 struct LEMON_API [[lemon::component]] rigidbody
 {
-    [[lemon::field]] vec2 position       = {};
-    [[lemon::field]] f32 rotation        = {};
-    [[lemon::field]] vec2 velocity       = {};
-    [[lemon::field]] f32 angularRotation = {};
-    [[lemon::field]] f32 linearDrag      = {};
-    [[lemon::field]] f32 mass            = { 1.f };
-    [[lemon::field]] bool isKinetic      = { true };
+    [[lemon::field]] vec2 position              = {};
+    [[lemon::field]] f32 rotation               = {};
+    [[lemon::field]] vec2 velocity              = {};
+    [[lemon::field]] f32 angularRotation        = {};
+    [[lemon::field]] f32 linearDrag             = {};
+    [[lemon::field]] f32 mass                   = { 1.f };
+    [[lemon::field]] bool isKinetic             = { true };
+    [[lemon::field]] collider_type colliderType = collider_type::none;
+
+    vec2 _oldPosition = {};
 };
 
 struct LEMON_API [[lemon::component]] box_collider
@@ -41,7 +51,7 @@ struct LEMON_API [[lemon::component]] capsule_collider
     [[lemon::field]] f32 height     = { 0.5f };
 };
 
-LEMON_REFL(rigidbody, position, rotation, velocity, angularRotation, linearDrag, mass, isKinetic);
+LEMON_REFL(rigidbody, position, rotation, velocity, angularRotation, linearDrag, mass, isKinetic, colliderType);
 LEMON_REFL(box_collider, bounciness, friction, offset, hSize);
 LEMON_REFL(circle_collider, bounciness, friction, offset, radius);
 LEMON_REFL(capsule_collider, bounciness, friction, offset, radius, height);
