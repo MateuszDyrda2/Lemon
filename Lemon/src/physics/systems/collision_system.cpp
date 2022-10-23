@@ -37,15 +37,64 @@ collision_system::get_aabb(const entity_t _entity, const rigidbody& _rigidbody)
     }
 }
 
+void collision_system::add_box2tree(registry& _reg, entity_t handle)
+{
+    const auto&& [_transform, _collider] = _reg.get<transform, box_collider>(handle);
+    tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
+                     detail::AABB{
+                         .min = _transform.position + _collider.offset - _collider.hSize,
+                         .max = _transform.position + _collider.offset + _collider.hSize,
+                     });
+}
+
+void collision_system::add_circle2tree(registry& _reg, entity_t handle)
+{
+
+    const auto&& [_transform, _collider] = _reg.get<transform, circle_collider>(handle);
+    tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
+                     detail::AABB{
+                         .min = _transform.position + _collider.offset - _collider.radius,
+                         .max = _transform.position + _collider.offset + _collider.radius,
+                     });
+}
+
+void collision_system::add_capsule2tree(registry& _reg, entity_t handle)
+{
+    (void)_reg;
+    (void)handle;
+}
+
+void collision_system::remove_from_tree([[maybe_unused]] registry& _reg, entity_t handle)
+{
+    tree.remove_leaf(std::underlying_type_t<typeof(handle)>(handle));
+}
+
 collision_system::collision_system(scene& _scene, event_queue& _eventQueue):
     _scene(_scene), _eventQueue(_eventQueue)
 {
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
         this->onUpdate(e);
     };
+
+    auto& _reg = _scene.get_registry();
+    _reg.on_construct<box_collider>().connect<&collision_system::add_box2tree>(this);
+    _reg.on_construct<circle_collider>().connect<&collision_system::add_circle2tree>(this);
+    _reg.on_construct<capsule_collider>().connect<&collision_system::add_capsule2tree>(this);
+    _reg.on_destroy<box_collider>().connect<&collision_system::remove_from_tree>(this);
+    _reg.on_destroy<circle_collider>().connect<&collision_system::remove_from_tree>(this);
+    _reg.on_destroy<capsule_collider>().connect<&collision_system::remove_from_tree>(this);
 }
 
-collision_system::~collision_system() { }
+collision_system::~collision_system()
+{
+    auto& _reg = _scene.get_registry();
+    _reg.on_construct<box_collider>().disconnect<&collision_system::add_box2tree>(this);
+    _reg.on_construct<circle_collider>().disconnect<&collision_system::add_circle2tree>(this);
+    _reg.on_construct<capsule_collider>().disconnect<&collision_system::add_capsule2tree>(this);
+    _reg.on_destroy<box_collider>().disconnect<&collision_system::remove_from_tree>(this);
+    _reg.on_destroy<circle_collider>().disconnect<&collision_system::remove_from_tree>(this);
+    _reg.on_destroy<capsule_collider>().disconnect<&collision_system::remove_from_tree>(this);
+}
 
 void collision_system::onUpdate([[maybe_unused]] event_args* e)
 {
@@ -109,28 +158,46 @@ void collision_system::collision_events(entity_t a, entity_t b)
     }
 }
 
-void collision_system::physics_reponse(f32 fixedDelta,
-                                       f32 bounciness, const mtv& vec,
-                                       rigidbody& aRigidbody, rigidbody& bRigidbody)
+void collision_system::physics_reponse([[maybe_unused]] f32 fixedDelta,
+                                       [[maybe_unused]] f32 bounciness,
+                                       [[maybe_unused]] const mtv& vec,
+                                       [[maybe_unused]] rigidbody& aRigidbody,
+                                       [[maybe_unused]] rigidbody& bRigidbody)
 {
+    // move apart
+    if (aRigidbody.isKinetic)
+    {
+        auto axis = dot(bRigidbody.velocity, vec.axis) < 0 ? vec.axis : -1.f * vec.axis;
+        bRigidbody.position += axis * vec.overlap;
+    }
+    else if (bRigidbody.isKinetic)
+    {
+        auto axis = dot(aRigidbody.velocity, vec.axis) < 0 ? vec.axis : -1.f * vec.axis;
+        aRigidbody.position += axis * vec.overlap;
+    }
+    else
+    {
+        auto axis = dot(aRigidbody.velocity, vec.axis) < 0 ? vec.axis : -1.f * vec.axis;
+        bRigidbody.position += axis * vec.overlap * 0.5f;
+        aRigidbody.position -= axis * vec.overlap * 0.5f;
+    }
+
     // J = (-(1 + e)Vab * n) / (n * n(1/ma + 1/mb))
     // Va+ = Va- + J/ma * n
     // Vb+ = Vb- - J/mb * n
-    const auto oma = i32(aRigidbody.isKinetic) * 1.f / aRigidbody.mass;
-    const auto omb = i32(bRigidbody.isKinetic) * 1.f / bRigidbody.mass;
+    /*const auto axis = dot(bRigidbody.velocity, vec.axis) < 0 ? vec.axis : -1.f * vec.axis;*/
+    /*const auto oma  = i32(!aRigidbody.isKinetic) * 1.f / aRigidbody.mass;*/
+    /*const auto omb  = i32(!bRigidbody.isKinetic) * 1.f / bRigidbody.mass;*/
 
-    const auto Vab  = (aRigidbody.velocity - bRigidbody.velocity);
-    const auto rVel = glm::dot(Vab, vec.axis);
-    const auto J    = (-(1 + bounciness) * rVel) / (oma + omb);
+    /*const auto Vab  = (bRigidbody.velocity - aRigidbody.velocity);*/
+    /*const auto rVel = glm::dot(Vab, axis);*/
+    /*const auto J    = (-(1.f + bounciness) * rVel) / (oma + omb);*/
 
-    const auto Va = aRigidbody.velocity + J * oma * vec.axis;
-    const auto Vb = aRigidbody.velocity - J * omb * vec.axis;
+    /*aRigidbody.velocity -= J * oma * axis;*/
+    /*bRigidbody.velocity += J * omb * axis;*/
 
-    aRigidbody.velocity = Va;
-    bRigidbody.velocity = Vb;
-
-    aRigidbody.position = aRigidbody.velocity * fixedDelta;
-    bRigidbody.position = bRigidbody.velocity * fixedDelta;
+    /*aRigidbody.position += aRigidbody.velocity * fixedDelta;*/
+    /*bRigidbody.position += bRigidbody.velocity * fixedDelta;*/
 }
 
 void collision_system::handle_box_collisions(

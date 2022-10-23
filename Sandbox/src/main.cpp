@@ -43,14 +43,13 @@ void Sandbox::initialize()
 
     auto& scene = _sceneManager
                       .load_scene("SandboxScene"_hs)
-                      //.register_system<input_system>()
                       .register_system<entity_system>()
+                      .register_system<movement_system>()
                       .register_system<physics_system>()
-                      //.register_system<collision_system>()
+                      .register_system<collision_system>()
                       .register_system<interpolate_system>()
                       .register_system<transform_system>()
-                      .register_system<rendering_system>()
-                      .register_system<movement_system>();
+                      .register_system<rendering_system>();
 
     auto services = scene.get_services();
 
@@ -58,17 +57,27 @@ void Sandbox::initialize()
     mainCamera.emplace<main_camera_t>();
     mainCamera.emplace<camera>();
 
-    /*    auto tile = scene.create_entity(ENT_NAME("Tile"));*/
-    /*auto&& sr = tile.emplace<sprite_renderer>();*/
-    /*sr.tex    = services._asset_storage.get_asset<texture>("tile"_hs);*/
-
-    auto player = scene.create_entity(ENT_NAME("player"));
+    auto player = scene.create_entity(ENT_NAME("Player"));
     player.emplace<player_t>();
-    player.emplace<rigidbody>();
     auto&& psr = player.emplace<sprite_renderer>();
     psr.tex    = services._asset_storage.get_asset<texture>("player"_hs);
     transform_system::move_by(player, { -600, 0 });
     transform_system::scale_by(player, { 0.25, 0.25 });
+
+    auto&& rb       = player.emplace<rigidbody>();
+    rb.position     = player.get<transform>().position;
+    rb._oldPosition = rb.position;
+    rb.colliderType = collider_type::box;
+    rb.isKinetic    = false;
+    player.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 35.f, 55.f });
+
+    auto tile     = scene.create_entity(ENT_NAME("Tile"));
+    auto&& sr     = tile.emplace<sprite_renderer>();
+    sr.tex        = services._asset_storage.get_asset<texture>("tile"_hs);
+    auto&& tileRb = tile.emplace<rigidbody>();
+    tile.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 340.f, 220.f });
+    tileRb.colliderType = collider_type::box;
+    tileRb.isKinetic    = true;
 }
 
 GAME_DECL(Sandbox);

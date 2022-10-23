@@ -72,12 +72,32 @@ class LEMON_API input
      * @param actionId nameid of the event
      */
     void add_axis(pair_keycodes axis, hash_str actionId);
-
+    /** @brief Check if key's current state matches the argument
+     * @param key keycode to check
+     * @param action action to compare
+     * @return true if the key is in the specified state */
     bool check_key(keycode key, key_action action);
+    /** @brief Check if mouse button's current state matches the argument
+     * @param key mouse button keycode to check
+     * @param action action to compare
+     * @return true if the button is in the specified state */
     bool check_key(mouse button, key_action action);
+    /** @brief Check if gamepad button's current state matches the argument
+     * @param key keycode to check
+     * @param action action to compare
+     * @return true if the button is in the specified state */
     bool check_key(gamepad button, key_action action);
+    /** @brief Get value of axis
+     * @param axis pair of keycodes
+     * @return value in range[-1, 1] representing current axis state */
     f32 check_axis(pair_keycodes axis);
+    /** @brief Get value of gamepad axis
+     * @param axis gamepad axis
+     * @return value in range[-1, 1] representing current axis state */
     f32 check_axis(gamepad_axis gamepad);
+    /** @brief Get value of mouse axis
+     * @param axis mouse axis (x,y)
+     * @return current mouse position */
     f32 check_axis(mouse_axis mouse);
 
   private:

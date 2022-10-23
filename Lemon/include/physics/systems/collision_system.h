@@ -33,6 +33,10 @@ class LEMON_API collision_system : public system
     event_queue::listener_handle update;
 
   private:
+    void add_box2tree(registry& _reg, entity_t handle);
+    void add_circle2tree(registry& _reg, entity_t handle);
+    void add_capsule2tree(registry& _reg, entity_t handle);
+    void remove_from_tree(registry& _reg, entity_t handle);
     std::optional<detail::AABB> get_aabb(
         const entity_t _entity, const rigidbody& _rigidbody);
     void collision_events(entity_t a, entity_t b);

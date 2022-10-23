@@ -1,4 +1,3 @@
-#include "glm/geometric.hpp"
 #include "movement_system.h"
 #include "physics/systems/physics_system.h"
 #include "player_components.h"
@@ -40,7 +39,7 @@ void movement_system::onUpdate([[maybe_unused]] event_args* e)
         _input.check_axis({ keycode::a, keycode::d }),
         _input.check_axis({ keycode::s, keycode::w }),
     };
-    velocity = glm::normalize(velocity);
+    velocity = normalize(velocity);
 
     auto player = _scene.get_entity(_scene.view<player_t>().front());
     physics_system::set_velocity(player, velocity * speed);

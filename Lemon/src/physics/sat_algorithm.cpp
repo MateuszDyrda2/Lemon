@@ -21,14 +21,14 @@ std::optional<mtv> sat_algorithm::operator()(
     int axisCount = (axis[0] == axis[2] || axis[0] == axis[3]) ? 2 : 4;
     mtv t         = { .overlap = std::numeric_limits<f32>::max(), .axis = {} };
 
-    for(int i = 0; i < axisCount; ++i)
+    for (int i = 0; i < axisCount; ++i)
     {
         auto&& [lhsMin, lhsMax] = project_box(lhs, axis[i]);
         auto&& [rhsMin, rhsMax] = project_box(rhs, axis[i]);
 
         auto distance = std::min(lhsMax, rhsMax) - std::max(lhsMin, rhsMin);
-        if(distance <= 0.f) return {};
-        if(distance >= t.overlap) continue;
+        if (distance <= 0.f) return {};
+        if (distance >= t.overlap) continue;
 
         t = { .overlap = distance, .axis = axis[i] };
     }
@@ -45,14 +45,14 @@ std::optional<mtv> sat_algorithm::operator()(
     };
 
     mtv t = { .overlap = std::numeric_limits<f32>::max(), .axis = {} };
-    for(const auto& a : axis)
+    for (const auto& a : axis)
     {
         const auto&& [lhsMin, lhsMax] = project_box(lhs, a);
         const auto&& [rhsMin, rhsMax] = project_circle(rhs, a);
         auto distance                 = std::min(lhsMax, rhsMax) - std::max(lhsMin, rhsMin);
 
-        if(distance <= 0.f) return {};
-        if(distance >= t.overlap) continue;
+        if (distance <= 0.f) return {};
+        if (distance >= t.overlap) continue;
 
         t = { .overlap = distance, .axis = a };
     }
@@ -68,7 +68,7 @@ std::optional<mtv> sat_algorithm::operator()(
     auto&& [rhsMin, rhsMax] = project_circle(rhs, axis);
 
     auto distance = std::min(lhsMax, rhsMax) - std::max(lhsMin, rhsMin);
-    if(distance <= 0.f) return {};
+    if (distance <= 0.f) return {};
 
     return mtv{ .overlap = distance, .axis = axis };
 }
@@ -77,12 +77,12 @@ std::pair<f32, f32>
 sat_algorithm::project_box(const box_shape& shape, const vec2& axis)
     const noexcept
 {
-    f32 _min = std::numeric_limits<f32>::max();
-    f32 _max = std::numeric_limits<f32>::min();
+    f32 _min, _max;
+    _max = _min = dot(shape.vertices[0], axis);
 
-    for(const auto& vertex : shape.vertices)
+    for (std::size_t i = 1; i < 4; ++i)
     {
-        f32 p = dot(vertex, axis);
+        f32 p = dot(shape.vertices[i], axis);
         _min  = std::min(_min, p);
         _max  = std::max(_max, p);
     }
