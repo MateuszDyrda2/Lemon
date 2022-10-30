@@ -17,5 +17,13 @@ struct LEMON_API
     [[lemon::field]] asset<texture> tex{};
 };
 
+struct LEMON_API
+    [[lemon::component]] animation_component
+{
+    [[lemon::field]] u32 nFrames{ 1 };
+    [[lemon::field]] vec2 frameSize{};
+};
+
 LEMON_REFL(sprite_renderer, col, texCoords, tex);
+LEMON_REFL(animation_component, nFrames, frameSize);
 }

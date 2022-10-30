@@ -7,7 +7,7 @@ namespace lemon {
 engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
     _eventQueue{}, _window("engine", { 1080, 720 }),
     _input(_window, _eventQueue), _renderingContext{},
-    _assertStorage(assetPath),
+    _assertStorage(assetPath, _scriptingEngine),
     _scheduler(std::thread::hardware_concurrency() - 1),
     _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input)
 { }

@@ -6,7 +6,7 @@ set(lemon_VERSION_MINOR 1)
 set(lemon_VERSION_PATCH 0)
 set(lemon_VERSION ${lemon_VERSION_MAJOR}.${lemon_VERSION_MINOR}.${lemon_VERSION_PATCH})
 # ----------------------------------------------
-
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # ---------------- Description -----------------
 set(lemon_DESC "2D game engine written in C++")
 
@@ -16,9 +16,8 @@ project(Lemon DESCRIPTION ${lemon_DESC} LANGUAGES CXX)
 # ------------- External libraries -------------
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 # ----------------------------------------------
-
-
 find_package(Threads REQUIRED)
+find_package(LuaJIT REQUIRED)
 # ----------------------------------------------
 
 # --------------- Add library ------------------
@@ -44,7 +43,9 @@ set(lemon_RENDERING_SRC
    src/rendering/rendering_context.cpp 
    src/rendering/shader.cpp 
    src/rendering/texture.cpp 
-   src/rendering/vertex_array.cpp src/rendering/vertex_buffer.cpp 
+   src/rendering/vertex_array.cpp 
+   src/rendering/vertex_buffer.cpp 
+   src/rendering/animation_script.cpp
    src/rendering/systems/rendering_system.cpp
 )
 set(lemon_THREADING_SRC
@@ -66,6 +67,9 @@ set(lemon_PHYSICS_SRC
     src/physics/shapes.cpp
     src/physics/detail/collision_set.cpp
 )
+set (lemon_SCRIPTING_SRC
+    src/scripting/scripting_engine.cpp
+)
 
 set(lemon_SRC
     ${lemon_ASSETS_SRC}
@@ -76,11 +80,17 @@ set(lemon_SRC
     ${lemon_THREADING_SRC}
     ${lemon_WORLD_SRC}
     ${lemon_PHYSICS_SRC}
+    ${lemon_SCRIPTING_SRC}
 )
 
 add_library(lemon ${lemon_SRC})
 add_library(lemon::lemon ALIAS lemon)
-target_include_directories(lemon PUBLIC include/)
+target_include_directories(lemon 
+  PUBLIC 
+    include/
+    ${LUAJIT_INCLUDE_DIR}
+)
+
 target_link_libraries(lemon
   PUBLIC
     Threads::Threads
@@ -92,6 +102,8 @@ target_link_libraries(lemon
     rapidjson
     stb
     EnTT::EnTT
+    ${LUAJIT_LIBRARIES}
+    LuaBridge
 )
 # ----------------------------------------------
 

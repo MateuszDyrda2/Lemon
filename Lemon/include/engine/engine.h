@@ -5,6 +5,7 @@
 #include <platform/input.h>
 #include <platform/window.h>
 #include <rendering/rendering_context.h>
+#include <scripting/scripting_engine.h>
 #include <threading/scheduler.h>
 #include <world/scene_manager.h>
 
@@ -21,6 +22,7 @@ class LEMON_API engine
     window _window;
     input _input;
     rendering_context _renderingContext;
+    scripting_engine _scriptingEngine;
     asset_storage _assertStorage;
     scheduler _scheduler;
     scene_manager _sceneManager;

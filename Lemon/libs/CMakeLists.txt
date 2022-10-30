@@ -22,3 +22,5 @@ target_include_directories(rapidjson INTERFACE rapidjson/include/)
 add_subdirectory(stb)
 
 add_subdirectory(entt)
+
+add_subdirectory(luabridge3)

@@ -19,3 +19,6 @@
 [submodule "tests/googletest"]
 	path = tests/googletest
 	url = https://github.com/google/googletest.git
+[submodule "Lemon/libs/luabridge3"]
+	path = Lemon/libs/luabridge3
+	url = git@github.com:kunitoki/LuaBridge3.git
