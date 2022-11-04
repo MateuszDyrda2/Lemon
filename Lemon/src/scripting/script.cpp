@@ -82,7 +82,7 @@ void script::execute(const std::string& func, message_payload* payload)
     while (p != nullptr)
     {
         lua_pushargument(L, p);
-        p = payload->next;
+        p = p->next;
         ++count;
     }
     if (lua_pcall(L, count, 0, 0) != 0)

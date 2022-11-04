@@ -69,7 +69,7 @@ void movement_system::onUpdate([[maybe_unused]] event_args* e)
         currentDirection = newDirection;
     }
     if (currentDirection == direction::LEFT)
-        _messageBus.push_message(u32(player.get_handle()), "test");
+        _messageBus.push_message(u32(player.get_handle()), "test", 3, 2, 1);
 
     physics_system::set_velocity(player, velocity * speed);
 }
