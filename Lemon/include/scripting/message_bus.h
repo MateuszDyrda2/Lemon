@@ -65,11 +65,18 @@ class LEMON_API message_bus
 template<class... Args>
 void message_bus::push_message(u32 entityid, const std::string& messageName, Args&&... args)
 {
-    message_payload* payloads[] = { get_payload(args)... };
-    for (std::size_t i = 0; i < (sizeof...(Args)) - 1; ++i)
+    if constexpr (sizeof...(Args) == 0)
     {
-        payloads[i]->next = payloads[i + 1];
+        messages[entityid].push_back(message{ .messageName = messageName, .payload = nullptr });
     }
-    messages[entityid].push_back(message{ .messageName = messageName, .payload = payloads[0] });
+    else
+    {
+        message_payload* payloads[] = { get_payload(args)... };
+        for (std::size_t i = 0; i < (sizeof...(Args)) - 1; ++i)
+        {
+            payloads[i]->next = payloads[i + 1];
+        }
+        messages[entityid].push_back(message{ .messageName = messageName, .payload = payloads[0] });
+    }
 }
 }

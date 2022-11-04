@@ -23,7 +23,7 @@ void scripting_system::on_update([[maybe_unused]] event_args* e)
         if (auto messages = _messageBus.get_messages(underlying_type_t<entity_t>(_entity)))
         {
             auto scr = _scriptComponent.scriptObject.get();
-            for (auto&& message : messages)
+            for (auto&& message : *messages)
             {
                 scr->execute(message.messageName, message.payload);
             }

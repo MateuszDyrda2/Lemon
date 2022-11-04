@@ -9,23 +9,11 @@
 using namespace lemon;
 movement_system::movement_system(scene& _scene,
                                  event_queue& _eventQueue,
-                                 input& _input):
+                                 input& _input, message_bus& _messageBus):
     _input(_input),
-    _scene(_scene)
+    _scene(_scene),
+    _messageBus(_messageBus)
 {
-    /*    f32 speed  = 200.f;*/
-    /*horizontal = _eventQueue["Horizontal"_hs] += [&, speed](event_args* e) {*/
-    /*auto&& [value]                     = get_event<axis_event>(e);*/
-    /*auto player                        = _scene.get_entity(_scene.view<player_t>().front());*/
-    /*player.get<rigidbody>().velocity.x = value * speed;*/
-    /*};*/
-
-    /*vertical = _eventQueue["Vertical"_hs] += [&, speed](event_args* e) {*/
-    /*auto&& [value]                     = get_event<axis_event>(e);*/
-    /*auto player                        = _scene.get_entity(_scene.view<player_t>().front());*/
-    /*player.get<rigidbody>().velocity.y = value * speed;*/
-    /*};*/
-
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
         this->onUpdate(e);
     };
@@ -80,6 +68,8 @@ void movement_system::onUpdate([[maybe_unused]] event_args* e)
         }
         currentDirection = newDirection;
     }
+    if (currentDirection == direction::LEFT)
+        _messageBus.push_message(u32(player.get_handle()), "test");
 
     physics_system::set_velocity(player, velocity * speed);
 }

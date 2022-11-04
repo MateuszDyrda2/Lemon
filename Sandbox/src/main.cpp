@@ -12,6 +12,7 @@
 #include <physics/systems/physics_system.h>
 #include <rendering/systems/animation_system.h>
 #include <scripting/components/scripting_components.h>
+#include <scripting/script.h>
 #include <scripting/systems/scripting_system.h>
 
 #include <rendering/systems/rendering_system.h>
@@ -81,8 +82,8 @@ void Sandbox::initialize()
     animation.frameSize = { 22, 56 };
     player.emplace<start_animation_m>("idle"_hs);
 
-    auto&& script       = player.emplace<script_component>();
-    script.scriptObject = services._asset_storage.get_asset<script>("player_script"_hs);
+    auto&& scr       = player.emplace<script_component>();
+    scr.scriptObject = services._asset_storage.get_asset<script>("player_script"_hs);
 
     auto tile     = scene.create_entity(ENT_NAME("Tile"));
     auto&& sr     = tile.emplace<sprite_renderer>();

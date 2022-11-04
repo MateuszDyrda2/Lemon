@@ -5,6 +5,7 @@
 #include <core/defines.h>
 #include <core/hash_string.h>
 #include <core/lemon_types.h>
+#include <scripting/script.h>
 
 #include <memory>
 #include <unordered_map>
@@ -46,15 +47,24 @@ class LEMON_API asset_loader
   private:
     std::vector<char> load_from_file(const std::string& path);
 };
+
 template<class T>
 inline std::unique_ptr<T> asset_loader::load_resource(hash_str nameid)
 {
     return std::make_unique<T>(nameid, resourcePaths[nameid]);
 }
+
 template<>
 inline std::unique_ptr<animation_script>
 asset_loader::load_resource<animation_script>(hash_str nameid)
 {
     return std::make_unique<animation_script>(nameid, resourcePaths[nameid], _scriptingEngine);
+}
+
+template<>
+inline std::unique_ptr<script>
+asset_loader::load_resource<script>(hash_str nameid)
+{
+    return std::make_unique<script>(nameid, resourcePaths[nameid], _scriptingEngine);
 }
 } // namespace lemon
