@@ -62,6 +62,10 @@ scripting_engine::scripting_engine()
     L = luaL_newstate();
     registerMainThread(L);
     luaL_openlibs(L);
+
+    getGlobalNamespace(L)
+        .beginNamespace("lemon")
+        .endNamespace();
 }
 
 scripting_engine::~scripting_engine()
@@ -78,5 +82,11 @@ unordered_map<hash_str, function<i32(f32)>> scripting_engine::get_animation(cons
 {
     auto table = getGlobal(L, name.c_str());
     return get_key_value_map(L, table);
+}
+
+void scripting_engine::call_function(const std::string& scope, const std::string& func)
+{
+    auto table = getGlobal(L, scope.c_str());
+    table[func.c_str()];
 }
 }

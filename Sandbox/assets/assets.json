@@ -25,5 +25,11 @@
             "name": "player_script",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/player_script.lua"
         }
+    ],
+    "animations": [
+        {
+            "name": "player_animation",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player_animation.lua"
+        }
     ]
 }

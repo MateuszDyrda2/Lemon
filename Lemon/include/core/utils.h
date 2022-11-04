@@ -18,4 +18,10 @@ constexpr inline bool in_range(const T& val, const T& low, const T& high)
 {
     return !(val < low) && !(high < val);
 }
+
+template<class F, class... Args>
+inline void run_for_each(F callable, Args&&... args)
+{
+    (callable(args), ...);
+}
 }

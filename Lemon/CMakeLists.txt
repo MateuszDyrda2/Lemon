@@ -70,6 +70,9 @@ set(lemon_PHYSICS_SRC
 )
 set (lemon_SCRIPTING_SRC
     src/scripting/scripting_engine.cpp
+    src/scripting/systems/scripting_system.cpp
+    src/scripting/script.cpp
+    src/scripting/message_bus.cpp
 )
 
 set(lemon_SRC
@@ -179,5 +182,4 @@ add_custom_target(lemon_engine_types
 )
 
 # ----------------------------------------------
-
 

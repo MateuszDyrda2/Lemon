@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scripting/message_bus.h"
 #include <assets/asset.h>
 #include <core/defines.h>
 #include <events/events.h>
@@ -81,6 +82,7 @@ struct LEMON_API service_container
     class scene& _scene;
     window& _window;
     input& _input;
+    message_bus& _message_bus;
 };
 
 class system;

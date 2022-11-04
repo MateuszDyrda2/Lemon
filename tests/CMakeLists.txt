@@ -21,6 +21,7 @@ set(TEST_LIST
     assets/assets_test.cpp
     core/hash_string_test.cpp
     core/logger_test.cpp
+    core/pool_allocator_test.cpp
     events/events_test.cpp
     threading/scheduler_test.cpp
     physics/sat_test.cpp

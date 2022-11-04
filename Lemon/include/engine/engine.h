@@ -19,6 +19,7 @@ class LEMON_API engine
 
   protected:
     event_queue _eventQueue;
+    message_bus _messageBus;
     window _window;
     input _input;
     rendering_context _renderingContext;

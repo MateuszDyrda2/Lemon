@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/defines.h"
-#include "events/events.h"
+#include <core/defines.h>
+#include <events/events.h>
 #include <world/system.h>
 
 namespace lemon {

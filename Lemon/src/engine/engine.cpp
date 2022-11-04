@@ -9,7 +9,7 @@ engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
     _input(_window, _eventQueue), _renderingContext{},
     _assertStorage(assetPath, _scriptingEngine),
     _scheduler(std::thread::hardware_concurrency() - 1),
-    _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input)
+    _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input, _messageBus)
 { }
 
 engine::~engine()

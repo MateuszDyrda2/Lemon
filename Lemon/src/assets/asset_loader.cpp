@@ -1,4 +1,5 @@
 #include "core/logger.h"
+#include "core/utils.h"
 #include <assets/asset_loader.h>
 
 #include <rapidjson/document.h>
@@ -33,13 +34,15 @@ asset_loader::asset_loader(const string& path, scripting_engine& _scriptingEngin
     lemon_assert(document.HasMember("sounds"));
     lemon_assert(document.HasMember("shaders"));
     lemon_assert(document.HasMember("scripts"));
+    lemon_assert(document.HasMember("animations"));
 
-    auto&& textures = document["textures"].GetArray();
-    auto&& sounds   = document["sounds"].GetArray();
-    auto&& shaders  = document["shaders"].GetArray();
-    auto&& scripts  = document["scripts"].GetArray();
+    auto&& textures   = document["textures"].GetArray();
+    auto&& sounds     = document["sounds"].GetArray();
+    auto&& shaders    = document["shaders"].GetArray();
+    auto&& scripts    = document["scripts"].GetArray();
+    auto&& animations = document["animations"].GetArray();
 
-    auto load = [this](auto vv) {
+    run_for_each([this](auto& vv) {
         for (auto&& v : vv)
         {
             auto&& t                           = v.GetObject();
@@ -47,12 +50,8 @@ asset_loader::asset_loader(const string& path, scripting_engine& _scriptingEngin
             auto path                          = t["path"].GetString();
             resourcePaths[hash_string_d(name)] = path;
         }
-    };
-
-    load(textures);
-    load(sounds);
-    load(shaders);
-    load(scripts);
+    },
+                 textures, sounds, shaders, scripts, animations);
 }
 asset_loader::~asset_loader()
 {

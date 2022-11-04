@@ -18,6 +18,8 @@ class LEMON_API scripting_engine
 
     void load_file(const std::string& path);
     std::unordered_map<hash_str, std::function<i32(f32)>> get_animation(const std::string& name);
+    void call_function(const std::string& scope, const std::string& func);
+    lua_State* get_state() { return L; }
 
   private:
     lua_State* L;

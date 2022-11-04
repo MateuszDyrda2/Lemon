@@ -3,12 +3,13 @@
 namespace lemon {
 scene_manager::scene_manager(asset_storage& _assetStorage,
                              scheduler& _scheduler, event_queue& _eventQueue,
-                             window& _window, input& _input):
+                             window& _window, input& _input, message_bus& _messageBus):
     _assetStorage(_assetStorage),
     _scheduler(_scheduler),
     _eventQueue(_eventQueue),
     _window(_window),
-    _input(_input)
+    _input(_input),
+    _messageBus(_messageBus)
 { }
 
 scene_manager::~scene_manager()
@@ -18,12 +19,12 @@ void scene_manager::create_scene(hash_str sceneid)
 {
     scenes.emplace(
         sceneid,
-        new scene(sceneid, _assetStorage, _scheduler, _eventQueue, _window, _input));
+        new scene(sceneid, _assetStorage, _scheduler, _eventQueue, _window, _input, _messageBus));
 }
 
 scene& scene_manager::load_scene(hash_str sceneid)
 {
-    if(currentScene)
+    if (currentScene)
     {
         //        currentScene->on_unload();
     }
