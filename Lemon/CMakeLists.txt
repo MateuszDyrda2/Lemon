@@ -47,6 +47,7 @@ set(lemon_RENDERING_SRC
    src/rendering/vertex_buffer.cpp 
    src/rendering/animation_script.cpp
    src/rendering/systems/rendering_system.cpp
+   src/rendering/systems/animation_system.cpp
 )
 set(lemon_THREADING_SRC
     src/threading/scheduler.cpp

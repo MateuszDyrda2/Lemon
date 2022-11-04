@@ -23,7 +23,7 @@ int engine::run()
 
     auto lastFrame  = high_resolution_clock::now();
     f32 delta       = 0.016,
-        fixedDelta  = 0.010f,
+        fixedDelta  = 0.020f,
         accumulator = {},
         alpha       = {};
 

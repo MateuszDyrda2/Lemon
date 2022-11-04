@@ -5,11 +5,11 @@ import json
 
 def main(argv):
     paths = []
-    names = ['textures', 'sounds', 'shaders']
+    names = ['textures', 'sounds', 'shaders', 'scripts']
     for p in names:
         paths.append(os.path.join(argv[1], p))
 
-    filepaths = {names[0]: [], names[1]: [], names[2]: []}
+    filepaths = { names[0]: [], names[1]: [], names[2]: [], names[3]: [] }
     for p, n in zip(paths, names):
         for subdir, _, files in os.walk(p):
             for file in files:

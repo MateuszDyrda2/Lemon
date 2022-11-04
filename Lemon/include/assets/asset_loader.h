@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rendering/animation.h"
+#include "rendering/animation_script.h"
 #include "scripting/scripting_engine.h"
 #include <core/defines.h>
 #include <core/hash_string.h>

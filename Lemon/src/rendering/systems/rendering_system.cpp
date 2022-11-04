@@ -37,8 +37,6 @@ void rendering_system::onRender([[maybe_unused]] event_args* e)
     const f32 aspect     = newViewport.z / newViewport.w;
     const f32 halfHeight = newViewport.w * cam.size * 0.5f;
     const f32 halfWidth  = halfHeight * aspect;
-    (void)halfWidth;
-    (void)halfHeight;
 
     const auto proj = glm::ortho(
         -halfWidth,
@@ -53,7 +51,7 @@ void rendering_system::onRender([[maybe_unused]] event_args* e)
 
     _scene.view<sprite_renderer, model>().each(
         [this](const auto, auto& sr, auto& m) {
-            if(sr.tex)
+            if (sr.tex)
                 renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);
         });
     renderer.end_render();

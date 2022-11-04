@@ -8,11 +8,11 @@
 namespace lemon {
 using namespace std;
 using namespace rapidjson;
-asset_loader::asset_loader(const string& path):
-    path(path + "/assets.json")
+asset_loader::asset_loader(const string& path, scripting_engine& _scriptingEngine):
+    path(path + "/assets.json"), _scriptingEngine(_scriptingEngine)
 {
     ifstream stream(this->path, ios::binary | ios::ate);
-    if(!stream)
+    if (!stream)
     {
         logger::fatal("Failed to open asset file: {}", this->path);
         return;
@@ -32,33 +32,27 @@ asset_loader::asset_loader(const string& path):
     lemon_assert(document.HasMember("textures"));
     lemon_assert(document.HasMember("sounds"));
     lemon_assert(document.HasMember("shaders"));
+    lemon_assert(document.HasMember("scripts"));
+
     auto&& textures = document["textures"].GetArray();
     auto&& sounds   = document["sounds"].GetArray();
     auto&& shaders  = document["shaders"].GetArray();
+    auto&& scripts  = document["scripts"].GetArray();
 
-    for(auto&& v : textures)
-    {
-        auto&& tex                         = v.GetObject();
-        auto name                          = tex["name"].GetString();
-        auto path                          = tex["path"].GetString();
-        resourcePaths[hash_string_d(name)] = path;
-    }
+    auto load = [this](auto vv) {
+        for (auto&& v : vv)
+        {
+            auto&& t                           = v.GetObject();
+            auto name                          = t["name"].GetString();
+            auto path                          = t["path"].GetString();
+            resourcePaths[hash_string_d(name)] = path;
+        }
+    };
 
-    for(auto&& v : sounds)
-    {
-        auto&& sou                         = v.GetObject();
-        auto name                          = sou["name"].GetString();
-        auto path                          = sou["path"].GetString();
-        resourcePaths[hash_string_d(name)] = path;
-    }
-
-    for(auto&& v : shaders)
-    {
-        auto&& sh                          = v.GetObject();
-        auto name                          = sh["name"].GetString();
-        auto path                          = sh["path"].GetString();
-        resourcePaths[hash_string_d(name)] = path;
-    }
+    load(textures);
+    load(sounds);
+    load(shaders);
+    load(scripts);
 }
 asset_loader::~asset_loader()
 {
@@ -71,7 +65,7 @@ std::vector<char> asset_loader::load_from_file(const string& path)
 {
     vector<char> buff;
     ifstream stream(path, ios::binary | ios::ate);
-    if(!stream)
+    if (!stream)
     {
         logger::error("Failed to load file: {}", path);
         return buff;

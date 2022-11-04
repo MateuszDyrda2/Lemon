@@ -1,22 +1,46 @@
 #include <rendering/animation_script.h>
 
-namespace lemon {
+#include <filesystem>
 
-animation_script::animation_script(hash_str name, const std::string& path, scripting_engine& _scriptingEngine):
-    resource(name)
+namespace lemon {
+namespace fs = std::filesystem;
+animation_script::animation_script(hash_str nameid, const std::string& path, scripting_engine& _scriptingEngine):
+    resource(nameid)
 {
+    this->name = fs::path(path).stem();
     _scriptingEngine.load_file(path);
+    animations = _scriptingEngine.get_animation(name);
 }
 
 animation_script::~animation_script()
 {
 }
 
-animation_script::animation_script(animation_script&& other) noexcept
+animation_script::animation_script(animation_script&& other) noexcept:
+    resource(std::move(other)), name(std::move(other.name)), animations(std::move(other.animations))
+{ }
+
+animation_script& animation_script::operator=(animation_script&& other) noexcept
 {
+    if (this != &other)
+    {
+        resource::operator=(std::move(other));
+        path = std::move(other.path);
+        name = std::move(other.name);
+        std::swap(animations, other.animations);
+    }
+    return *this;
 }
 
-animation_script& animation_script::operator=(const animation_script&& other) noexcept
+i32 animation_script::execute(hash_str nameid, f32 value)
 {
+    auto a = animations.find(nameid);
+    if (a == animations.end())
+    {
+        logger::error("Animation with nameid: {} not found", nameid);
+        return 0;
+    }
+
+    return a->second(value);
 }
 }
