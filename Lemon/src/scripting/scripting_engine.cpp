@@ -1,3 +1,4 @@
+#include "scripting/script_entity.h"
 #include <scripting/scripting_engine.h>
 
 extern "C"
@@ -7,7 +8,10 @@ extern "C"
 #include <lualib.h>
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
 #include <LuaBridge/LuaBridge.h>
+#pragma GCC diagnostic pop
 
 namespace lemon {
 using namespace luabridge;
@@ -65,6 +69,30 @@ scripting_engine::scripting_engine()
 
     getGlobalNamespace(L)
         .beginNamespace("lemon")
+        .beginClass<logger>("logger")
+        .addStaticFunction("info", &logger::info_c)
+        .addStaticFunction("warn", &logger::warn_c)
+        .addStaticFunction("error", &logger::error_c)
+        .addStaticFunction("fatal", &logger::fatal_c)
+        .endClass()
+        .beginClass<script_message_proxy>("ent_proxy")
+        .addFunction("arg",
+                     overload<i32>(&script_message_proxy::arg),
+                     overload<f32>(&script_message_proxy::arg),
+                     overload<bool>(&script_message_proxy::arg),
+                     overload<vec2>(&script_message_proxy::arg),
+                     overload<const char*>(&script_message_proxy::arg))
+        .addFunction("push", &script_message_proxy::push)
+        .endClass()
+        .beginClass<script_animator>("animator")
+        .addFunction("start", &script_animator::start_animation)
+        .addFunction("stop", &script_animator::stop_animations)
+        .endClass()
+        .beginClass<script_entity>("entity")
+        .addProperty("handle", &script_entity::handle)
+        .addProperty("animator", &script_entity::get_animator)
+        .addFunction("message", &script_entity::create_message)
+        .endClass()
         .endNamespace();
 }
 

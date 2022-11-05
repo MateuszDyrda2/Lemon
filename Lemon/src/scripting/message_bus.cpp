@@ -8,6 +8,15 @@ message_bus::message_bus()
 message_bus::~message_bus()
 { }
 
+message_bus::message_builder message_bus::create_message(u32 entityid, const char* messageName)
+{
+    return { .bus = *this, .head = nullptr, .last = nullptr, .entityid = entityid, .messageName = messageName };
+}
+void message_bus::message_builder::push()
+{
+    bus.messages[entityid].push_back(message{ .messageName = messageName, .payload = head });
+}
+
 optional<vector<message>> message_bus::get_messages(u32 entityid)
 {
     auto m = messages.find(entityid);

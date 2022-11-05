@@ -25,7 +25,9 @@ void scripting_system::on_update([[maybe_unused]] event_args* e)
             auto scr = _scriptComponent.scriptObject.get();
             for (auto&& message : *messages)
             {
-                scr->execute(message.messageName, message.payload);
+                scr->execute(
+                    script_entity(_messageBus, &_scene, u32(_entity)),
+                    message.messageName, message.payload);
             }
         }
     }

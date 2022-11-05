@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scripting/script_entity.h"
 #include "scripting_engine.h"
 
 #include <assets/resource.h>
@@ -23,7 +24,7 @@ class LEMON_API script : public resource
 
     static hash_str get_mocked() { return hash_string("mock_script"); }
 
-    void execute(const std::string& func, message_payload* payload);
+    void execute(script_entity ent, const std::string& func, message_payload* payload);
 
   private:
     std::string path;

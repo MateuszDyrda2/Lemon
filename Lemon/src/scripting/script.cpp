@@ -50,23 +50,48 @@ void lua_pushargument(lua_State* L, message_payload* payload)
     {
     case message_payload::Integer:
     case message_payload::HashString:
-        lua_pushnumber(L, payload->asInteger);
-        break;
+    {
+        auto res = luabridge::push(L, payload->asInteger);
+        if (!res)
+        {
+            logger::error("Error passing argument {} to lua", payload->asInteger);
+        }
+    }
+    break;
     case message_payload::Float:
-        lua_pushnumber(L, payload->asFloat);
-        break;
+    {
+        auto res = luabridge::push(L, payload->asFloat);
+        if (!res)
+        {
+            logger::error("Error passing argument {} to lua", payload->asFloat);
+        }
+    }
+    break;
     case message_payload::Bool:
-        lua_pushboolean(L, payload->asBool);
-        break;
+    {
+
+        auto res = luabridge::push(L, payload->asBool);
+        if (!res)
+        {
+            logger::error("Error passing argument {} to lua", payload->asBool);
+        }
+    }
+    break;
     case message_payload::Vector:
-        lua_pushlightuserdata(L, &payload->asVector);
-        break;
+    {
+        auto res = luabridge::push(L, payload->asVector);
+        if (!res)
+        {
+            logger::error("Error passing argument {}x{} to lua", payload->asVector.x, payload->asVector.y);
+        }
+    }
+    break;
     default:
         logger::warn("Incorrect function argument!");
     }
 }
 
-void script::execute(const std::string& func, message_payload* payload)
+void script::execute(script_entity ent, const std::string& func, message_payload* payload)
 {
     auto L = engine.get_state();
     lua_getglobal(L, name.c_str());
@@ -78,7 +103,13 @@ void script::execute(const std::string& func, message_payload* payload)
         return;
     }
     auto p            = payload;
-    std::size_t count = 0;
+    std::size_t count = 1;
+    auto res          = luabridge::push(L, ent);
+    if (!res)
+    {
+        logger::error("Error passing argument {} to {} in {}", count, func, name);
+        return;
+    }
     while (p != nullptr)
     {
         lua_pushargument(L, p);

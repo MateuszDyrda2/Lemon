@@ -42,15 +42,31 @@ struct LEMON_API message
 class LEMON_API message_bus
 {
   public:
+    struct message_builder
+    {
+        template<class T>
+        message_builder& add_arg(T arg);
+        void push();
+
+        message_bus& bus;
+        message_payload* head;
+        message_payload* last;
+        u32 entityid;
+        const char* messageName;
+    };
+
+  public:
     message_bus();
     ~message_bus();
 
     template<class... Args>
     void push_message(u32 entityid, const std::string& messageName, Args&&... args);
+    message_builder create_message(u32 entityid, const char* messageName);
     std::optional<std::vector<message>> get_messages(u32 entityid);
     void clear();
 
   private:
+    friend message_builder;
     std::unordered_map<u32, std::vector<message>> messages;
     pool_allocator<message_payload> payloads;
 
@@ -61,6 +77,22 @@ class LEMON_API message_bus
     message_payload* get_payload(vec2 value);
     message_payload* get_payload(hash_str value);
 };
+
+template<class T>
+message_bus::message_builder& message_bus::message_builder::add_arg(T arg)
+{
+    auto p = bus.get_payload(arg);
+    if (head == nullptr)
+    {
+        head = last = p;
+    }
+    else
+    {
+        last->next = p;
+        last       = p;
+    }
+    return *this;
+}
 
 template<class... Args>
 void message_bus::push_message(u32 entityid, const std::string& messageName, Args&&... args)

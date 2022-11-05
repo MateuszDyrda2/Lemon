@@ -73,6 +73,7 @@ set (lemon_SCRIPTING_SRC
     src/scripting/systems/scripting_system.cpp
     src/scripting/script.cpp
     src/scripting/message_bus.cpp
+    src/scripting/script_entity.cpp
 )
 
 set(lemon_SRC
