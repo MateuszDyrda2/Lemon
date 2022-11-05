@@ -14,10 +14,10 @@ class LEMON_API resource
     using self_type = resource;
 
     resource(hash_str name);
-    resource(const self_type&) = delete;
+    resource(const self_type&)             = delete;
     self_type& operator=(const self_type&) = delete;
     resource(self_type&& other) noexcept;
-    self_type& operator =(self_type&& other) noexcept;
+    self_type& operator=(self_type&& other) noexcept;
     virtual ~resource() = default;
     void increment() noexcept;
     u32 decrement() noexcept;

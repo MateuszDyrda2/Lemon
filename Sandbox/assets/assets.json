@@ -1,6 +1,10 @@
 {
     "textures": [
         {
+            "name": "player_anim",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player_anim.png"
+        },
+        {
             "name": "player",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player.png"
         },
@@ -14,6 +18,18 @@
         {
             "name": "sprite_renderer_shader",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/shaders/sprite_renderer_shader.glsl"
+        }
+    ],
+    "scripts": [
+        {
+            "name": "player_script",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/player_script.lua"
+        }
+    ],
+    "animations": [
+        {
+            "name": "player_animation",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player_animation.lua"
         }
     ]
 }

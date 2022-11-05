@@ -7,9 +7,9 @@ namespace lemon {
 engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
     _eventQueue{}, _window("engine", { 1080, 720 }),
     _input(_window, _eventQueue), _renderingContext{},
-    _assertStorage(assetPath),
+    _assertStorage(assetPath, _scriptingEngine),
     _scheduler(std::thread::hardware_concurrency() - 1),
-    _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input)
+    _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input, _messageBus)
 { }
 
 engine::~engine()
@@ -23,7 +23,7 @@ int engine::run()
 
     auto lastFrame  = high_resolution_clock::now();
     f32 delta       = 0.016,
-        fixedDelta  = 0.010f,
+        fixedDelta  = 0.020f,
         accumulator = {},
         alpha       = {};
 

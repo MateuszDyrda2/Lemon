@@ -19,7 +19,7 @@ class LEMON_API scene_manager
     /** @brief Create a scene manager with services */
     scene_manager(asset_storage& _assetStorage, scheduler& _scheduler,
                   event_queue& _eventQueue, window& _window,
-                  input& _input);
+                  input& _input, message_bus& messageBus);
     ~scene_manager();
     scene_manager(const scene_manager&)            = delete;
     scene_manager& operator=(const scene_manager&) = delete;
@@ -65,5 +65,6 @@ class LEMON_API scene_manager
     event_queue& _eventQueue;
     window& _window;
     input& _input;
+    message_bus& _messageBus;
 };
 }

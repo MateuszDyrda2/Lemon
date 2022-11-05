@@ -29,7 +29,8 @@ class LEMON_API scene
   public:
     scene(hash_str nameid, asset_storage& _assetStorage,
           scheduler& _scheduler, event_queue& _eventQueue,
-          window& _window, input& _input);
+          window& _window, input& _input,
+          message_bus& _messageBus);
     ~scene();
 
     const auto& get_systems() const { return systems; }
@@ -85,6 +86,7 @@ class LEMON_API scene
             ._scene         = *this,
             ._window        = _window,
             ._input         = _input,
+            ._message_bus   = _messageBus,
         };
     }
 
@@ -95,6 +97,7 @@ class LEMON_API scene
     event_queue& _eventQueue;
     window& _window;
     input& _input;
+    message_bus& _messageBus;
     registry _registry;
     std::vector<std::unique_ptr<system>> systems;
 };
@@ -110,7 +113,8 @@ scene& scene::register_system()
                 ._event_queue   = _eventQueue,
                 ._scene         = *this,
                 ._window        = _window,
-                ._input         = _input }));
+                ._input         = _input,
+                ._message_bus   = _messageBus }));
     return *this;
 }
 
