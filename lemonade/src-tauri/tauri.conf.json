@@ -1,10 +1,10 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run start",
-    "devPath": "http://localhost:3000",
-    "distDir": "../build"
+    "beforeBuildCommand": "yarn run build",
+    "beforeDevCommand": "yarn run dev",
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist"
   },
   "package": {
     "productName": "lemonade",
@@ -12,15 +12,7 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
-      "dialog": {
-        "all": true,
-        "ask": true,
-        "confirm": true,
-        "message": true,
-        "open": true,
-        "save": true
-      }
+      "all": true
     },
     "bundle": {
       "active": true,
@@ -37,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.lemonade.dev",
+      "identifier": "com.tauri.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -63,20 +55,11 @@
     },
     "windows": [
       {
-        "fileDropEnabled": false,
         "fullscreen": false,
-        "width": 1080,
-        "height": 720,
+        "height": 600,
         "resizable": true,
-        "title": "Lemonade",
-        "visible": false
-      },
-      {
-        "width": 400,
-        "height": 200,
-        "decorations": false,
-        "url": "splashscreen.html",
-        "label": "splashscreen"
+        "title": "lemonade",
+        "width": 800
       }
     ]
   }

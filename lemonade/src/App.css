@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+#root {
+  text-align: center;
+}
+
+.App {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Robot', monospace;
+}
+
+.vertDiv-container {
+    order :2;
+    cursor: ew-resize;
+    width: 5px;
+    position: relative;
+}
+
+.vertDiv {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: auto;
+    z-index: 100;
+    display: block;
+    width: 2px;
+}
+
+
