@@ -13,7 +13,7 @@ const MIN_HEIGHT = 50;
 
 const Midpanel = () => {
     const splitAppRef = createRef<HTMLDivElement>();
-    const [height, setHeight] = useState(200);
+    const [height, setHeight] = useState(300);
     const [separatorPos, setSeparatorPos] = useState<number | undefined>(
         undefined,
     );

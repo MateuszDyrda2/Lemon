@@ -1,4 +1,6 @@
 import { open } from '@tauri-apps/api/dialog';
+import { exit } from '@tauri-apps/api/process';
+
 import { useEffect, useState } from 'react';
 import LemonIcon from '../../../img/lemon.svg';
 import {
@@ -32,10 +34,10 @@ const Project = () => {
             <LemonImg src={LemonIcon} alt="Lemon logo" width={150} />
             <ButtonGroup>
                 <Button>New project</Button>
-                <Button>Open Project</Button>
+                <Button onClick={() => openProject()}>Open Project</Button>
                 <Button>Save</Button>
                 <Button>Save as</Button>
-                <Button>Exit</Button>
+                <Button onClick={() => exit(0)}>Exit</Button>
             </ButtonGroup>
         </ProjectContainer>
     );
