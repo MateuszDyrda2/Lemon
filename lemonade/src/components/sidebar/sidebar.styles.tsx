@@ -4,8 +4,7 @@ export const SidebarContainer = styled.div`
     float: left;
     min-width: 56px;
     order: 0;
-    background-color: ${(props) => props.theme.colors.bg};
-    border-right: 1px solid ${(props) => props.theme.colors.bg2};
+    background: ${(props) => props.theme.colors.bg0_h};
 `;
 
 export const SidebarStack = styled.div`

@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: row;
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     font-family: 'Robot', monospace;
 }
 
@@ -17,6 +17,7 @@
     cursor: ew-resize;
     width: 5px;
     position: relative;
+    margin-left: -5px;
 }
 
 .vertDiv {

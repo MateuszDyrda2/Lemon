@@ -1,14 +1,17 @@
-import { createRef, useState, useEffect, useRef, useCallback } from 'react';
+import { createRef, useState, useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import './App.css';
 import Midpanel from './components/midpanel/midpanel';
 import Sidebar from './components/sidebar/sidebar';
 import Sidepanel from './components/sidepanel/sidepanel';
+import { PanelTypes } from './props/panel-types';
+import { PanelContext } from './state/PanelContext';
 import { theme } from './utils/theme';
 
 const MIN_WIDTH = 50;
 
 const App = () => {
+    const [currentPanel, setCurrentPanel] = useState(PanelTypes.Project);
     const splitAppRef = createRef<HTMLDivElement>();
     const [sidepanelWidth, setSidepanelWidth] = useState(300);
     const [separatorXPosition, setSeparatorXPosition] = useState<
@@ -43,15 +46,22 @@ const App = () => {
     return (
         <div className="App">
             <ThemeProvider theme={theme}>
-                <Sidebar />
-                <Sidepanel
-                    width={sidepanelWidth}
-                    setWidth={setSidepanelWidth}
-                />
-                <div className="vertDiv-container" onMouseDown={onMouseDown}>
-                    <div className="vertDiv" />
-                </div>
-                <Midpanel />
+                <PanelContext.Provider
+                    value={{ currentPanel, setCurrentPanel }}
+                >
+                    <Sidebar />
+                    <Sidepanel
+                        width={sidepanelWidth}
+                        setWidth={setSidepanelWidth}
+                    />
+                    <div
+                        className="vertDiv-container"
+                        onMouseDown={onMouseDown}
+                    >
+                        <div className="vertDiv" />
+                    </div>
+                    <Midpanel />
+                </PanelContext.Provider>
             </ThemeProvider>
         </div>
     );

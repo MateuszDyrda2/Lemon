@@ -3,7 +3,9 @@ import styled from 'styled-components';
 export const SidepanelContainer = styled.div`
     height: 100%;
     overflow: hidden;
-    background-color: ${(props) => props.theme.colors.bg};
+    background: ${(props) => props.theme.colors.bg};
+    display: flex;
+    flex-direction: column;
 `;
 
 export const SidepanelHeader = styled.p`
@@ -12,7 +14,9 @@ export const SidepanelHeader = styled.p`
     background-color: ${(props) => props.theme.colors.bg0};
     text-transform: uppercase;
     color: ${(props) => props.theme.colors.fg4};
-    border-bottom: 1px solid ${(props) => props.theme.colors.bg3};
 `;
 
-export const SidepanelContent = styled.div``;
+export const SidepanelContent = styled.div`
+    height: 100%;
+    flex: 1;
+`;

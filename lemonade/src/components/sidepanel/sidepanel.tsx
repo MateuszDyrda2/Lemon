@@ -1,4 +1,10 @@
-import { useEffect, createRef } from 'react';
+import { useEffect, createRef, useContext } from 'react';
+import { PanelTypes } from '../../props/panel-types';
+import { PanelContext, PanelContextType } from '../../state/PanelContext';
+import Components from './components/components';
+import Project from './project/project';
+import Scene from './scene/scene';
+import Settings from './settings/settings';
 import {
     SidepanelContainer,
     SidepanelHeader,
@@ -12,6 +18,7 @@ interface Props {
 
 const Sidepanel = ({ width, setWidth }: Props) => {
     const leftRef = createRef<HTMLDivElement>();
+    const { currentPanel } = useContext(PanelContext) as PanelContextType;
 
     useEffect(() => {
         if (leftRef.current) {
@@ -19,14 +26,24 @@ const Sidepanel = ({ width, setWidth }: Props) => {
                 setWidth(leftRef.current?.clientWidth);
                 return;
             }
-            leftRef.current.style.width = `${width}px`;
+            const cw = currentPanel === PanelTypes.None ? 0 : width;
+            leftRef.current.style.width = `${cw}px`;
         }
     }, [width, setWidth, leftRef]);
 
     return (
         <SidepanelContainer ref={leftRef}>
-            <SidepanelHeader>Hello world</SidepanelHeader>
-            <SidepanelContent />
+            <SidepanelHeader>{currentPanel}</SidepanelHeader>
+            <SidepanelContent>
+                {(currentPanel === PanelTypes.Project && <Project />) ||
+                    (currentPanel === PanelTypes.Scene && <Scene />) ||
+                    (currentPanel === PanelTypes.Components && (
+                        <Components />
+                    )) ||
+                    (currentPanel === PanelTypes.Settings && <Settings />) || (
+                        <></>
+                    )}
+            </SidepanelContent>
         </SidepanelContainer>
     );
 };
