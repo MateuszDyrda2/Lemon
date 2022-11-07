@@ -1,10 +1,4 @@
 {
-  "systems": [
-    { "stage": 0, "systems": [4124121830] },
-    { "stage": 1, "systems": [] },
-    { "stage": 2, "systems": [2282876357] },
-    { "stage": 3, "systems": [752933127] }
-  ],
   "entities": { "count": 2, "ids": [{ "id": 4294967295 }, { "id": 0 }] },
   "components": [
     { "count": 0, "components": [] },
