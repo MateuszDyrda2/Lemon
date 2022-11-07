@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
     float: left;
-    min-width: 56px;
+    min-width: 64px;
     order: 0;
     background: ${(props) => props.theme.colors.bg0_h};
 `;

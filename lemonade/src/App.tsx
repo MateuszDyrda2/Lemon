@@ -1,4 +1,5 @@
 import { createRef, useState, useEffect } from 'react';
+import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
 import './App.css';
 import Midpanel from './components/midpanel/midpanel';
@@ -44,26 +45,28 @@ const App = () => {
     }, [dragging]);
 
     return (
-        <div className="App">
-            <ThemeProvider theme={theme}>
-                <PanelContext.Provider
-                    value={{ currentPanel, setCurrentPanel }}
-                >
-                    <Sidebar />
-                    <Sidepanel
-                        width={sidepanelWidth}
-                        setWidth={setSidepanelWidth}
-                    />
-                    <div
-                        className="vertDiv-container"
-                        onMouseDown={onMouseDown}
+        <RecoilRoot>
+            <div className="App">
+                <ThemeProvider theme={theme}>
+                    <PanelContext.Provider
+                        value={{ currentPanel, setCurrentPanel }}
                     >
-                        <div className="vertDiv" />
-                    </div>
-                    <Midpanel />
-                </PanelContext.Provider>
-            </ThemeProvider>
-        </div>
+                        <Sidebar />
+                        <Sidepanel
+                            width={sidepanelWidth}
+                            setWidth={setSidepanelWidth}
+                        />
+                        <div
+                            className="vertDiv-container"
+                            onMouseDown={onMouseDown}
+                        >
+                            <div className="vertDiv" />
+                        </div>
+                        <Midpanel />
+                    </PanelContext.Provider>
+                </ThemeProvider>
+            </div>
+        </RecoilRoot>
     );
 };
 

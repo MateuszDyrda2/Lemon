@@ -16,6 +16,11 @@ export const ButtonGroup = styled.ul`
     flex-direction: column;
 `;
 
+export const ProjectName = styled.p`
+    color: ${(props) => props.theme.colors.fg1};
+    font-size: ${(props) => props.theme.fontSizes.medium};
+`;
+
 export const Button = styled.li`
     display: inline-block;
     width: 10rem;
