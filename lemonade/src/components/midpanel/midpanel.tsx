@@ -32,8 +32,9 @@ const Midpanel = () => {
             setHeight((height) => {
                 const newHeight = height - e.clientY + separatorPos;
                 const sHeight = splitAppRef.current?.clientHeight ?? newHeight;
-                return Math.min(Math.max(MIN_HEIGHT, newHeight), sHeight);
+                return Math.min(Math.max(MIN_HEIGHT, newHeight), newHeight);
             });
+
             setDragging(false);
         };
         window.addEventListener('mouseup', onMouseUp);

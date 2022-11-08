@@ -35,7 +35,6 @@ pub struct Component {
 pub struct Scene {
     pub entities: Entities,
     pub components: Vec<Component>,
-    pub assets: Assets,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

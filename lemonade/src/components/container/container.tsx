@@ -7,11 +7,12 @@ import {
 interface Props {
     header: string;
     children?: JSX.Element | JSX.Element[];
+    height: string;
 }
 
-const Container = ({ header, children }: Props) => {
+const Container = ({ header, children, height }: Props) => {
     return (
-        <ContainerContainer>
+        <ContainerContainer height={height}>
             <ContainerHeader>{header}</ContainerHeader>
             <ContainerContent>{children}</ContainerContent>
         </ContainerContainer>

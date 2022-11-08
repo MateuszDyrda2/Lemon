@@ -11,7 +11,7 @@ use tauri::{
 };
 
 use project::{
-    get_assets, get_components, get_components_for_entity, get_entities, open_project, ProjectState,
+    get_components, get_components_for_entity, get_entities, open_project, ProjectState,
 };
 
 #[tauri::command]
@@ -49,7 +49,6 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             close_splashscreen,
             open_project,
-            get_assets,
             get_components,
             get_components_for_entity,
             get_entities,

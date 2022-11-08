@@ -17,8 +17,9 @@ export const ButtonGroup = styled.ul`
 `;
 
 export const ProjectName = styled.p`
-    color: ${(props) => props.theme.colors.fg1};
+    color: ${(props) => props.theme.colors.fg0};
     font-size: ${(props) => props.theme.fontSizes.medium};
+    padding: 15px;
 `;
 
 export const Button = styled.li`

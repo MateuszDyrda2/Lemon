@@ -32,9 +32,9 @@ struct LEMON_API [[lemon::component]] transform
         position(position), scale(scale), rotation(rotation) { }
 };
 
-struct LEMON_API [[lemon::component]] model
+struct LEMON_API model
 {
-    [[lemon::field]] mat4 matrix{ 1.0f };
+    mat4 matrix{ 1.0f };
 };
 
 struct LEMON_API [[lemon::component]] main_camera_t

@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "gl-matrix": "^3.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.6.0",
+    "react-resize-detector": "^7.1.2",
     "recoil": "^0.7.6",
     "styled-components": "^5.3.6"
   },

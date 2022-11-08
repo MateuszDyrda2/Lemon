@@ -2,14 +2,12 @@ import styled from 'styled-components';
 
 export const MidpanelContainer = styled.div`
     display: flex;
-    flex-flow: column-reverse nowrap;
+    flex-direction: column;
     flex: 1;
-    order: 3;
     background: ${(props) => props.theme.colors.bg1};
 `;
 
 export const DividerContainer = styled.div`
-    order: 1;
     cursor: ns-resize;
     height: 5px;
     margin-bottom: -5px;

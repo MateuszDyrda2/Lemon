@@ -76,6 +76,11 @@ set (lemon_SCRIPTING_SRC
     src/scripting/script_entity.cpp
 )
 
+set(lemon_SERIALIZATION_SRC
+    src/serialization/basic_types_serializer.cpp
+    src/serialization/scene_serializer.cpp
+)
+
 set(lemon_SRC
     ${lemon_ASSETS_SRC}
     ${lemon_ENGINE_SRC}

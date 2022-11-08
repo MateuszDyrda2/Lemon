@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const BottombarContainer = styled.div`
     overflow: hidden;
-    order: 0;
     background: ${(props) => props.theme.colors.bg0_h};
     display: flex;
     flex-direction: column;

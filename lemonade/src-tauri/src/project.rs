@@ -109,18 +109,6 @@ pub fn open_project(
     }
 }
 
-#[tauri::command]
-pub fn get_assets(
-    _window: Window,
-    state: tauri::State<ProjectState>,
-) -> Result<Assets, ProjectErrorCode> {
-    let state_guard = state.0.lock().unwrap();
-
-    let project = unwrap_or_return!(get_project(&(*state_guard)));
-    let scene = unwrap_or_return!(get_scene(project));
-    Ok(scene.assets.clone())
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EntityDTO {
     id: u32,
@@ -144,7 +132,7 @@ pub fn get_components(
 pub fn get_components_for_entity(
     _window: Window,
     state: tauri::State<ProjectState>,
-    entitid: u32,
+    entityid: u32,
 ) -> Result<HashMap<String, HashMap<String, Value>>, ProjectErrorCode> {
     let state_guard = state.0.lock().unwrap();
 
@@ -153,8 +141,8 @@ pub fn get_components_for_entity(
 
     Ok((&scene.components)
         .iter()
-        .filter(|c| c.entities.contains_key(&entitid))
-        .map(|c| (c.name.clone(), c.entities.get(&entitid).unwrap().clone()))
+        .filter(|c| c.entities.contains_key(&entityid))
+        .map(|c| (c.name.clone(), c.entities.get(&entityid).unwrap().clone()))
         .collect::<HashMap<String, HashMap<String, Value>>>())
 }
 

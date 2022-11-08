@@ -8,6 +8,7 @@ export const SceneContainer = styled.div`
 export const EntityList = styled.div`
     overflow-y: auto;
     position: relative;
+    margin: 5px;
 `;
 
 interface WrapperProps {
@@ -16,10 +17,10 @@ interface WrapperProps {
 export const EntityWrapper = styled.div<WrapperProps>`
     position: relative;
     overflow: hidden;
-    margin: 0 10px;
+    padding: 2px;
 
     background: ${(props) =>
-        props.selected ? props.theme.colors.bg1 : props.theme.colors.bg0};
+        props.selected ? props.theme.colors.bg1 : 'none'};
     &:hover {
         background: ${(props) => props.theme.colors.bg2};
     }
@@ -32,4 +33,6 @@ export const EntityName = styled.p`
     margin: 0;
     color: ${(props) => props.theme.colors.fg1};
     font-size ${(props) => props.theme.fontSizes.small};
+    text-align: left;
+    padding-left: 5px;
 `;

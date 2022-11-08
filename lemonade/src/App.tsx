@@ -9,11 +9,10 @@ import { PanelTypes } from './props/panel-types';
 import { PanelContext } from './state/PanelContext';
 import { theme } from './utils/theme';
 
-const MIN_WIDTH = 50;
+const MIN_WIDTH = 200;
 
 const App = () => {
     const [currentPanel, setCurrentPanel] = useState(PanelTypes.Project);
-    const splitAppRef = createRef<HTMLDivElement>();
     const [sidepanelWidth, setSidepanelWidth] = useState(300);
     const [separatorXPosition, setSeparatorXPosition] = useState<
         number | undefined
@@ -33,9 +32,8 @@ const App = () => {
             setSidepanelWidth((sidepanelWidth) => {
                 const newWidth =
                     sidepanelWidth + e.clientX - separatorXPosition;
-                const splitPanelWidth =
-                    splitAppRef.current?.clientWidth ?? newWidth;
-                return Math.min(Math.max(MIN_WIDTH, newWidth), splitPanelWidth);
+
+                return Math.max(MIN_WIDTH, newWidth);
             });
 
             setDragging(false);
