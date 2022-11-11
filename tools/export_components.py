@@ -10,6 +10,7 @@ def main(argv):
     matchField = re.compile('\\[\\[lemon::field\\]\\]\\s*(.*?(?=;|{))')
     components = {}
 
+
     lastkey = ''
     for line in open(srcPath, 'r'):
         for match in re.finditer(matchComp, line):
@@ -24,6 +25,7 @@ def main(argv):
     with open(jsonPath, 'w+') as f:
         json.dump(components, f)
 
+    print("generated {}".format(jsonPath))
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

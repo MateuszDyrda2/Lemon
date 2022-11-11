@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../reflection.h"
-
 #include <core/defines.h>
 #include <core/hash_string.h>
 
@@ -23,7 +21,4 @@ struct LEMON_API [[lemon::component]] tag
     [[lemon::field]] std::string name;
     [[lemon::field]] hash_str id;
 };
-
-LEMON_REFL(tag, name, id);
-LEMON_TAG(enabled_t);
 }

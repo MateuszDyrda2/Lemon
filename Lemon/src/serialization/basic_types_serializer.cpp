@@ -1,47 +1,47 @@
 #include <serialization/basic_types_serializer.h>
 
 namespace lemon {
-void serialize(i32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(i32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Int(value);
 }
 
-void serialize(u32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(u32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Uint(value);
 }
 
-void serialize(i64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(i64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Int64(value);
 }
 
-void serialize(u64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(u64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Uint64(value);
 }
 
-void serialize(bool value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(bool value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Bool(value);
 }
 
-void serialize(f32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(f32 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Double(f64(value));
 }
 
-void serialize(f64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(f64 value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Double(value);
 }
 
-void serialize(const std::string& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const std::string& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.String(value.c_str(), value.length());
 }
 
-void serialize(const vec2& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const vec2& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.StartArray();
     serialize(value.x, writer);
@@ -49,7 +49,15 @@ void serialize(const vec2& value, rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.EndArray();
 }
 
-void serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const ivec2& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.StartArray();
+    serialize(value.x, writer);
+    serialize(value.y, writer);
+    writer.EndArray();
+}
+
+void basic_types_serializer::serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.StartArray();
     serialize(value.x, writer);
@@ -58,7 +66,7 @@ void serialize(const vec3& value, rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.EndArray();
 }
 
-void serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.StartArray();
     serialize(value.x, writer);
@@ -67,7 +75,7 @@ void serialize(const vec4& value, rapidjson::Writer<rapidjson::StringBuffer>& wr
     serialize(value.w, writer);
     writer.EndArray();
 }
-void serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.StartArray();
     serialize(value[0], writer);
@@ -77,64 +85,71 @@ void serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.EndArray();
 }
 
-void serialize(entity_t value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(entity_t value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     serialize(entt::to_entity(value), writer);
 }
 
-void serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void basic_types_serializer::serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     serialize(value.rgba, writer);
 }
 
-void deserialize(i32& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(i32& value, const rapidjson::Value& iter)
 {
     value = iter.GetInt();
 }
 
-void deserialize(u32& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(u32& value, const rapidjson::Value& iter)
 {
     value = iter.GetUint();
 }
 
-void deserialize(i64& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(i64& value, const rapidjson::Value& iter)
 {
     value = iter.GetInt64();
 }
 
-void deserialize(u64& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(u64& value, const rapidjson::Value& iter)
 {
     value = iter.GetUint64();
 }
 
-void deserialize(bool& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(bool& value, const rapidjson::Value& iter)
 {
     value = iter.GetBool();
 }
 
-void deserialize(f32& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(f32& value, const rapidjson::Value& iter)
 {
     value = f32(iter.GetDouble());
 }
 
-void deserialize(f64& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(f64& value, const rapidjson::Value& iter)
 {
     value = f32(iter.GetDouble());
 }
 
-void deserialize(std::string& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(std::string& value, const rapidjson::Value& iter)
 {
     value = iter.GetString();
 }
 
-void deserialize(vec2& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(vec2& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
                a[1].GetDouble() };
 }
 
-void deserialize(vec3& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(ivec2& value, const rapidjson::Value& iter)
+{
+    auto a = iter.GetArray();
+    value  = { a[0].GetInt(),
+               a[1].GetInt() };
+}
+
+void basic_types_serializer::deserialize(vec3& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
@@ -142,7 +157,7 @@ void deserialize(vec3& value, const rapidjson::Value& iter)
                a[2].GetDouble() };
 }
 
-void deserialize(vec4& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(vec4& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     value  = { a[0].GetDouble(),
@@ -151,7 +166,7 @@ void deserialize(vec4& value, const rapidjson::Value& iter)
                a[3].GetDouble() };
 }
 
-void deserialize(mat4& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(mat4& value, const rapidjson::Value& iter)
 {
     auto a = iter.GetArray();
     auto b = a[0].GetArray();
@@ -185,12 +200,12 @@ void deserialize(mat4& value, const rapidjson::Value& iter)
         },
     };
 }
-void deserialize(entity_t& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(entity_t& value, const rapidjson::Value& iter)
 {
     value = entity_t(iter.GetUint());
 }
 
-void deserialize(color& value, const rapidjson::Value& iter)
+void basic_types_serializer::deserialize(color& value, const rapidjson::Value& iter)
 {
     deserialize(value.rgba, iter);
 }

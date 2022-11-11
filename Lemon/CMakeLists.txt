@@ -78,7 +78,8 @@ set (lemon_SCRIPTING_SRC
 
 set(lemon_SERIALIZATION_SRC
     src/serialization/basic_types_serializer.cpp
-    src/serialization/scene_serializer.cpp
+    #    src/serialization/scene_serializer.cpp
+    src/serialization/serializer.cpp
 )
 
 set(lemon_SRC
@@ -91,6 +92,7 @@ set(lemon_SRC
     ${lemon_WORLD_SRC}
     ${lemon_PHYSICS_SRC}
     ${lemon_SCRIPTING_SRC}
+    ${lemon_SERIALIZATION_SRC}
 )
 
 add_library(lemon ${lemon_SRC})
@@ -145,47 +147,46 @@ target_precompile_headers(lemon
 # ----------------------------------------------
 
 # --------------- Build step -------------------
-set(COMPONENTS_LIST
-    "include/world/components/entity_components.h"
-    "include/world/components/transform_components.h"
-    "include/rendering/components/rendering_components.h"
-)
-set(SYSTEMS_LIST
-    "include/world/systems/entity_system.h"
-    "include/world/systems/transform_system.h"
-    "include/rendering/systems/rendering_system.h"
+set(COMPONENTS_LIST_LEMON
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/world/components/entity_components.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/world/components/transform_components.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/rendering/components/rendering_components.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/scripting/components/scripting_components.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/physics/components/physics_components.h"
+    PARENT_SCOPE
 )
 
-foreach(path IN LISTS COMPONENTS_LIST)
-    set(filename)
-    get_filename_component(filename ${path} NAME_WE)
-    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
-    add_custom_command(
-        OUTPUT ${output}
-        DEPENDS ${path}
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-        COMMENT "Generated editor data for ${filename}")
-    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
-endforeach(path in LISTS ARGN)
 
-foreach(path IN LISTS SYSTEMS_LIST)
-    set(filename)
-    get_filename_component(filename ${path} NAME_WE)
-    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
-    add_custom_command(
-        OUTPUT ${output}
-        DEPENDS ${path}
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-        COMMENT "Generated editor data for ${filename}"
-    )
-    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
-endforeach(path in LISTS ARGN)
-set(ENGINE_TYPES ${ENGINE_TYPES} PARENT_SCOPE)
-
-add_custom_target(lemon_engine_types
-  ALL DEPENDS
-    ${ENGINE_TYPES}
-)
+#foreach(path IN LISTS COMPONENTS_LIST_LEMON)
+#    set(filename)
+#    get_filename_component(filename ${path} NAME_WE)
+#    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
+#    add_custom_command(
+#        OUTPUT ${output}
+#        DEPENDS ${path}
+#        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+#        COMMENT "Generated editor data for ${filename}")
+#    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
+#endforeach(path in LISTS ARGN)
+#
+#foreach(path IN LISTS SYSTEMS_LIST_LEMON)
+#    set(filename)
+#    get_filename_component(filename ${path} NAME_WE)
+#    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
+#    add_custom_command(
+#        OUTPUT ${output}
+#        DEPENDS ${path}
+#        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+#        COMMENT "Generated editor data for ${filename}"
+#    )
+#    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
+#endforeach(path in LISTS ARGN)
+#set(ENGINE_TYPES ${ENGINE_TYPES} PARENT_SCOPE)
+#
+#add_custom_target(lemon_engine_types
+#  ALL DEPENDS
+#    ${ENGINE_TYPES}
+#)
 
 # ----------------------------------------------
 

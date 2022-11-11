@@ -35,7 +35,7 @@ void output_archive::operator()(entity ent)
 
 void output_archive::operator()(underlying_type_t<entity> size)
 {
-    switch(started)
+    switch (started)
     {
     case 0:
         writer.Key("entities");
@@ -84,12 +84,12 @@ void input_archive::operator()(entity& ent)
 
 void input_archive::operator()(underlying_type_t<entity>& size)
 {
-    if(started == 0)
+    if (started == 0)
     {
         size    = (entityIterator++)->GetUint();
         started = 1;
     }
-    else if(started == 1)
+    else if (started == 1)
     {
         const auto& a     = document["components"];
         entityIterator    = a.Begin();
