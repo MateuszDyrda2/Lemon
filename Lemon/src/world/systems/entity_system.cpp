@@ -1,5 +1,8 @@
 #include <world/systems/entity_system.h>
 
+#include <world/components/entity_components.h>
+#include <world/scene.h>
+
 namespace lemon {
 entity_system::entity_system(scene& _scene, event_queue& eventQueue):
     _scene(_scene)

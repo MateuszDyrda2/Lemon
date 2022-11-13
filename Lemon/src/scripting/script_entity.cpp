@@ -1,6 +1,7 @@
 #include <scripting/script_entity.h>
 
 #include "rendering/components/rendering_components.h"
+#include <world/scene.h>
 
 namespace lemon {
 void script_animator::start_animation(const char* animation) const

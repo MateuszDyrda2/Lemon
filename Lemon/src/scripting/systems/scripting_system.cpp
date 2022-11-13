@@ -1,6 +1,7 @@
 #include "scripting/components/scripting_components.h"
 #include <scripting/systems/scripting_system.h>
 #include <type_traits>
+#include <world/scene.h>
 
 namespace lemon {
 using namespace std;

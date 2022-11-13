@@ -1,5 +1,6 @@
 mod error_codes;
 mod models;
+mod utils;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, Value};
@@ -9,6 +10,8 @@ use tauri::Window;
 
 use self::models::*;
 use error_codes::ProjectErrorCode;
+use ndarray::arr2;
+use utils::hash_string;
 
 pub struct ProjectState(pub Mutex<Option<Project>>);
 
@@ -48,6 +51,13 @@ fn read_types_file(path: &str) -> Result<Types, serde_json::error::Error> {
     Ok(types)
 }
 
+fn read_assets_file(path: &str) -> Result<Assets, serde_json::error::Error> {
+    let contents = fs::read_to_string(path).expect("Failed to read assets file");
+
+    let assets: Assets = from_str(&contents)?;
+    Ok(assets)
+}
+
 fn get_scene(project: &Project) -> Result<&Scene, ProjectErrorCode> {
     project
         .current_scene
@@ -66,6 +76,65 @@ fn get_dataset(project: &Project) -> Result<&Types, ProjectErrorCode> {
         .ok_or(ProjectErrorCode::NoDatasetLoaded)
 }
 
+fn get_assets(project: &Project) -> Result<&Assets, ProjectErrorCode> {
+    project
+        .assets
+        .as_ref()
+        .ok_or(ProjectErrorCode::NoAssetsLoaded)
+}
+
+fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
+    let mut asset_lookup: HashMap<u32, String> = HashMap::new();
+    for a in &assets.textures {
+        let hashed = hash_string(&a.name);
+        if let Some(h) = hashed {
+            asset_lookup.insert(h, a.path.clone());
+        } else {
+            println!("Failed to hash and insert asset: {}", &a.name);
+        }
+    }
+
+    for a in &assets.sounds {
+        let hashed = hash_string(&a.name);
+        if let Some(h) = hashed {
+            asset_lookup.insert(h, a.path.clone());
+        } else {
+            println!("Failed to hash and insert asset: {}", &a.name);
+        }
+    }
+
+    for a in &assets.shaders {
+        let hashed = hash_string(&a.name);
+        if let Some(h) = hashed {
+            asset_lookup.insert(h, a.path.clone());
+        } else {
+            println!("Failed to hash and insert asset: {}", &a.name);
+        }
+    }
+
+    for a in &assets.scripts {
+        let hashed = hash_string(&a.name);
+        if let Some(h) = hashed {
+            asset_lookup.insert(h, a.path.clone());
+        } else {
+            println!("Failed to hash and insert asset: {}", &a.name);
+        }
+    }
+
+    for a in &assets.animations {
+        let hashed = hash_string(&a.name);
+        if let Some(h) = hashed {
+            asset_lookup.insert(h, a.path.clone());
+        } else {
+            println!("Failed to hash and insert asset: {}", &a.name);
+        }
+    }
+
+    Ok(AssetLookup {
+        assets: asset_lookup,
+    })
+}
+
 #[tauri::command]
 pub fn open_project(
     window: Window,
@@ -79,7 +148,7 @@ pub fn open_project(
             *state_guard = Some(p);
         }
         Err(e) => println!("Error parsing the project file: {}", e.to_string()),
-    }
+    };
 
     if let Some(project) = &mut (*state_guard) {
         let parent = Path::new(path).parent();
@@ -90,7 +159,7 @@ pub fn open_project(
         match read_scene_file(scene_path.to_str().unwrap()) {
             Ok(s) => project.current_scene = Some(s),
             Err(e) => println!("{}", e.to_string()),
-        }
+        };
 
         let types = parent
             .unwrap()
@@ -99,6 +168,20 @@ pub fn open_project(
         match read_types_file(types.to_str().unwrap()) {
             Ok(t) => project.data_set = Some(t),
             Err(e) => println!("{}", e.to_string()),
+        };
+
+        let assets = parent
+            .unwrap()
+            .join(&project.assets_path)
+            .join("assets.json");
+
+        match read_assets_file(assets.to_str().unwrap()) {
+            Ok(a) => project.assets = Some(a),
+            Err(e) => println!("{}", e.to_string()),
+        };
+
+        if let Some(a) = &project.assets {
+            project.asset_lookup = generate_assets(a).ok();
         }
 
         _ = window.emit("project-opened", "");
@@ -168,4 +251,76 @@ pub fn get_entities(
         .collect::<Vec<EntityDTO>>();
 
     Ok(ret_ent)
+}
+
+#[tauri::command]
+pub fn get_rendering_data(
+    _window: Window,
+    state: tauri::State<ProjectState>,
+) -> Result<Vec<RenderingData>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let project = unwrap_or_return!(get_project(&(*state_guard)));
+    let scene = unwrap_or_return!(get_scene(project));
+
+    let transforms = (&scene.components).iter().find(|x| x.name == "transform");
+    let transform_entities = &transforms.as_ref().unwrap().entities;
+    let sprite_renderers = (&scene.components)
+        .iter()
+        .find(|x| x.name == "sprite_renderer");
+    let rendering_entities = &sprite_renderers.as_ref().unwrap().entities;
+
+    Ok(rendering_entities
+        .into_iter()
+        .filter_map(|(key, value)| {
+            transform_entities.get(key).map(|value_b| {
+                let position = value_b["position"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+                let rotation = value_b["rotation"].as_f64().unwrap() as f32;
+                let scale = value_b["scale"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let translation_matrix = arr2(&[
+                    [1f32, 0f32, 0f32, 0f32],
+                    [0f32, 1f32, 0f32, 0f32],
+                    [0f32, 0f32, 1f32, 0f32],
+                    [position[0], position[1], 0f32, 1f32],
+                ]);
+
+                let scale_matrix = arr2(&[
+                    [scale[0], 0f32, 0f32, 0f32],
+                    [0f32, scale[1], 0f32, 0f32],
+                    [0f32, 0f32, 1f32, 0f32],
+                    [0f32, 0f32, 0f32, 1f32],
+                ]);
+
+                let rotation_matrix = arr2(&[
+                    [rotation.cos(), -rotation.sin(), 0f32, 0f32],
+                    [rotation.sin(), rotation.cos(), 0f32, 0f32],
+                    [0f32, 0f32, 1f32, 0f32],
+                    [0f32, 0f32, 0f32, 1f32],
+                ]);
+
+                let model = translation_matrix
+                    .dot(&rotation_matrix)
+                    .dot(&scale_matrix)
+                    .into_iter()
+                    .collect::<Vec<f32>>();
+
+                RenderingData {
+                    nameid: *key,
+                    model,
+                    textureid: value["tex"].as_u64().unwrap() as u32,
+                }
+            })
+        })
+        .collect::<Vec<RenderingData>>())
 }

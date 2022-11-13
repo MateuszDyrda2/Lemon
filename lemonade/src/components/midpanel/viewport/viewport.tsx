@@ -1,10 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ViewportCanvas, ViewportContainer } from './viewport.styles';
 import { useResizeDetector } from 'react-resize-detector';
 import { mat4 } from 'gl-matrix';
@@ -14,6 +8,9 @@ import {
     vertexSource,
 } from './shader/shader';
 import { initializeBuffers } from './buffer/buffer';
+import { appWindow } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api';
+import { RenderingData } from '../../../props/rendering_data';
 
 interface RenderingState {
     buffer: WebGLBuffer;
@@ -28,12 +25,12 @@ const Viewport = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [renderingState, setRenderingState] = useState<RenderingState>();
     const [size, setSize] = useState<Size>({ width: 300, height: 300 });
+    const [renderingData, setRenderingData] = useState<RenderingData[]>();
 
     const onResize = useCallback(
         (width: number | undefined, height: number | undefined) => {
             if (width && height) {
                 setSize({ width: width, height: height });
-                console.log(`${width}x${height}`);
             }
         },
         [setSize],
@@ -80,7 +77,6 @@ const Viewport = () => {
     );
 
     useEffect(() => {
-        console.log('i run only once');
         const canvas = canvasRef.current as HTMLCanvasElement;
         const gl = canvas.getContext('webgl');
         if (gl === null) return;
@@ -90,6 +86,14 @@ const Viewport = () => {
         if (program === null || buffer === null) return;
 
         setRenderingState({ program: program, buffer: buffer });
+
+        appWindow.listen('project-opened', (_) => {
+            invoke('get_rendering_data')
+                .then((data) => {
+                    setRenderingData(data as RenderingData[]);
+                })
+                .catch((err) => console.log(err));
+        });
     }, []);
 
     useEffect(() => {

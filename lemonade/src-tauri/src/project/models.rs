@@ -24,7 +24,7 @@ pub struct Assets {
     pub animations: Vec<Asset>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 pub struct AssetLookup {
     pub assets: HashMap<u32, String>,
 }
@@ -56,6 +56,8 @@ pub struct Project {
     pub data_set: Option<Types>,
     #[serde(skip)]
     pub assets: Option<Assets>,
+    #[serde(skip)]
+    pub asset_lookup: Option<AssetLookup>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -109,4 +111,11 @@ pub struct ComponentModel {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Types {
     pub components: HashMap<String, HashMap<String, String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RenderingData {
+    pub nameid: u32,
+    pub model: Vec<f32>,
+    pub textureid: u32,
 }
