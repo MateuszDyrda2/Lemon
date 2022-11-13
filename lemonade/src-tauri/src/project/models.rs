@@ -17,11 +17,16 @@ pub struct Asset {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Assets {
-    pub textures: Vec<Assets>,
-    pub sounds: Vec<Assets>,
-    pub shaders: Vec<Assets>,
-    pub scripts: Vec<Assets>,
-    pub animations: Vec<Assets>,
+    pub textures: Vec<Asset>,
+    pub sounds: Vec<Asset>,
+    pub shaders: Vec<Asset>,
+    pub scripts: Vec<Asset>,
+    pub animations: Vec<Asset>,
+}
+
+#[derive(Serialize)]
+pub struct AssetLookup {
+    pub assets: HashMap<u32, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -49,6 +54,8 @@ pub struct Project {
     pub current_scene: Option<Scene>,
     #[serde(skip)]
     pub data_set: Option<Types>,
+    #[serde(skip)]
+    pub assets: Option<Assets>,
 }
 
 #[derive(Deserialize, Debug)]

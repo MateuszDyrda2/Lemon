@@ -5,4 +5,5 @@ pub enum ProjectErrorCode {
     NoProjectLoaded,
     NoSceneOpened,
     NoDatasetLoaded,
+    NoAssetsLoaded,
 }
