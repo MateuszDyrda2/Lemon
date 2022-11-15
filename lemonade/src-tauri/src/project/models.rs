@@ -118,4 +118,5 @@ pub struct RenderingData {
     pub nameid: u32,
     pub model: Vec<f32>,
     pub textureid: u32,
+    pub texCoords: Vec<f32>,
 }

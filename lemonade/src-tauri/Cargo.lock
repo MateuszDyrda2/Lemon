@@ -48,6 +48,7 @@ checksum = "216261ddc8289130e551ddcd5ce8a064710c0d064a4d2895c67151c92b5443f6"
 name = "app"
 version = "0.1.0"
 dependencies = [
+ "imagesize",
  "ndarray",
  "serde",
  "serde_json",
@@ -1130,6 +1131,12 @@ dependencies = [
  "num-rational",
  "num-traits",
 ]
+
+[[package]]
+name = "imagesize"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df19da1e92fbfec043ca97d622955381b1f3ee72a180ec999912df31b1ccd951"
 
 [[package]]
 name = "indexmap"

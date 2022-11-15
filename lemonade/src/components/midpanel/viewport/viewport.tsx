@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ViewportCanvas, ViewportContainer } from './viewport.styles';
 import { useResizeDetector } from 'react-resize-detector';
-import { mat4 } from 'gl-matrix';
 import {
     fragmentSource,
     initializeShaders,
+    ProgramInfo,
     vertexSource,
 } from './shader/shader';
-import { initializeBuffers } from './buffer/buffer';
+import { Buffers, initializeBuffers } from './buffer/buffer';
 import { appWindow } from '@tauri-apps/api/window';
 import { invoke } from '@tauri-apps/api';
 import { RenderingData } from '../../../props/rendering_data';
+import load_textures, { Texture, TextureDefinition } from './assets/assets';
+import renderScene from './renderer/renderer';
 
 interface RenderingState {
-    buffer: WebGLBuffer;
-    program: WebGLProgram;
+    buffers: Buffers;
+    program: ProgramInfo;
 }
+
 interface Size {
     width: number;
     height: number;
@@ -26,6 +29,7 @@ const Viewport = () => {
     const [renderingState, setRenderingState] = useState<RenderingState>();
     const [size, setSize] = useState<Size>({ width: 300, height: 300 });
     const [renderingData, setRenderingData] = useState<RenderingData[]>();
+    const [textures, setTextures] = useState<{ [nameid: number]: Texture }>();
 
     const onResize = useCallback(
         (width: number | undefined, height: number | undefined) => {
@@ -45,33 +49,20 @@ const Viewport = () => {
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.viewport(0, 0, size.width, size.height);
 
-            if (!renderingState) return;
+            if (!renderingState || !renderingData || !textures) return;
+
             const program = renderingState.program;
-            const buffer = renderingState.buffer;
+            const buffers = renderingState.buffers;
 
-            const vertexPos = gl.getAttribLocation(program, 'a_position');
-            const projectionPos = gl.getUniformLocation(program, 'projection');
-            const modelPos = gl.getUniformLocation(program, 'model');
-            if (
-                vertexPos === null ||
-                projectionPos === null ||
-                modelPos === null
-            )
-                return;
-
-            const projection = mat4.create();
-            const hWidth = size.width * 0.5;
-            const hHeight = size.height * 0.5;
-            mat4.ortho(projection, -hWidth, hWidth, -hHeight, hHeight, -1, 1);
-            const model = mat4.create();
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.vertexAttribPointer(vertexPos, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(vertexPos);
-            gl.useProgram(program);
-            gl.uniformMatrix4fv(projectionPos, false, projection);
-            gl.uniformMatrix4fv(modelPos, false, model);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            renderScene(
+                renderingData,
+                gl,
+                program,
+                buffers,
+                textures,
+                size.width,
+                size.height,
+            );
         },
         [renderingState, size],
     );
@@ -82,15 +73,31 @@ const Viewport = () => {
         if (gl === null) return;
 
         const program = initializeShaders(gl, vertexSource, fragmentSource);
-        const buffer = initializeBuffers(gl);
-        if (program === null || buffer === null) return;
+        const buffers = initializeBuffers(gl);
+        if (program === null || buffers === null) return;
 
-        setRenderingState({ program: program, buffer: buffer });
+        setRenderingState({ program: program, buffers: buffers });
 
         appWindow.listen('project-opened', (_) => {
             invoke('get_rendering_data')
                 .then((data) => {
-                    setRenderingData(data as RenderingData[]);
+                    const rd = data as RenderingData[];
+                    setRenderingData(rd);
+
+                    const arr: number[] = [];
+                    for (var i = 0; i < rd.length; ++i) {
+                        arr.push(rd[i].textureid);
+                    }
+                    invoke('get_asset_list', { ids: arr })
+                        .then((ret) =>
+                            setTextures(
+                                load_textures(
+                                    gl,
+                                    ret as { [key: number]: TextureDefinition },
+                                ),
+                            ),
+                        )
+                        .catch((err) => console.log(err));
                 })
                 .catch((err) => console.log(err));
         });

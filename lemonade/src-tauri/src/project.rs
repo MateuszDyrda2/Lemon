@@ -13,6 +13,8 @@ use error_codes::ProjectErrorCode;
 use ndarray::arr2;
 use utils::hash_string;
 
+use imagesize::size;
+
 pub struct ProjectState(pub Mutex<Option<Project>>);
 
 macro_rules! unwrap_or_return {
@@ -315,12 +317,64 @@ pub fn get_rendering_data(
                     .into_iter()
                     .collect::<Vec<f32>>();
 
+                let tex_coords = value["texCoords"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
                 RenderingData {
                     nameid: *key,
                     model,
                     textureid: value["tex"].as_u64().unwrap() as u32,
+                    texCoords: tex_coords,
                 }
             })
         })
         .collect::<Vec<RenderingData>>())
+}
+
+#[derive(Serialize)]
+pub struct TextureDTO {
+    pub path: String,
+    pub width: usize,
+    pub height: usize,
+}
+
+#[tauri::command]
+pub fn get_asset_list(
+    state: tauri::State<ProjectState>,
+    ids: Vec<u32>,
+) -> Result<HashMap<u32, TextureDTO>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let project = unwrap_or_return!(get_project(&(*state_guard)));
+
+    match &project.asset_lookup {
+        Some(assets) => Ok(ids
+            .into_iter()
+            .filter_map(|id| {
+                assets.assets.get(&id).map(|val| match size(val.clone()) {
+                    Ok(dim) => (
+                        id,
+                        TextureDTO {
+                            path: val.clone(),
+                            width: dim.width,
+                            height: dim.height,
+                        },
+                    ),
+                    Err(err) => (
+                        id,
+                        TextureDTO {
+                            path: val.clone(),
+                            width: 0usize,
+                            height: 0usize,
+                        },
+                    ),
+                })
+            })
+            .collect::<HashMap<u32, TextureDTO>>()),
+        None => Err(ProjectErrorCode::NoAssetsLoaded),
+    }
 }

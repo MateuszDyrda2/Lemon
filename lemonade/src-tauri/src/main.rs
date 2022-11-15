@@ -7,12 +7,11 @@ mod project;
 use std::sync::Mutex;
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
-    Window,
 };
 
 use project::{
-    get_components, get_components_for_entity, get_entities, get_rendering_data, open_project,
-    ProjectState,
+    get_asset_list, get_components, get_components_for_entity, get_entities, get_rendering_data,
+    open_project, ProjectState,
 };
 
 #[tauri::command]
@@ -54,6 +53,7 @@ fn main() {
             get_components_for_entity,
             get_entities,
             get_rendering_data,
+            get_asset_list,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
