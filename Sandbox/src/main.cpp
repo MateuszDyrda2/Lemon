@@ -67,10 +67,11 @@ void Sandbox::initialize()
 
     auto player = scene.create_entity(ENT_NAME("Player"));
     player.emplace<player_t>();
-    auto&& psr = player.emplace<sprite_renderer>();
-    psr.tex    = services._asset_storage.get_asset<texture>("player_anim"_hs);
+    auto&& psr      = player.emplace<sprite_renderer>();
+    psr.tex         = services._asset_storage.get_asset<texture>("player_anim"_hs);
+    const auto size = psr.tex.get()->get_size();
+    psr.texCoords   = { 0, 0, 22.f / size.x, 56.f / size.y };
     transform_system::move_by(player, { -600, 0 });
-    transform_system::scale_by(player, { 0.3, 0.3 });
 
     auto&& rb       = player.emplace<rigidbody>();
     rb.position     = player.get<transform>().position;
@@ -95,7 +96,7 @@ void Sandbox::initialize()
     tileRb.colliderType = collider_type::box;
     tileRb.isKinetic    = true;
 
-    _serializer.serialize_scene(scene, "randompath.json");
+    _serializer.serialize_scene(scene, SCENE_PATH "/sandbox1.json");
 }
 
 GAME_DECL(Sandbox);

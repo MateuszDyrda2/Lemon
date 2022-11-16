@@ -1,7 +1,8 @@
-import { glMatrix, mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import { RenderingData } from '../../../../props/rendering_data';
 import { Texture } from '../assets/assets';
 import { Buffers } from '../buffer/buffer';
+import { Camera, getCameraModel } from '../camera/camera';
 import { ProgramInfo } from '../shader/shader';
 
 const renderScene = (
@@ -9,6 +10,7 @@ const renderScene = (
     gl: WebGLRenderingContext,
     program: ProgramInfo,
     buffer: Buffers,
+    camera: Camera,
     textures: { [nameid: number]: Texture },
     width: number,
     height: number,
@@ -18,11 +20,10 @@ const renderScene = (
     const hHeight = height * 0.5;
     mat4.ortho(projection, -hWidth, hWidth, -hHeight, hHeight, -1, 1);
     gl.useProgram(program.program);
-    gl.uniformMatrix4fv(
-        program.uniformLocations.projectionMatrix,
-        false,
-        projection,
-    );
+    var view = getCameraModel(camera);
+    mat4.multiply(view, projection, view);
+
+    gl.uniformMatrix4fv(program.uniformLocations.projectionMatrix, false, view);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
     gl.vertexAttribPointer(
         program.attribLocations.vertexPosition,
@@ -38,9 +39,16 @@ const renderScene = (
         const { handle, size } = textures[data.textureid];
         const texCoords = data.texCoords;
 
-        const model = mat4.fromScaling(
+        const texSize = [
+            size[0] * (texCoords[2] - texCoords[0]),
+            size[1] * (texCoords[3] - texCoords[1]),
+        ];
+
+        var model = mat4.create();
+        mat4.scale(
+            model,
             data.model,
-            vec3.fromValues(size[0], size[1], 1),
+            vec3.fromValues(texSize[0], texSize[1], 1),
         );
 
         const coords = [

@@ -1,5 +1,3 @@
-import { RenderingData } from '../../../../props/rendering_data';
-import { invoke } from '@tauri-apps/api';
 import { readBinaryFile } from '@tauri-apps/api/fs';
 
 export interface Texture {
@@ -14,19 +12,20 @@ export interface TextureDefinition {
     height: number;
 }
 
-const load_textures = (
+const load_textures = async (
     gl: WebGLRenderingContext,
     definitions: { [key: number]: TextureDefinition },
 ) => {
     var textures: { [nameid: number]: Texture } = {};
 
-    Object.entries(definitions).forEach(([nameid, def]) => {
+    for (const [nameid, def] of Object.entries(definitions)) {
+        const tex = await load_texture(gl, def);
         textures[parseInt(nameid)] = {
             path: def.path,
-            handle: load_texture(gl, def),
+            handle: tex,
             size: [def.width, def.height],
         };
-    });
+    }
 
     return textures;
 };
@@ -41,7 +40,7 @@ const arrayBufferToBase64 = (buffer: Uint8Array) => {
     return window.btoa(binary);
 };
 
-const load_texture = (
+const load_texture = async (
     gl: WebGLRenderingContext,
     textureDefinition: TextureDefinition,
 ) => {
@@ -79,29 +78,26 @@ const load_texture = (
         srcType,
         tempImage,
     );
-    gl.bindTexture(gl.TEXTURE_2D, null);
 
-    const promise = readBinaryFile(path);
-    promise
-        .then((response) => {
-            var base64 = arrayBufferToBase64(response);
-            var image = new Image();
-            image.src = 'data:image/png;base64, ' + base64;
-            image.onload = (_) => {
-                console.log(image.width + ' x ' + image.height);
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(
-                    gl.TEXTURE_2D,
-                    0,
-                    internalFormat,
-                    sourceFormat,
-                    srcType,
-                    image,
-                );
-                gl.bindTexture(gl.TEXTURE_2D, null);
-            };
-        })
-        .catch((err) => console.log(err));
+    try {
+        const response = await readBinaryFile(path);
+        var base64 = arrayBufferToBase64(response);
+        var image = new Image();
+        image.src = 'data:image/png;base64,' + base64;
+        await image.decode();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            internalFormat,
+            sourceFormat,
+            srcType,
+            image,
+        );
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    } catch (e) {
+        console.log('Error decoding image: ' + e);
+    }
 
     return texture;
 };

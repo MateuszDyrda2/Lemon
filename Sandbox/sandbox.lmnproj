@@ -5,6 +5,6 @@
   "src_path": "src",
   "build_dir": "../build",
   "scenes": [
-    "sandbox_scene"
+    "sandbox1"
   ]
 }

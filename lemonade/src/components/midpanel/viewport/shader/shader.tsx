@@ -72,6 +72,10 @@ export const initializeShaders = (
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
 
+    // enable blending
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
         console.log(
             `Unable to initialize the shader program: ${gl.getProgramInfoLog(

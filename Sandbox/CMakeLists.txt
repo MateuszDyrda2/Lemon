@@ -6,7 +6,6 @@ set(sandbox_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/input_system.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement_system.cpp
-
 )
 
 set(COMPONENTS_LIST
@@ -66,4 +65,5 @@ target_link_libraries(sandbox PUBLIC lemon::lemon)
 target_compile_definitions(
     sandbox PUBLIC
     "ASSET_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/assets\""
+    "SCENE_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/scenes\""
 )
