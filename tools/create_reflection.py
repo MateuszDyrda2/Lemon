@@ -54,7 +54,7 @@ def main(argv):
     with open(input_path, 'r') as f:
         components = json.load(f)['components']
 
-    serialization_components = [component_template.format(k, ''.join(field_template.format(kk) for kk,val in v.items()), ''.join(field_out_template.format(kk) for kk,val in v.items())) for k,v in components.items()]
+    serialization_components = [component_template.format(k, ''.join(field_template.format(val["name"]) for val in v), ''.join(field_out_template.format(val["name"]) for val in v)) for k,v in components.items()]
 
     serialization_file = file_template.format(''.join(include_template.format(i) for i in include_strings),''.join(c for c in serialization_components))
 

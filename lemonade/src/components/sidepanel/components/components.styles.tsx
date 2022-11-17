@@ -1,5 +1,11 @@
 import { MdArrowDropDown, MdArrowDropUp } from 'react-icons/md';
 import styled from 'styled-components';
+import {
+    clickable,
+    small_text,
+    flex_column,
+    medium_text,
+} from '../../../styles/styles';
 
 export const ObjectInput = styled.input`
     margin: 2px;
@@ -7,12 +13,11 @@ export const ObjectInput = styled.input`
     box-sizing: border-box;
     border: none;
     background: ${(props) => props.theme.colors.bg_s};
-    color: ${(props) => props.theme.colors.fg1};
-    font-size: ${(props) => props.theme.fontSizes.small};
     padding: 4px;
     border-radius: 2px;
     outline: none;
     user-select: text;
+    ${small_text}
 `;
 export const ObjectClass = styled.div`
     display: inline;
@@ -35,8 +40,7 @@ export const FieldName = styled.p`
 export const ComponentClass = styled.div`
     border: 1px solid ${(props) => props.theme.colors.bg1};
     margin: 10px 0;
-    display: flex;
-    flex-direction: column;
+    ${flex_column}
     border-radius: 2px;
 `;
 export const ComponentHeader = styled.div`
@@ -46,21 +50,19 @@ export const ComponentHeader = styled.div`
     cursor: pointer;
 `;
 export const ComponentName = styled.p`
-    color: ${(props) => props.theme.colors.fg1};
-    font-size: ${(props) => props.theme.fontSizes.small};
+    ${small_text}
     padding: 2px 10px 2px 10px;
     margin: 0;
-    text-overflow: ellipsis;
     overflow: hidden;
 `;
 
 export const DropDown = styled(MdArrowDropDown)`
-    font-size: large;
+    ${medium_text}
     margin-left: 5px;
 `;
 
 export const DropUp = styled(MdArrowDropUp)`
-    font-size: large;
+    ${medium_text}
     margin-left: 5px;
 `;
 
@@ -69,4 +71,22 @@ export const ComponentsContainer = styled.div`
     height: 100%;
     width: 100%;
     overflow-y: auto;
+`;
+
+export const IconWrapper = styled.div`
+    padding: 5px;
+    color: ${(props) => props.theme.colors.fg1};
+    border: 2px solid ${(props) => props.theme.colors.bg1};
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+
+    ${clickable}
+`;
+
+interface WrapperProps {
+    isVisible: boolean;
+}
+export const DropdownWrapper = styled.div<WrapperProps>`
+    display: ${(props) => (props.isVisible ? 'block' : 'none')};
 `;

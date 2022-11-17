@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import { clickable } from '../../../styles/styles';
+
 export const ProjectContainer = styled.div`
     height: 100%;
 `;
@@ -25,15 +27,10 @@ export const ProjectName = styled.p`
 export const Button = styled.li`
     display: inline-block;
     width: 10rem;
-    cursor: pointer;
     border-radius: 2px;
     margin: 3px;
     padding: 5px;
     border: 1px solid ${(props) => props.theme.colors.fg4};
-    &:hover {
-        background: ${(props) => props.theme.colors.bg3};
-    }
-    &:active {
-        background: ${(props) => props.theme.colors.fg4};
-    }
+
+    ${clickable}
 `;

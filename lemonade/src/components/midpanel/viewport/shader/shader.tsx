@@ -21,7 +21,25 @@ export const fragmentSource = `
     uniform sampler2D uSampler;
 
     void main() {
-        gl_FragColor = texture2D(uSampler, vTextureCoord);
+        vec4 color = texture2D(uSampler, vTextureCoord);
+        if (color.a <= 0.04)
+            discard;
+
+        gl_FragColor = color;
+    }
+`;
+
+export const highlightFragmentSource = `
+    precision mediump float;
+
+    varying highp vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main() {
+        vec4 color = vec4(1,0.8,0,0);
+        vec4 alpha = vec4(0,0,0,1) * texture2D(uSampler, vTextureCoord);
+        gl_FragColor = color + alpha;
     }
 `;
 
@@ -51,14 +69,18 @@ const loadShader = (
 
 export interface ProgramInfo {
     program: WebGLProgram;
+    hProgram: WebGLProgram;
     attribLocations: Record<string, number>;
     uniformLocations: Record<string, WebGLUniformLocation | null>;
+    hAttribLocations: Record<string, number>;
+    hUniformLocations: Record<string, WebGLUniformLocation | null>;
 }
 
 export const initializeShaders = (
     gl: WebGLRenderingContext,
     vertexSource: string,
     fragmentSource: string,
+    highlightFragmentSource: string,
 ) => {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
@@ -73,8 +95,32 @@ export const initializeShaders = (
     gl.linkProgram(shaderProgram);
 
     // enable blending
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        console.log(
+            `Unable to initialize the shader program: ${gl.getProgramInfoLog(
+                shaderProgram,
+            )}`,
+        );
+        return null;
+    }
+
+    // highlight
+    const hVertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexSource);
+    const hFragmentShader = loadShader(
+        gl,
+        gl.FRAGMENT_SHADER,
+        highlightFragmentSource,
+    );
+
+    if (hVertexShader === null || hFragmentShader === null) return null;
+
+    const hShaderProgram = gl.createProgram();
+    if (hShaderProgram === null) return null;
+
+    gl.attachShader(hShaderProgram, hVertexShader);
+    gl.attachShader(hShaderProgram, hFragmentShader);
+    gl.linkProgram(hShaderProgram);
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
         console.log(
@@ -88,6 +134,7 @@ export const initializeShaders = (
     //return shaderProgram;
     const programInfo: ProgramInfo = {
         program: shaderProgram,
+        hProgram: hShaderProgram,
         attribLocations: {
             vertexPosition: gl.getAttribLocation(shaderProgram, 'position'),
             textureCoords: gl.getAttribLocation(shaderProgram, 'texCoords'),
@@ -99,6 +146,18 @@ export const initializeShaders = (
             ),
             modelViewMatrix: gl.getUniformLocation(shaderProgram, 'model'),
             uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
+        },
+        hAttribLocations: {
+            vertexPosition: gl.getAttribLocation(hShaderProgram, 'position'),
+            textureCoords: gl.getAttribLocation(hShaderProgram, 'texCoords'),
+        },
+        hUniformLocations: {
+            projectionMatrix: gl.getUniformLocation(
+                hShaderProgram,
+                'projection',
+            ),
+            modelViewMatrix: gl.getUniformLocation(hShaderProgram, 'model'),
+            uSampler: gl.getUniformLocation(hShaderProgram, 'uSampler'),
         },
     };
 

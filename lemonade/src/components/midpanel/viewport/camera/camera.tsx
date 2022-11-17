@@ -34,8 +34,8 @@ export const moveCameraBy = (camera: Camera, offset: number[]) => {
     const c: Camera = {
         size: camera.size,
         position: [
-            camera.position[0] + offset[0],
-            camera.position[1] + offset[1],
+            camera.position[0] + offset[0] / camera.size,
+            camera.position[1] + offset[1] / camera.size,
         ],
     };
     return c;

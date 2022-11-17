@@ -60,9 +60,10 @@ pub struct Project {
     pub asset_lookup: Option<AssetLookup>,
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(untagged, rename_all = "lowercase")]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "lowercase", tag = "type")]
 pub enum FieldType {
+    Bool,
     I8,
     I16,
     I32,
@@ -92,13 +93,16 @@ pub enum FieldType {
     #[serde(rename = "hash_str")]
     HashStr,
     Asset,
+    #[serde(rename = "entity_t")]
     Entity,
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FieldModel {
     pub name: String,
-    #[serde(rename = "type")]
+    #[serde(flatten)]
     pub _type: FieldType,
 }
 
@@ -110,7 +114,7 @@ pub struct ComponentModel {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Types {
-    pub components: HashMap<String, HashMap<String, String>>,
+    pub components: HashMap<String, Vec<FieldModel>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

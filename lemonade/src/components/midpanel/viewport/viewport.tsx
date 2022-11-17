@@ -3,6 +3,7 @@ import { ViewportCanvas, ViewportContainer } from './viewport.styles';
 import { useResizeDetector } from 'react-resize-detector';
 import {
     fragmentSource,
+    highlightFragmentSource,
     initializeShaders,
     ProgramInfo,
     vertexSource,
@@ -20,10 +21,13 @@ import {
     resetCamera,
     zoomCamera,
 } from './camera/camera';
+import { useRecoilState } from 'recoil';
+import { chosenEntity } from '../../../state/chosen_entity';
 
 interface RenderingState {
     buffers: Buffers;
     program: ProgramInfo;
+    gl: WebGLRenderingContext;
 }
 
 interface Size {
@@ -43,8 +47,8 @@ const Viewport = () => {
         x: 0,
         y: 0,
     });
-    const [isMouseOver, setIsMouseOver] = useState(false);
     const [camera, setCamera] = useState<Camera | undefined>(undefined);
+    const [chEntity] = useRecoilState(chosenEntity);
 
     const onResize = useCallback(
         (width: number | undefined, height: number | undefined) => {
@@ -61,7 +65,11 @@ const Viewport = () => {
             if (!size) return;
 
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.clear(
+                gl.COLOR_BUFFER_BIT |
+                    gl.DEPTH_BUFFER_BIT |
+                    gl.STENCIL_BUFFER_BIT,
+            );
             gl.viewport(0, 0, size.width, size.height);
 
             if (!renderingState || !renderingData || !textures) return;
@@ -77,17 +85,30 @@ const Viewport = () => {
                 textures,
                 size.width,
                 size.height,
+                chEntity,
             );
         },
-        [renderingState, size, update, camera],
+        [renderingState, size, update, camera, chEntity],
     );
 
     useEffect(() => {
         const canvas = canvasRef.current as HTMLCanvasElement;
-        const gl = canvas.getContext('webgl');
+        const gl = canvas.getContext('webgl', { stencil: true });
         if (gl === null) return;
 
-        const program = initializeShaders(gl, vertexSource, fragmentSource);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.STENCIL_TEST);
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+        gl.stencilMask(0x00);
+        const program = initializeShaders(
+            gl,
+            vertexSource,
+            fragmentSource,
+            highlightFragmentSource,
+        );
         const buffers = initializeBuffers(gl);
         setCamera(createCamera(1.0));
         if (program === null || buffers === null) return;
@@ -95,6 +116,7 @@ const Viewport = () => {
         setRenderingState({
             program: program,
             buffers: buffers,
+            gl: gl,
         });
 
         appWindow.listen('project-opened', async (_) => {
@@ -122,19 +144,16 @@ const Viewport = () => {
     }, []);
 
     useEffect(() => {
-        if (canvasRef.current === null) return;
-        const canvas = canvasRef.current as HTMLCanvasElement;
-        const gl = canvas.getContext('webgl');
-        if (gl === null) return;
+        if (!renderingState) return;
 
         var animationFrameId: number;
         const render = () => {
-            drawScene(gl);
+            drawScene(renderingState.gl);
             animationFrameId = window.requestAnimationFrame(render);
         };
         render();
         return () => window.cancelAnimationFrame(animationFrameId);
-    }, [drawScene, update]);
+    }, [drawScene]);
 
     useEffect(() => {
         if (!mouseDown) return;
@@ -146,7 +165,7 @@ const Viewport = () => {
                     -1 * (mousePos.y - e.clientY),
                 ];
                 setCamera((old) => moveCameraBy(old as Camera, offset));
-                setMousePos({ x: e.pageX, y: e.pageY });
+                setMousePos({ x: e.clientX, y: e.clientY });
             }
         };
 
@@ -171,7 +190,7 @@ const Viewport = () => {
     };
 
     const onMouseDown = (e: React.MouseEvent) => {
-        setMousePos({ x: e.pageX, y: e.pageY });
+        setMousePos({ x: e.clientX, y: e.clientY });
         setMouseDown(true);
     };
 
@@ -179,8 +198,6 @@ const Viewport = () => {
         <ViewportContainer ref={ref}>
             <ViewportCanvas
                 onMouseDown={onMouseDown}
-                onMouseEnter={() => setIsMouseOver(true)}
-                onMouseLeave={() => setIsMouseOver(false)}
                 onWheel={handleNavigation}
                 ref={canvasRef}
                 width={size.width}

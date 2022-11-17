@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { useCallback, useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { chosenEntity } from '../../../state/chosen_entity';
+import { RiAddFill } from 'react-icons/ri';
 
 import {
     ComponentsContainer,
@@ -15,7 +16,10 @@ import {
     DropUp,
     ObjectInput,
     DropDown,
+    IconWrapper,
+    DropdownWrapper,
 } from './components.styles';
+import Dropdown from './dropdown/dropdown';
 
 interface Field {
     name: string;
@@ -103,18 +107,43 @@ const Components = () => {
     const [components, setComponents] = useState<
         { [name: string]: { [key: string]: object } } | undefined
     >(undefined);
+    const [dropdown, setDropdown] = useState(false);
+    const [componentDefs, setComponentDefs] = useState<string[]>([]);
+
+    const fetchComponentsForEntity = async () => {
+        if (chEntity) {
+            const value = await invoke('get_components_for_entity', {
+                entityid: chEntity.id,
+            });
+            setComponents(
+                value as { [name: string]: { [key: string]: object } },
+            );
+        }
+    };
+
+    const fetchComponents = async () => {
+        const value = await invoke('get_components');
+        setComponentDefs(value as string[]);
+    };
 
     useEffect(() => {
-        if (chEntity) {
-            invoke('get_components_for_entity', { entityid: chEntity.id })
-                .then((value) =>
-                    setComponents(
-                        value as { [name: string]: { [key: string]: object } },
-                    ),
-                )
-                .catch((err) => console.log(err));
-        }
+        fetchComponentsForEntity().catch(console.error);
+        fetchComponents().catch(console.error);
     }, [chEntity]);
+
+    const chooseComponent = async (ch: DropdownOption) => {
+        setDropdown(false);
+        try {
+            await invoke('add_component_to_entity', {
+                entityid: chEntity?.id,
+                componentname: ch,
+            });
+
+            await fetchComponentsForEntity();
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <ComponentsContainer>
@@ -122,6 +151,17 @@ const Components = () => {
                 Object.keys(components).map((key, _) => (
                     <Component name={key} fields={components[key]} key={key} />
                 ))}
+
+            <DropdownWrapper isVisible={!!components}>
+                <IconWrapper onClick={() => setDropdown((old) => !old)}>
+                    <RiAddFill size="2em" />
+                </IconWrapper>
+                <Dropdown
+                    isOpen={dropdown}
+                    options={componentDefs}
+                    onSelect={chooseComponent}
+                />
+            </DropdownWrapper>
         </ComponentsContainer>
     );
 };

@@ -10,8 +10,8 @@ use tauri::{
 };
 
 use project::{
-    get_asset_list, get_components, get_components_for_entity, get_entities, get_rendering_data,
-    open_project, ProjectState,
+    add_component_to_entity, get_asset_list, get_components, get_components_for_entity,
+    get_entities, get_rendering_data, open_project, ProjectState,
 };
 
 #[tauri::command]
@@ -54,6 +54,7 @@ fn main() {
             get_entities,
             get_rendering_data,
             get_asset_list,
+            add_component_to_entity,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
