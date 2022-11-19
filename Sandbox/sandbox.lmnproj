@@ -3,7 +3,8 @@
   "assets_path": "assets",
   "scene_path": "scenes",
   "src_path": "src",
-  "build_dir": "../build",
+  "types_path": "../build/_generated/types.json",
+  "exec_path": "../build/Sandbox/sandbox",
   "scenes": [
     "sandbox1"
   ]

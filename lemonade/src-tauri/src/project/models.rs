@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -48,7 +48,8 @@ pub struct Project {
     pub assets_path: String,
     pub scene_path: String,
     pub src_path: String,
-    pub build_dir: String,
+    pub types_path: String,
+    pub exec_path: String,
     pub scenes: Vec<String>,
     #[serde(skip)]
     pub current_scene: Option<Scene>,
@@ -58,6 +59,8 @@ pub struct Project {
     pub assets: Option<Assets>,
     #[serde(skip)]
     pub asset_lookup: Option<AssetLookup>,
+    #[serde(skip)]
+    pub executable: Option<PathBuf>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

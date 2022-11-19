@@ -16,8 +16,8 @@ import {
 const Project = () => {
     const [projectState, setProjectState] = useRecoilState(current_project);
 
-    const openProject = async () => {
-        const selected = await open({
+    const openProject = () => {
+        open({
             multiple: false,
             filters: [
                 {
@@ -25,13 +25,17 @@ const Project = () => {
                     extensions: ['lmnproj'],
                 },
             ],
-        });
-
-        if (selected) {
-            invoke('open_project', { path: selected })
-                .then((name) => setProjectState({ name: name as string }))
-                .catch((error) => console.log(error));
-        }
+        })
+            .then((selected) => {
+                if (selected) {
+                    invoke('open_project', { path: selected })
+                        .then((name) =>
+                            setProjectState({ name: name as string }),
+                        )
+                        .catch(console.error);
+                }
+            })
+            .catch(console.error);
     };
 
     return (

@@ -13,6 +13,7 @@ import { FaPlay, FaStop } from 'react-icons/fa';
 import { useRecoilState } from 'recoil';
 import { selectedTools, SelectedTools } from '../../../state/selected_tools';
 import { Tools } from '../../../props/tools';
+import { invoke } from '@tauri-apps/api';
 
 const Topbar = () => {
     const [selected, setSelected] = useRecoilState(selectedTools);
@@ -36,6 +37,13 @@ const Topbar = () => {
             return s;
         });
     };
+    const runEngine = () => {
+        invoke('run_engine').catch(console.error);
+    };
+
+    const stopEngine = () => {
+        invoke('stop_engine').catch(console.error);
+    };
 
     return (
         <TopbarContainer>
@@ -57,10 +65,10 @@ const Topbar = () => {
                 </ToolWrapper>
             </ToolboxContainer>
             <PlayContainer>
-                <PlayWrapper>
+                <PlayWrapper onClick={runEngine}>
                     <FaPlay size="25" color="#12F012" />
                 </PlayWrapper>
-                <PlayWrapper>
+                <PlayWrapper onClick={stopEngine}>
                     <FaStop size="25" />
                 </PlayWrapper>
             </PlayContainer>

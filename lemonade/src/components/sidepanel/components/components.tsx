@@ -1,167 +1,100 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { useCallback, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { chosenEntity } from '../../../state/chosen_entity';
 import { RiAddFill } from 'react-icons/ri';
 
 import {
     ComponentsContainer,
-    ObjectClass,
-    FieldClass,
-    FieldValues,
-    ComponentClass,
-    ComponentHeader,
-    FieldName,
-    ComponentName,
-    DropUp,
-    ObjectInput,
-    DropDown,
     IconWrapper,
     DropdownWrapper,
+    EntityNameContainer,
+    EntityName,
 } from './components.styles';
 import Dropdown from './dropdown/dropdown';
 
-interface Field {
+import Component from './component/component';
+
+interface EntityComponents {
+    components: { [name: string]: { [key: string]: object } };
     name: string;
-    value: object;
 }
-
-interface ComponentProps {
-    name: string;
-    fields: { [key: string]: object };
-}
-
-interface ObjectProps {
-    obj: object;
-}
-
-const RenderObject = ({ obj }: ObjectProps) => {
-    const [val, setVal] = useState<unknown>(obj);
-    return (
-        <ObjectClass>
-            {(Object.prototype.toString.call(obj) === '[object Array]' &&
-                (val as object[]).map((key, index) => (
-                    <RenderObject obj={key} key={index} />
-                ))) ||
-                (typeof obj === 'object' &&
-                    Object.keys(val as { [key: string]: object }).map(
-                        (k, index) => (
-                            <div>
-                                <p>{k}</p>
-                                <RenderObject
-                                    obj={val as { [key: string]: object }}
-                                    key={index}
-                                />
-                            </div>
-                        ),
-                    )) ||
-                (typeof obj === 'number' && (
-                    <ObjectInput
-                        type="number"
-                        value={val as number}
-                        onChange={(e) => setVal(e.target.value)}
-                    />
-                )) ||
-                (typeof obj === 'string' && (
-                    <ObjectInput
-                        type="string"
-                        value={val as string}
-                        onChange={(e) => setVal(e.target.value)}
-                    />
-                ))}
-        </ObjectClass>
-    );
-};
-
-const RenderField = ({ name, value }: Field) => {
-    return (
-        <FieldClass>
-            <FieldName>{name}</FieldName>
-            <FieldValues>
-                <RenderObject obj={value as object} />
-            </FieldValues>
-        </FieldClass>
-    );
-};
-
-const Component = ({ name, fields }: ComponentProps) => {
-    const [expanded, setExpanded] = useState(false);
-    const onExpand = useCallback(() => setExpanded(!expanded), [expanded]);
-
-    return (
-        <ComponentClass>
-            <ComponentHeader onClick={onExpand}>
-                {expanded ? <DropUp /> : <DropDown />}
-                <ComponentName>{name}</ComponentName>
-            </ComponentHeader>
-            {expanded &&
-                Object.keys(fields).map((key, _) => (
-                    <RenderField name={key} value={fields[key]} key={key} />
-                ))}
-        </ComponentClass>
-    );
-};
 
 const Components = () => {
-    const [chEntity] = useRecoilState(chosenEntity);
-    const [components, setComponents] = useState<
-        { [name: string]: { [key: string]: object } } | undefined
-    >(undefined);
+    const [chEntity, setChEntity] = useRecoilState(chosenEntity);
+    const [components, setComponents] = useState<EntityComponents | undefined>(
+        undefined,
+    );
     const [dropdown, setDropdown] = useState(false);
     const [componentDefs, setComponentDefs] = useState<string[]>([]);
 
-    const fetchComponentsForEntity = async () => {
-        if (chEntity) {
-            const value = await invoke('get_components_for_entity', {
-                entityid: chEntity.id,
-            });
-            setComponents(
-                value as { [name: string]: { [key: string]: object } },
-            );
-        }
-    };
-
-    const fetchComponents = async () => {
-        const value = await invoke('get_components');
-        setComponentDefs(value as string[]);
-    };
-
     useEffect(() => {
-        fetchComponentsForEntity().catch(console.error);
-        fetchComponents().catch(console.error);
+        if (chEntity) {
+            invoke('get_components_for_entity', {
+                entityid: chEntity.id,
+            })
+                .then((value) => setComponents(value as EntityComponents))
+                .catch(console.error);
+        }
+        invoke('get_components')
+            .then((value) => setComponentDefs(value as string[]))
+            .catch(console.error);
     }, [chEntity]);
 
-    const chooseComponent = async (ch: DropdownOption) => {
+    const chooseComponent = (ch: string) => {
         setDropdown(false);
-        try {
-            await invoke('add_component_to_entity', {
-                entityid: chEntity?.id,
-                componentname: ch,
-            });
+        invoke('add_component_to_entity', {
+            entityid: chEntity?.id,
+            componentname: ch,
+        })
+            .then((value) => setComponents(value as EntityComponents))
+            .catch(console.error);
+    };
 
-            await fetchComponentsForEntity();
-        } catch (err) {
-            console.error(err);
-        }
+    const changeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setComponents({ ...components!, name: e.target.value });
+    };
+    const acceptNameChange = (e: React.FocusEvent<HTMLInputElement>) => {
+        invoke('set_entity_name', {
+            entityid: chEntity?.id,
+            name: e.target.value,
+        })
+            .then((ret) => setChEntity({ ...chEntity!, name: ret as string }))
+            .catch(console.error);
     };
 
     return (
         <ComponentsContainer>
-            {components &&
-                Object.keys(components).map((key, _) => (
-                    <Component name={key} fields={components[key]} key={key} />
-                ))}
+            {components && (
+                <>
+                    <EntityNameContainer>
+                        <EntityName
+                            value={components && components.name}
+                            onBlur={acceptNameChange}
+                            onChange={changeName}
+                        />
+                    </EntityNameContainer>
+                    {Object.keys(components.components).map((key, _) => (
+                        <Component
+                            entityid={chEntity?.id ?? 0}
+                            name={key}
+                            fields={components.components[key]}
+                            key={key}
+                        />
+                    ))}
 
-            <DropdownWrapper isVisible={!!components}>
-                <IconWrapper onClick={() => setDropdown((old) => !old)}>
-                    <RiAddFill size="2em" />
-                </IconWrapper>
-                <Dropdown
-                    isOpen={dropdown}
-                    options={componentDefs}
-                    onSelect={chooseComponent}
-                />
-            </DropdownWrapper>
+                    <DropdownWrapper>
+                        <IconWrapper onClick={() => setDropdown((old) => !old)}>
+                            <RiAddFill size="2em" />
+                        </IconWrapper>
+                        <Dropdown
+                            isOpen={dropdown}
+                            options={componentDefs}
+                            onSelect={chooseComponent}
+                        />
+                    </DropdownWrapper>
+                </>
+            )}
         </ComponentsContainer>
     );
 };

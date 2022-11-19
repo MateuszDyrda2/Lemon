@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { clickable } from '../../../styles/styles';
 
 export const SceneContainer = styled.div`
     height: 100%;
@@ -35,4 +36,15 @@ export const EntityName = styled.p`
     font-size ${(props) => props.theme.fontSizes.small};
     text-align: left;
     padding-left: 5px;
+`;
+
+export const AddWrapper = styled.div`
+    width: 100%;
+    color ${(props) => props.theme.colors.fg1};
+    border: 2px solid ${(props) => props.theme.colors.bg1};
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+
+    ${clickable}
 `;
