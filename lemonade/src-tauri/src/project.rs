@@ -8,10 +8,10 @@ mod utils;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::io::Read;
+use std::io::{self, BufRead, BufReader, Read, Stdout, Write};
 use std::process::{Child, Command, Stdio};
 use std::thread::{self, JoinHandle};
-use std::{path::Path, result::Result, sync::Mutex};
+use std::{path::Path, result::Result, str, sync::Mutex};
 use tauri::Window;
 
 use self::component::{
@@ -28,8 +28,8 @@ use utils::hash_string;
 use imagesize::size;
 
 pub struct EngineProcess {
-    child: Child,
-    handle: JoinHandle<()>,
+    child: Option<Child>,
+    handle: Option<JoinHandle<()>>,
 }
 
 pub struct ProjectState(pub Mutex<Option<Project>>);
@@ -286,7 +286,7 @@ pub fn get_rendering_data(
                     nameid: *key,
                     model,
                     textureid: value["tex"].as_u64().unwrap() as u32,
-                    texCoords: tex_coords,
+                    tex_coords,
                 }
             })
         })
@@ -456,47 +456,48 @@ pub fn run_engine(
     let mut engine_state_guard = engine_state.0.lock().unwrap();
 
     if let Some(engine) = &mut *engine_state_guard {
-        match engine.child.try_wait() {
-            Ok(Some(status)) => println!("exited with {status}"),
-            Ok(None) => match engine.child.kill() {
-                Err(_err) => return Err(ProjectErrorCode::FailedToStartEngine),
-                _ => (),
-            },
-            Err(e) => {
-                return Err(ProjectErrorCode::FailedToStartEngine);
+        if let Some(child) = &mut engine.child {
+            match child.try_wait() {
+                Ok(Some(status)) => println!("exited with {status}"),
+                Ok(None) => match child.kill() {
+                    Err(_err) => return Err(ProjectErrorCode::FailedToStartEngine),
+                    _ => (),
+                },
+                Err(e) => {
+                    return Err(ProjectErrorCode::FailedToStartEngine);
+                }
             }
+        }
+        if let Some(thread_join_handle) = engine.handle.take() {
+            thread_join_handle.join().unwrap();
         }
     }
 
-    let child = Command::new(project.executable.as_ref().unwrap())
+    let mut child = Command::new(project.executable.as_ref().unwrap())
         .stdout(Stdio::piped())
         .spawn()
         .expect("failed to execute child");
 
-    let mut stdout = engine_state_guard
-        .as_mut()
-        .unwrap()
-        .child
-        .stdout
-        .take()
-        .unwrap();
+    let mut stdout = child.stdout.take().unwrap();
 
     let t = thread::Builder::new()
         .name("engine_stream_to_editor".into())
-        .spawn(move || loop {
-            let mut buff = [0];
-            match stdout.read(&mut buff) {
-                Err(err) => {
-                    println!("{}", err);
-                    break;
-                }
-                Ok(got) => {
-                    if got == 0 {
+        .spawn(move || {
+            let mut f = BufReader::new(stdout);
+            loop {
+                println!("once");
+                let mut buff = String::new();
+                match f.read_line(&mut buff) {
+                    Err(err) => {
+                        println!("{}", err);
                         break;
-                    } else if got == 1 {
-                        println!("{}", buff[0]);
-                    } else {
-                        break;
+                    }
+                    Ok(got) => {
+                        if got == 0 {
+                            break;
+                        } else {
+                            println!("{}", buff);
+                        }
                     }
                 }
             }
@@ -504,28 +505,42 @@ pub fn run_engine(
     match t {
         Ok(thread) => {
             *engine_state_guard = Some(EngineProcess {
-                child,
-                handle: thread,
-            })
+                child: Some(child),
+                handle: Some(thread),
+            });
+            Ok(())
         }
-        Err(_err) => {
-            return Err(ProjectErrorCode::FailedToStartEngine);
-        }
+        Err(_err) => Err(ProjectErrorCode::FailedToStartEngine),
     }
-
-    Ok(())
 }
 
 #[tauri::command]
 pub fn stop_engine(engine_state: tauri::State<Engine>) -> Result<(), ProjectErrorCode> {
     let mut engine_state_guard = engine_state.0.lock().unwrap();
 
-    if let Some(engine) = &mut *engine_state_guard {
-        match engine.child.kill() {
-            Ok(_) => Ok(()),
-            Err(_err) => Err(ProjectErrorCode::EngineNotRunning),
+    let Some(engine) = &mut *engine_state_guard else {
+        return Err(ProjectErrorCode::EngineNotRunning);
+    };
+
+    if let Some(child) = &mut engine.child {
+        match child.kill() {
+            Ok(_) => (),
+            Err(_err) => return Err(ProjectErrorCode::EngineNotRunning),
         }
-    } else {
-        Err(ProjectErrorCode::EngineNotRunning)
     }
+    if let Some(thread_join_handle) = engine.handle.take() {
+        thread_join_handle.join().unwrap();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_scenes(state: tauri::State<ProjectState>) -> Result<Vec<String>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    Ok(project.scenes.clone())
 }

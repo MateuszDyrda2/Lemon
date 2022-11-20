@@ -11,7 +11,7 @@ use tauri::{
 
 use project::{
     add_component_to_entity, add_entity, change_entity_component, get_asset_list, get_components,
-    get_components_for_entity, get_entities, get_rendering_data, open_project,
+    get_components_for_entity, get_entities, get_rendering_data, get_scenes, open_project,
     remove_component_from_entity, run_engine, set_entity_name, stop_engine, Engine, ProjectState,
 };
 
@@ -63,6 +63,7 @@ fn main() {
             change_entity_component,
             run_engine,
             stop_engine,
+            get_scenes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
