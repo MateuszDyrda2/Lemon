@@ -544,3 +544,75 @@ pub fn get_scenes(state: tauri::State<ProjectState>) -> Result<Vec<String>, Proj
 
     Ok(project.scenes.clone())
 }
+
+#[tauri::command]
+pub fn get_textures(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(assets) = &project.assets else {
+        return Err(ProjectErrorCode::NoAssetsLoaded);
+    };
+
+    Ok(assets.textures.clone())
+}
+
+#[tauri::command]
+pub fn get_sounds(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(assets) = &project.assets else {
+        return Err(ProjectErrorCode::NoAssetsLoaded);
+    };
+
+    Ok(assets.sounds.clone())
+}
+#[tauri::command]
+pub fn get_scripts(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(assets) = &project.assets else {
+        return Err(ProjectErrorCode::NoAssetsLoaded);
+    };
+
+    Ok(assets.scripts.clone())
+}
+#[tauri::command]
+pub fn get_animations(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(assets) = &project.assets else {
+        return Err(ProjectErrorCode::NoAssetsLoaded);
+    };
+
+    Ok(assets.animations.clone())
+}
+#[tauri::command]
+pub fn get_shaders(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(assets) = &project.assets else {
+        return Err(ProjectErrorCode::NoAssetsLoaded);
+    };
+
+    Ok(assets.shaders.clone())
+}

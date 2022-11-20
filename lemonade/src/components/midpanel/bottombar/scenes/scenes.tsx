@@ -21,7 +21,7 @@ const Scenes = () => {
     return (
         <ScenesContainer>
             {scenes.map((scene) => (
-                <IconWrapper>
+                <IconWrapper key={scene}>
                     <BsFillFileEarmarkFill size="4em" />
                     <SceneName>{scene}</SceneName>
                 </IconWrapper>

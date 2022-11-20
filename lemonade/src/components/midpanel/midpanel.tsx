@@ -44,6 +44,7 @@ const Midpanel = () => {
     return (
         <MidpanelContainer>
             <Topbar />
+            <Viewport />
             <DividerContainer onMouseDown={onMouseDown}>
                 <Divider />
             </DividerContainer>

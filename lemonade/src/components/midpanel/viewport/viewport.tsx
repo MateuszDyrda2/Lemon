@@ -13,7 +13,7 @@ import { appWindow } from '@tauri-apps/api/window';
 import { invoke } from '@tauri-apps/api';
 import { RenderingData } from '../../../props/rendering_data';
 import load_textures, { Texture, TextureDefinition } from './assets/assets';
-import renderScene from './renderer/renderer';
+import renderScene, { testMouse } from './renderer/renderer';
 import {
     Camera,
     createCamera,
@@ -48,7 +48,7 @@ const Viewport = () => {
         y: 0,
     });
     const [camera, setCamera] = useState<Camera | undefined>(undefined);
-    const [chEntity] = useRecoilState(chosenEntity);
+    const [chEntity, setChEntity] = useRecoilState(chosenEntity);
 
     const onResize = useCallback(
         (width: number | undefined, height: number | undefined) => {
@@ -192,6 +192,19 @@ const Viewport = () => {
     const onMouseDown = (e: React.MouseEvent) => {
         setMousePos({ x: e.clientX, y: e.clientY });
         setMouseDown(true);
+
+        if (!renderingData || !canvasRef.current || !camera || !textures)
+            return;
+
+        const hit = testMouse(
+            e.clientX,
+            e.clientY,
+            canvasRef.current,
+            camera,
+            renderingData,
+            textures,
+        );
+        setChEntity(hit ? { id: hit } : undefined);
     };
 
     return (

@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { RenderingData } from '../../../../props/rendering_data';
 import { Entity } from '../../../../state/chosen_entity';
 import { Texture } from '../assets/assets';
@@ -40,7 +40,7 @@ const renderScene = (
 
     for (const data of renderingData) {
         const { handle, size } = textures[data.textureid];
-        const texCoords = data.texCoords;
+        const texCoords = data.tex_coords;
 
         const texSize = [
             size[0] * (texCoords[2] - texCoords[0]),
@@ -124,7 +124,7 @@ const renderScene = (
             );
             gl.enableVertexAttribArray(program.hAttribLocations.vertexPosition);
 
-            const texCoords = found.texCoords;
+            const texCoords = found.tex_coords;
 
             const texSize = [
                 size[0] * (texCoords[2] - texCoords[0]) + 5,
@@ -175,6 +175,73 @@ const renderScene = (
             gl.stencilMask(0xff);
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);
             gl.enable(gl.DEPTH_TEST);
+        }
+    }
+};
+
+export const testMouse = (
+    x: number,
+    y: number,
+    canvas: HTMLCanvasElement,
+    camera: Camera,
+    renderingData: RenderingData[],
+    textures: { [nameid: number]: Texture },
+) => {
+    var rect = canvas.getBoundingClientRect();
+
+    var relativeMousePos = {
+        x: x - rect.left,
+        y: y - rect.top,
+    };
+
+    relativeMousePos.x =
+        (relativeMousePos.x * canvas.width) / canvas.clientWidth;
+    relativeMousePos.y =
+        (relativeMousePos.y * canvas.height) / canvas.clientHeight;
+
+    const webglCoords = {
+        x: (relativeMousePos.x / canvas.width) * 2 - 1,
+        y: (relativeMousePos.y / canvas.height) * -2 + 1,
+    };
+
+    const hWidth = canvas.width * 0.5;
+    const hHeight = canvas.height * 0.5;
+
+    const gameWorldCoords = {
+        x: (webglCoords.x * hWidth) / camera.size + camera.position[0],
+        y: (webglCoords.y * hHeight) / camera.size + camera.position[1],
+    };
+
+    const pointer = vec4.fromValues(gameWorldCoords.x, gameWorldCoords.y, 0, 0);
+
+    for (var i = 0; i < renderingData.length; ++i) {
+        var model = renderingData[i].model;
+        var position = vec3.create();
+        var scale = vec3.create();
+
+        mat4.getTranslation(position, model);
+        mat4.getScaling(scale, model);
+
+        const { size } = textures[renderingData[i].textureid];
+        const texCoords = renderingData[i].tex_coords;
+
+        const texSize = [
+            size[0] * (texCoords[2] - texCoords[0]) * 0.5,
+            size[1] * (texCoords[3] - texCoords[1]) * 0.5,
+        ];
+
+        const leftBound = position[0] - texSize[0] * scale[0];
+        const rightBound = position[0] + texSize[0] * scale[0]!;
+        const bottomBound = position[1] - texSize[1] * scale[1];
+        const topBound = position[1] + texSize[1] * scale[1];
+
+        if (
+            pointer[0] >= leftBound &&
+            pointer[0] <= rightBound &&
+            pointer[1] >= bottomBound &&
+            pointer[1] <= topBound
+        ) {
+            return renderingData[i].nameid;
         }
     }
 };
