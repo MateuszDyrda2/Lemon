@@ -25,6 +25,8 @@ struct LEMON_API [[lemon::component]] transform
     [[lemon::field]] entity_t parent{ entt::null };
     [[lemon::field]] std::size_t order{};
 
+    [[lemon::field]] i32 layer{ 0 };
+
     transform() = default;
     transform(vec2 position):
         position(position) { }
