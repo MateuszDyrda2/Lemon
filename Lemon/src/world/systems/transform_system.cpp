@@ -1,6 +1,7 @@
 #include <world/systems/transform_system.h>
 
 #include <core/math/math.h>
+#include <core/math/vec3.h>
 
 namespace lemon {
 transform_system::transform_system(scene& _scene, event_queue& _eventQueue):
@@ -29,7 +30,8 @@ void transform_system::onUpdate([[maybe_unused]] event_args* e)
             _model.matrix = _transform.parent == entt::null
                                 ? mat4(1.0f)
                                 : _scene.get<model>(_transform.parent).matrix;
-            _model.matrix = translate(_model.matrix, vec3(_transform.position, 0.0f));
+
+            _model.matrix = translate(_model.matrix, vec3(_transform.position, _transform.layer * 0.01));
             _model.matrix = rotate(_model.matrix, _transform.rotation, vec3(0.0f, 0.0f, 1.0f));
             _model.matrix = scale(_model.matrix, vec3(_transform.scale, 1.0f));
         });

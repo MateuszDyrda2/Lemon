@@ -5,6 +5,11 @@ pub enum ProjectErrorCode {
     NoProjectLoaded,
     NoSceneOpened,
     NoDatasetLoaded,
-    NoMatchedStage,
-    NoMatchedSystem,
+    NoAssetsLoaded,
+    NoEntityFound,
+    EntityDoesNotHaveCompoonent,
+    NoComponentFound,
+    NoComponentDefinitionFound,
+    EngineNotRunning,
+    FailedToStartEngine,
 }

@@ -2,6 +2,7 @@
 
 #include <core/math/math.h>
 #include <physics/components/physics_components.h>
+#include <type_traits>
 #include <world/components/transform_components.h>
 
 namespace lemon {

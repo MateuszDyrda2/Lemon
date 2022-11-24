@@ -23,13 +23,14 @@ texture::texture(hash_str name, const std::string& path,
         &height,
         &numberOfChannels,
         0);
-    if(!data)
+    if (!data)
     {
         logger::error("Failed to load texture from {}", path);
         return;
     }
     size         = { width, height };
     nrOfChannels = numberOfChannels;
+    logger::info("{}x{}", width, height);
 
     glGenTextures(1, &handle);
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, handle));
@@ -61,7 +62,7 @@ texture::texture(hash_str name, const std::vector<u8>& buffer):
         &height,
         &numberOfChannels,
         0);
-    if(!data)
+    if (!data)
     {
         logger::error("Failed to load texture from buffer");
         return;
@@ -95,7 +96,7 @@ texture::texture(hash_str name, const ivec2& size, const color& c, wrap wrapping
     lemon_assert(!(size.x % 4) && !(size.y % 4));
     std::vector<unsigned char> data(size.x * size.y * 4);
     auto&& [r, g, b, a] = c.to_u8();
-    for(std::size_t i = 0; i < data.size(); i += 4)
+    for (std::size_t i = 0; i < data.size(); i += 4)
     {
         data[i]     = r;
         data[i + 1] = g;
@@ -130,7 +131,7 @@ void texture::unbind() const
 }
 texture::~texture()
 {
-    if(!handle) return;
+    if (!handle) return;
 
     glDeleteTextures(1, &handle);
 }
@@ -141,7 +142,7 @@ texture::texture(texture&& other) noexcept:
 }
 texture& texture::operator=(texture&& other) noexcept
 {
-    if(this != &other)
+    if (this != &other)
     {
         resource::operator=(std::move(other));
         std::swap(handle, other.handle);

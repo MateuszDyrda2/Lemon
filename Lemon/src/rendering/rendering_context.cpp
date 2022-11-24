@@ -8,12 +8,13 @@
 namespace lemon {
 rendering_context::rendering_context()
 {
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         logger::fatal("Failed to initialize GLAD");
     }
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
     logger::info("Rendering context created");
 }
 rendering_context::~rendering_context()
@@ -32,7 +33,7 @@ void rendering_context::set_viewport(const ivec4& vp)
 void rendering_context::clear_screen(const color& c)
 {
     GL_CHECK(glClearColor(c.r, c.g, c.b, c.a));
-    GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+    GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 void rendering_context::draw_arrays(GLenum mode, std::size_t first, std::size_t count)
 {

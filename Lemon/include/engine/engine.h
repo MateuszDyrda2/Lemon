@@ -1,5 +1,6 @@
 #pragma once
 
+#include "serialization/serializer.h"
 #include <assets/asset.h>
 #include <events/events.h>
 #include <platform/input.h>
@@ -24,9 +25,10 @@ class LEMON_API engine
     input _input;
     rendering_context _renderingContext;
     scripting_engine _scriptingEngine;
-    asset_storage _assertStorage;
+    asset_storage _assetStorage;
     scheduler _scheduler;
     scene_manager _sceneManager;
+    serializer _serializer;
 };
 } // namespace lemon
 

@@ -2,10 +2,10 @@
 
 #include <core/defines.h>
 #include <core/lemon_types.h>
-#include <world/reflection.h>
+#include <core/math/vec2.h>
 
 namespace lemon {
-enum class collider_type
+enum collider_type
 {
     none,
     box,
@@ -59,9 +59,4 @@ struct LEMON_API [[lemon::component]] capsule_collider
     [[lemon::field]] f32 radius     = { 0.5f };
     [[lemon::field]] f32 height     = { 0.5f };
 };
-
-LEMON_REFL(rigidbody, position, rotation, velocity, angularRotation, linearDrag, mass, isKinetic, colliderType);
-LEMON_REFL(box_collider, bounciness, friction, offset, hSize);
-LEMON_REFL(circle_collider, bounciness, friction, offset, radius);
-LEMON_REFL(capsule_collider, bounciness, friction, offset, radius, height);
 }

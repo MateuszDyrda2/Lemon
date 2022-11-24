@@ -1,12 +1,7 @@
+use std::{collections::HashMap, path::PathBuf};
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Stage {
-    pub stage: u32,
-    pub systems: Vec<u32>,
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entities {
@@ -22,9 +17,16 @@ pub struct Asset {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Assets {
-    pub textures: Vec<Assets>,
+    pub textures: Vec<Asset>,
     pub sounds: Vec<Asset>,
     pub shaders: Vec<Asset>,
+    pub scripts: Vec<Asset>,
+    pub animations: Vec<Asset>,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct AssetLookup {
+    pub assets: HashMap<u32, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -36,41 +38,35 @@ pub struct Component {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Scene {
-    pub systems: Vec<Stage>,
     pub entities: Entities,
     pub components: Vec<Component>,
-    pub assets: Assets,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Project {
     pub project_name: String,
     pub assets_path: String,
     pub scene_path: String,
     pub src_path: String,
-    pub build_dir: String,
+    pub types_path: String,
+    pub exec_path: String,
     pub scenes: Vec<String>,
     #[serde(skip)]
     pub current_scene: Option<Scene>,
     #[serde(skip)]
     pub data_set: Option<Types>,
+    #[serde(skip)]
+    pub assets: Option<Assets>,
+    #[serde(skip)]
+    pub asset_lookup: Option<AssetLookup>,
+    #[serde(skip)]
+    pub executable: Option<PathBuf>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct StageModel {
-    pub id: u32,
-    pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SystemModel {
-    pub id: u32,
-    pub name: String,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(untagged, rename_all = "lowercase")]
+#[serde(rename_all = "lowercase", tag = "type")]
 pub enum FieldType {
+    Bool,
     I8,
     I16,
     I32,
@@ -79,7 +75,7 @@ pub enum FieldType {
     U16,
     U32,
     U64,
-    #[serde(rename = "std::size_t")]
+    #[serde(rename = "std::size_t", alias = "size_t")]
     SizeT,
     F32,
     F64,
@@ -100,13 +96,16 @@ pub enum FieldType {
     #[serde(rename = "hash_str")]
     HashStr,
     Asset,
+    #[serde(rename = "entity_t")]
     Entity,
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FieldModel {
     pub name: String,
-    #[serde(rename = "type")]
+    #[serde(flatten)]
     pub _type: FieldType,
 }
 
@@ -116,9 +115,15 @@ pub struct ComponentModel {
     pub fields: Vec<FieldModel>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Types {
-    pub stages: HashMap<u32, String>,
-    pub systems: HashMap<u32, String>,
-    pub components: HashMap<String, HashMap<String, String>>,
+    pub components: HashMap<String, Vec<FieldModel>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RenderingData {
+    pub nameid: u32,
+    pub model: Vec<f32>,
+    pub textureid: u32,
+    pub tex_coords: Vec<f32>,
 }

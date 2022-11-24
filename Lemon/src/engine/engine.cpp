@@ -7,10 +7,12 @@ namespace lemon {
 engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
     _eventQueue{}, _window("engine", { 1080, 720 }),
     _input(_window, _eventQueue), _renderingContext{},
-    _assertStorage(assetPath, _scriptingEngine),
+    _assetStorage(assetPath, _scriptingEngine),
     _scheduler(std::thread::hardware_concurrency() - 1),
-    _sceneManager(_assertStorage, _scheduler, _eventQueue, _window, _input, _messageBus)
-{ }
+    _sceneManager(_assetStorage, _scheduler, _eventQueue, _window, _input, _messageBus),
+    _serializer(_assetStorage)
+{
+}
 
 engine::~engine()
 {
@@ -60,7 +62,7 @@ int engine::run()
         _eventQueue["Render"_hs]
             .fire_immediate(&e);
         // clean unused assets
-        _assertStorage.update();
+        _assetStorage.update();
     }
     return 0;
 }

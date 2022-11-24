@@ -7,6 +7,7 @@
 #include <core/math/mat4.h>
 #include <core/math/math.h>
 #include <core/math/vec2.h>
+#include <core/math/vec3.h>
 #include <core/math/vec4.h>
 
 namespace lemon {
@@ -52,11 +53,11 @@ void basic_renderer::render_sprite(const color& col, const vec4& texCoords, asse
     auto texture = tex.get();
     shader->use();
     auto model         = m;
-    const auto texSize = texture->get_size();
-    const f32 texW     = f32(texSize.x);
-    const f32 texH     = f32(texSize.y);
+    const auto texsize = texture->get_size();
+    const f32 texw     = f32(texsize.x) * (texCoords.z - texCoords.x);
+    const f32 texh     = f32(texsize.y) * (texCoords.w - texCoords.y);
 
-    model = scale(model, vec3(texW, texH, 1.f));
+    model = scale(model, vec3(texw, texh, 1.f));
 
     shader->set_uniform("spriteColor", col.rgba);
     shader->set_uniform("model", model);

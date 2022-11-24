@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Splashscreen</title>
-    <style>
-      body {
-        background-color: #282828;
-        align-items: center;
-      }
-    </style>
-  </head>
-  <body>
-    <img src="lemon.svg" alt="Lemon Logo" width="200" />
-  </body>
+    <head>
+        <title>Splashscreen</title>
+        <style>
+            html,body {
+                height: 100%;
+                width: 100%;
+            }
+            body {
+                background-color: #282828;
+            }
+            #container {
+                height: 100%;
+                width: 100%;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            img {
+                animation: spin 4s linear infinite;
+            }
+            @keyframes spin {
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <img src="lemon.svg" alt="Lemon logo" width="200"/>
+        </div>
+    </body>
 </html>

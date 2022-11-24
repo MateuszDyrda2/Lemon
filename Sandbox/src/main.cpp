@@ -16,7 +16,6 @@
 #include <scripting/systems/scripting_system.h>
 
 #include <rendering/systems/rendering_system.h>
-#include <serialization/scene_serializer.h>
 #include <world/systems/entity_system.h>
 #include <world/systems/transform_system.h>
 
@@ -57,6 +56,9 @@ void Sandbox::initialize()
                       .register_system<animation_system>()
                       .register_system<rendering_system>();
 
+    _serializer.register_all(scene.get_registry());
+    //    _serializer.deserialize_scene(scene, "build/randompath.json");
+
     auto services = scene.get_services();
 
     auto mainCamera = scene.create_entity(ENT_NAME("Main Camera"));
@@ -65,10 +67,11 @@ void Sandbox::initialize()
 
     auto player = scene.create_entity(ENT_NAME("Player"));
     player.emplace<player_t>();
-    auto&& psr = player.emplace<sprite_renderer>();
-    psr.tex    = services._asset_storage.get_asset<texture>("player_anim"_hs);
+    auto&& psr      = player.emplace<sprite_renderer>();
+    psr.tex         = services._asset_storage.get_asset<texture>("player_anim"_hs);
+    const auto size = psr.tex.get()->get_size();
+    psr.texCoords   = { 0, 0, 22.f / size.x, 56.f / size.y };
     transform_system::move_by(player, { -600, 0 });
-    transform_system::scale_by(player, { 0.3, 0.3 });
 
     auto&& rb       = player.emplace<rigidbody>();
     rb.position     = player.get<transform>().position;
@@ -92,6 +95,8 @@ void Sandbox::initialize()
     tile.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 340.f, 220.f });
     tileRb.colliderType = collider_type::box;
     tileRb.isKinetic    = true;
+
+    _serializer.serialize_scene(scene, SCENE_PATH "/sandbox1.json");
 }
 
 GAME_DECL(Sandbox);
