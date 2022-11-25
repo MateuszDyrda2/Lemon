@@ -45,18 +45,20 @@ asset_loader::asset_loader(const string& path, scripting_engine& _scriptingEngin
     run_for_each([this](auto& vv) {
         for (auto&& v : vv)
         {
-            auto&& t                           = v.GetObject();
-            auto name                          = t["name"].GetString();
-            auto path                          = t["path"].GetString();
-            resourcePaths[hash_string_d(name)] = path;
+            auto&& t                                   = v.GetObject();
+            auto name                                  = t["name"].GetString();
+            auto path                                  = t["path"].GetString();
+            resourcePaths[hashstr::runtime_hash(name)] = path;
         }
     },
                  textures, sounds, shaders, scripts, animations);
+
+    logger::info("Assets loaded");
 }
 asset_loader::~asset_loader()
 {
 }
-bool asset_loader::resource_exists(hash_str nameid) const noexcept
+bool asset_loader::resource_exists(hashstr nameid) const noexcept
 {
     return resourcePaths.contains(nameid);
 }

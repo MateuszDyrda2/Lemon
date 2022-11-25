@@ -37,7 +37,6 @@ pub fn field_to_value(ftype: &FieldType) -> Value {
         | FieldType::U32
         | FieldType::U64
         | FieldType::SizeT
-        | FieldType::HashStr
         | FieldType::Asset
         | FieldType::Entity
         | FieldType::Unknown => json!(0),
@@ -48,6 +47,6 @@ pub fn field_to_value(ftype: &FieldType) -> Value {
         FieldType::Mat2 => json!([[0, 0], [0, 0]]),
         FieldType::Mat3 => json!([[0, 0, 0], [0, 0, 0], [0, 0, 0]]),
         FieldType::Mat4 => json!([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
-        FieldType::Str => json!(""),
+        FieldType::Str | FieldType::HashStr => json!(""),
     }
 }

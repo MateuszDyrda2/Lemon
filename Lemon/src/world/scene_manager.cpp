@@ -15,14 +15,14 @@ scene_manager::scene_manager(asset_storage& _assetStorage,
 scene_manager::~scene_manager()
 { }
 
-void scene_manager::create_scene(hash_str sceneid)
+void scene_manager::create_scene(hashstr sceneid)
 {
     scenes.emplace(
         sceneid,
         new scene(sceneid, _assetStorage, _scheduler, _eventQueue, _window, _input, _messageBus));
 }
 
-scene& scene_manager::load_scene(hash_str sceneid)
+scene& scene_manager::load_scene(hashstr sceneid)
 {
     if (currentScene)
     {
@@ -45,17 +45,17 @@ const scene& scene_manager::get_current_scene() const
     return *currentScene;
 }
 
-scene& scene_manager::get_scene(hash_str sceneid)
+scene& scene_manager::get_scene(hashstr sceneid)
 {
     return *scenes.at(sceneid);
 }
 
-const scene& scene_manager::get_scene(hash_str sceneid) const
+const scene& scene_manager::get_scene(hashstr sceneid) const
 {
     return *scenes.at(sceneid);
 }
 
-bool scene_manager::is_current(hash_str sceneid) const
+bool scene_manager::is_current(hashstr sceneid) const
 {
     lemon_assert(currentScene);
     return currentScene->get_nameid() == sceneid;

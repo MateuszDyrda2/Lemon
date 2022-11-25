@@ -10,7 +10,7 @@ asset_storage::~asset_storage()
 {
     logger::info("Asset storage destroyed");
 }
-void asset_storage::release_asset(hash_str nameid)
+void asset_storage::release_asset(hashstr nameid)
 {
     if (!nameid) return;
 
@@ -22,7 +22,7 @@ void asset_storage::release_asset(hash_str nameid)
     toDelete.push_back(std::move(res->second));
     cachedAssets.erase(res);
 }
-hash_str asset_storage::clone_asset(hash_str nameid)
+hashstr asset_storage::clone_asset(hashstr nameid)
 {
     if (!nameid) return nameid;
 

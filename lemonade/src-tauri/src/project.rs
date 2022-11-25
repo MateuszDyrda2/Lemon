@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::io::{self, BufRead, BufReader, Read, Stdout, Write};
 use std::process::{Child, Command, Stdio};
 use std::thread::{self, JoinHandle};
-use std::{path::Path, result::Result, str, sync::Mutex};
+use std::{fs, path::Path, result::Result, str, sync::Mutex};
 use tauri::Window;
 
 use self::component::{
@@ -144,12 +144,17 @@ pub fn open_project(
 
     if let Some(project) = &mut (*state_guard) {
         let parent = Path::new(path).parent();
+        project.path = parent.unwrap().to_path_buf();
         let scenes_path = parent.unwrap().join(&project.scene_path);
         let scene_name = project.scenes.first().unwrap().to_owned();
-        let scene_path = scenes_path.join(scene_name + ".json");
+
+        let scene_path = scenes_path.join(scene_name.clone() + ".json");
 
         match read_scene_file(scene_path.to_str().unwrap()) {
-            Ok(s) => project.current_scene = Some(s),
+            Ok(mut s) => {
+                s.name = scene_name;
+                project.current_scene = Some(s)
+            }
             Err(e) => println!("{}", e.to_string()),
         };
 
@@ -240,6 +245,8 @@ pub fn get_rendering_data(
                     .into_iter()
                     .map(|x| x.as_f64().unwrap() as f32)
                     .collect::<Vec<f32>>();
+                let layer = value_b["layer"].as_u64().unwrap();
+
                 let rotation = value_b["rotation"].as_f64().unwrap() as f32;
                 let scale = value_b["scale"]
                     .as_array()
@@ -252,7 +259,7 @@ pub fn get_rendering_data(
                     [1f32, 0f32, 0f32, 0f32],
                     [0f32, 1f32, 0f32, 0f32],
                     [0f32, 0f32, 1f32, 0f32],
-                    [position[0], position[1], 0f32, 1f32],
+                    [position[0], position[1], layer as f32 * 0.1f32, 1f32],
                 ]);
 
                 let scale_matrix = arr2(&[
@@ -285,7 +292,7 @@ pub fn get_rendering_data(
                 RenderingData {
                     nameid: *key,
                     model,
-                    textureid: value["tex"].as_u64().unwrap() as u32,
+                    textureid: hash_string(value["tex"].as_str().unwrap()).unwrap(),
                     tex_coords,
                 }
             })
@@ -425,6 +432,7 @@ pub fn set_entity_name(
 #[tauri::command]
 pub fn change_entity_component(
     state: tauri::State<ProjectState>,
+    window: Window,
     entityid: u32,
     componentname: String,
     fieldname: String,
@@ -440,12 +448,18 @@ pub fn change_entity_component(
         return Err(ProjectErrorCode::NoSceneOpened);
     };
 
-    change_component(scene, entityid, componentname, fieldname, newvalue)
+    change_component(scene, entityid, componentname, fieldname, newvalue)?;
+    window
+        .emit("scene-changed", ())
+        .expect("Failed to emit event on scene changed");
+
+    Ok(())
 }
 
 #[tauri::command]
 pub fn run_engine(
     state: tauri::State<ProjectState>,
+    window: Window,
     engine_state: tauri::State<Engine>,
 ) -> Result<(), ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -475,32 +489,37 @@ pub fn run_engine(
 
     let mut child = Command::new(project.executable.as_ref().unwrap())
         .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
         .spawn()
         .expect("failed to execute child");
 
-    let mut stdout = child.stdout.take().unwrap();
+    //let mut stdout = child.stdout.take().unwrap();
+    let out = BufReader::new(child.stdout.take().unwrap());
 
     let t = thread::Builder::new()
         .name("engine_stream_to_editor".into())
         .spawn(move || {
-            let mut f = BufReader::new(stdout);
-            loop {
-                println!("once");
-                let mut buff = String::new();
-                match f.read_line(&mut buff) {
-                    Err(err) => {
-                        println!("{}", err);
-                        break;
-                    }
-                    Ok(got) => {
-                        if got == 0 {
-                            break;
-                        } else {
-                            println!("{}", buff);
-                        }
-                    }
-                }
-            }
+            //let mut f = BufReader::new(stdout);
+            out.lines()
+                .for_each(|line| _ = window.emit("received-output", line.unwrap()));
+            // loop {
+            /*println!("once");*/
+            /*let mut buff = String::new();*/
+            /*match f.read_line(&mut buff) {*/
+            /*Err(err) => {*/
+            /*println!("{}", err);*/
+            /*break;*/
+            /*}*/
+            /*Ok(got) => {*/
+            /*if got == 0 {*/
+            /*break;*/
+            /*} else {*/
+            /*println!("{}", buff);*/
+            /*window.emit("received-output", buff.clone());*/
+            /*}*/
+            /*}*/
+            /*}*/
+            //}
         });
     match t {
         Ok(thread) => {
@@ -588,6 +607,7 @@ pub fn get_scripts(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, Proj
 
     Ok(assets.scripts.clone())
 }
+
 #[tauri::command]
 pub fn get_animations(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -602,6 +622,7 @@ pub fn get_animations(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, P
 
     Ok(assets.animations.clone())
 }
+
 #[tauri::command]
 pub fn get_shaders(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -615,4 +636,26 @@ pub fn get_shaders(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, Proj
     };
 
     Ok(assets.shaders.clone())
+}
+
+#[tauri::command]
+pub fn save(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
+    let mut state_guard = lock_state!(state);
+
+    let Some(project) = &mut (*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &mut project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    let slice = serde_json::to_vec(&scene);
+    let path = project
+        .path
+        .join(&project.scene_path)
+        .join(scene.name.clone() + ".json");
+
+    fs::write(path, slice.unwrap()).expect("Failed to save scene to file");
+    Ok(())
 }

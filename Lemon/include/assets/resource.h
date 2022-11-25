@@ -13,7 +13,7 @@ class LEMON_API resource
   public:
     using self_type = resource;
 
-    resource(hash_str name);
+    resource(hashstr name);
     resource(const self_type&)             = delete;
     self_type& operator=(const self_type&) = delete;
     resource(self_type&& other) noexcept;
@@ -24,6 +24,6 @@ class LEMON_API resource
 
   private:
     std::atomic<u32> _count; ///< reference count of the resource
-    hash_str name;
+    hashstr name;
 };
 } // namespace lemon

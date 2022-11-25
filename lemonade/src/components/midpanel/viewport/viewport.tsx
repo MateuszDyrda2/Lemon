@@ -91,6 +91,33 @@ const Viewport = () => {
         [renderingState, size, update, camera, chEntity],
     );
 
+    const reloadScene = useCallback((gl: WebGLRenderingContext) => {
+        invoke('get_rendering_data')
+            .then((data) => {
+                const rd = data as RenderingData[];
+                setRenderingData(rd);
+
+                const arr: number[] = [];
+                for (var i = 0; i < rd.length; ++i) arr.push(rd[i].textureid);
+
+                invoke('get_asset_list', { ids: arr })
+                    .then((ret) => {
+                        load_textures(
+                            gl,
+                            ret as { [key: number]: TextureDefinition },
+                        )
+                            .then((texs) => {
+                                setTextures(texs);
+                                setCamera(resetCamera());
+                                forceUpdate();
+                            })
+                            .catch(console.error);
+                    })
+                    .catch(console.error);
+            })
+            .catch(console.error);
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current as HTMLCanvasElement;
         const gl = canvas.getContext('webgl', { stencil: true });
@@ -119,29 +146,19 @@ const Viewport = () => {
             gl: gl,
         });
 
-        appWindow.listen('project-opened', async (_) => {
-            try {
-                const data = await invoke('get_rendering_data');
-                const rd = data as RenderingData[];
-                setRenderingData(rd);
-
-                const arr: number[] = [];
-                for (var i = 0; i < rd.length; ++i) {
-                    arr.push(rd[i].textureid);
-                }
-                const ret = await invoke('get_asset_list', { ids: arr });
-                const texs = await load_textures(
-                    gl,
-                    ret as { [key: number]: TextureDefinition },
-                );
-                setTextures(texs);
-                setCamera(resetCamera());
-                forceUpdate();
-            } catch (e) {
-                console.log(e);
-            }
+        const unlisten1 = appWindow.listen('project-opened', (_) =>
+            reloadScene(gl),
+        );
+        const unlisten2 = appWindow.listen('scene-changed', (_) => {
+            console.log('scene-changed');
+            reloadScene(gl);
         });
-    }, []);
+
+        return () => {
+            unlisten1.then((unlisten) => unlisten).catch(console.log);
+            unlisten2.then((unlisten) => unlisten).catch(console.log);
+        };
+    }, [reloadScene]);
 
     useEffect(() => {
         if (!renderingState) return;

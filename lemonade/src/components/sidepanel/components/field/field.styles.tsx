@@ -18,6 +18,8 @@ export const ObjectClass = styled.div`
 `;
 export const FieldClass = styled.div`
     overflow: hidden;
+
+    border-bottom: 1px solid ${(props) => props.theme.colors.bg1};
 `;
 export const FieldValues = styled.div`
     margin: 10px 20px;

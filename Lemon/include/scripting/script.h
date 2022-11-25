@@ -12,7 +12,7 @@ struct message_payload;
 class LEMON_API script : public resource
 {
   public:
-    script(hash_str nameid, const std::string& path, scripting_engine& _scriptingEngine);
+    script(hashstr nameid, const std::string& path, scripting_engine& _scriptingEngine);
     virtual ~script();
 
     script(const script&)            = delete;
@@ -22,7 +22,7 @@ class LEMON_API script : public resource
 
     const std::string& get_path() const { return path; }
 
-    static hash_str get_mocked() { return hash_string("mock_script"); }
+    static hashstr get_mocked() { return "mock_script"_hs; }
 
     void execute(script_entity ent, const std::string& func, message_payload* payload);
 

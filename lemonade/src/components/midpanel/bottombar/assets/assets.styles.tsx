@@ -6,7 +6,7 @@ export const AssetsContainer = styled.div`
     height: 100%;
     display: flex;
     flex-flow: column wrap;
-    align-items: flex-start;
+    align-items: space-around;
 `;
 
 export const IconWrapper = styled.div`

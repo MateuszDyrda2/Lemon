@@ -16,7 +16,7 @@ extern "C"
 namespace lemon {
 namespace fs = std::filesystem;
 
-script::script(hash_str nameid, const std::string& path, scripting_engine& _scriptingEngine):
+script::script(hashstr nameid, const std::string& path, scripting_engine& _scriptingEngine):
     resource(nameid),
     path(path), engine(_scriptingEngine)
 {

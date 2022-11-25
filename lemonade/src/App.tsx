@@ -1,4 +1,4 @@
-import { createRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
 import './App.css';
@@ -8,6 +8,8 @@ import Sidepanel from './components/sidepanel/sidepanel';
 import { PanelTypes } from './props/panel-types';
 import { PanelContext } from './state/PanelContext';
 import { theme } from './utils/theme';
+import { registerAll } from '@tauri-apps/api/globalShortcut';
+import { invoke } from '@tauri-apps/api';
 
 const MIN_WIDTH = 200;
 
@@ -41,6 +43,14 @@ const App = () => {
         window.addEventListener('mouseup', onMouseUp);
         return () => window.removeEventListener('mouseup', onMouseUp);
     }, [dragging]);
+
+    useEffect(() => {
+        registerAll(['CommandOrCtrl+s'], (shortcut) => {
+            if (shortcut === 'CommandOrCtrl+s') {
+                invoke('save').catch(console.error);
+            }
+        }).catch(console.error);
+    }, []);
 
     return (
         <RecoilRoot>

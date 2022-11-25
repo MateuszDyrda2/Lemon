@@ -27,7 +27,7 @@ namespace lemon {
 class LEMON_API scene
 {
   public:
-    scene(hash_str nameid, asset_storage& _assetStorage,
+    scene(hashstr nameid, asset_storage& _assetStorage,
           scheduler& _scheduler, event_queue& _eventQueue,
           window& _window, input& _input,
           message_bus& _messageBus);
@@ -37,12 +37,12 @@ class LEMON_API scene
     template<class S>
     scene& register_system();
 
-    hash_str get_nameid() const { return nameid; }
+    hashstr get_nameid() const { return nameid; }
     registry& get_registry() { return _registry; }
     const registry& get_registry() const { return _registry; }
 
-    entity create_entity(const char* name, hash_str nameid);
-    entity create_entity(const char* name, hash_str nameid, vec2 position);
+    entity create_entity(hashstr name);
+    entity create_entity(hashstr name, vec2 position);
     entity get_entity(entity_t handle);
 
     template<class Component, class... Other, class... Exclude>
@@ -91,7 +91,7 @@ class LEMON_API scene
     }
 
   private:
-    hash_str nameid;
+    hashstr nameid;
     asset_storage& _assetStorage;
     scheduler& _scheduler;
     event_queue& _eventQueue;

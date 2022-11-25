@@ -25,9 +25,9 @@ using namespace std;
         lua_pop(L, 1);                                       \
     }
 
-std::unordered_map<hash_str, function<i32(f32)>> get_key_value_map(lua_State* L, const LuaRef& table)
+std::unordered_map<hashstr, function<i32(f32)>> get_key_value_map(lua_State* L, const LuaRef& table)
 {
-    std::unordered_map<hash_str, function<i32(f32)>> result;
+    std::unordered_map<hashstr, function<i32(f32)>> result;
     if (table.isNil())
     {
         logger::error("Lua table is nil");
@@ -44,7 +44,7 @@ std::unordered_map<hash_str, function<i32(f32)>> get_key_value_map(lua_State* L,
             auto f = LuaRef::fromStack(L, -1);
             if (f.isFunction())
             {
-                result.emplace(hash_string_d(lua_tostring(L, -2)), [f = std::move(f)](f32 v) -> i32 {
+                result.emplace(hashstr::runtime_hash(lua_tostring(L, -2)), [f = std::move(f)](f32 v) -> i32 {
                     auto res = f(v);
                     if (res.hasFailed()) logger::error("Invokation of a lua animation script raised an error {}", res.errorMessage());
 
@@ -94,6 +94,8 @@ scripting_engine::scripting_engine()
         .addFunction("message", &script_entity::create_message)
         .endClass()
         .endNamespace();
+
+    logger::info("Scripting Engine created");
 }
 
 scripting_engine::~scripting_engine()
@@ -106,7 +108,7 @@ void scripting_engine::load_file(const std::string& path)
     LUA_CHECK(luaL_dofile, L, path.c_str()); // load the file
 }
 
-unordered_map<hash_str, function<i32(f32)>> scripting_engine::get_animation(const std::string& name)
+unordered_map<hashstr, function<i32(f32)>> scripting_engine::get_animation(const std::string& name)
 {
     auto table = getGlobal(L, name.c_str());
     return get_key_value_map(L, table);

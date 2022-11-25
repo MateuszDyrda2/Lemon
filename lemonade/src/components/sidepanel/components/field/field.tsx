@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api';
+import { appWindow } from '@tauri-apps/api/window';
 import { useState } from 'react';
 import {
     ObjectClass,
@@ -22,9 +23,6 @@ interface ObjectProps {
 }
 
 const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-        setObj(e.target.value);
-
     return (
         <ObjectClass>
             {(Object.prototype.toString.call(obj) === '[object Array]' &&
@@ -60,17 +58,23 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                     )) ||
                 (typeof obj === 'number' && (
                     <ObjectInput
-                        type="number"
+                        type="text"
                         value={obj as number}
-                        onChange={onChange}
+                        onChange={(e) => {
+                            setObj(
+                                parseFloat(
+                                    e.target.value.replace(/[^0-9.-]/g, ''),
+                                ),
+                            );
+                        }}
                         onBlur={onBlur}
                     />
                 )) ||
                 (typeof obj === 'string' && (
                     <ObjectInput
-                        type="string"
+                        type="text"
                         value={obj as string}
-                        onChange={onChange}
+                        onChange={(e) => setObj(e.target.value)}
                         onBlur={onBlur}
                     />
                 ))}
@@ -80,7 +84,6 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
 
 const RenderField = ({ entityid, componentName, name, value }: Field) => {
     const onBlur = () => {
-        console.log(`${savedValue}`);
         invoke('change_entity_component', {
             entityid: entityid,
             componentname: componentName,
@@ -89,6 +92,7 @@ const RenderField = ({ entityid, componentName, name, value }: Field) => {
         }).catch(console.error);
     };
     const [savedValue, setSavedValue] = useState<unknown>(value);
+    console.log('rerender');
 
     return (
         <FieldClass>

@@ -1,4 +1,7 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -32,12 +35,15 @@ pub struct AssetLookup {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Component {
     pub name: String,
+    pub id: u64,
     pub count: u32,
     pub entities: HashMap<u32, HashMap<String, Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Scene {
+    #[serde(skip)]
+    pub name: String,
     pub entities: Entities,
     pub components: Vec<Component>,
 }
@@ -51,6 +57,8 @@ pub struct Project {
     pub types_path: String,
     pub exec_path: String,
     pub scenes: Vec<String>,
+    #[serde(skip)]
+    pub path: PathBuf,
     #[serde(skip)]
     pub current_scene: Option<Scene>,
     #[serde(skip)]
@@ -93,7 +101,7 @@ pub enum FieldType {
     Mat4,
     #[serde(rename = "std::string", alias = "string")]
     Str,
-    #[serde(rename = "hash_str")]
+    #[serde(rename = "hashstr")]
     HashStr,
     Asset,
     #[serde(rename = "entity_t")]

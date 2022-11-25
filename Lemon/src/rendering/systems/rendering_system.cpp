@@ -46,7 +46,7 @@ void rendering_system::onRender([[maybe_unused]] event_args* e)
     const auto viewProj = proj * mod.matrix;
 
     rendering_context::set_viewport(newViewport);
-    rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
+    rendering_context::clear_screen(color{ 0.0f, 0.0f, 0.0f, 1.0f });
     renderer.start_render(viewProj);
 
     _scene.view<sprite_renderer, model>().each(

@@ -7,13 +7,13 @@
 
 namespace lemon {
 using namespace std;
-shader::shader(hash_str name, const std::string& shaderPath):
+shader::shader(hashstr name, const std::string& shaderPath):
     resource(name)
 {
     string shaderCode;
     ifstream shaderFile(shaderPath, ios::binary);
 
-    if(!shaderFile)
+    if (!shaderFile)
     {
         logger::error("Shader read failure: {}", shaderPath);
         return;
@@ -41,7 +41,7 @@ shader::shader(hash_str name, const std::string& shaderPath):
 
     // print compile errors if any
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-    if(!success)
+    if (!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
         logger::error("Vertex shader compilation failure!: {}", infoLog);
@@ -53,7 +53,7 @@ shader::shader(hash_str name, const std::string& shaderPath):
 
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-    if(!success)
+    if (!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
         logger::error("Fragment shader compilation failure!: {}", infoLog);
@@ -65,7 +65,7 @@ shader::shader(hash_str name, const std::string& shaderPath):
 
     // print errors
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
-    if(success == GL_FALSE)
+    if (success == GL_FALSE)
     {
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
         logger::error("Shader program linking failure!: {}", infoLog);
@@ -75,7 +75,7 @@ shader::shader(hash_str name, const std::string& shaderPath):
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
-shader::shader(hash_str name, const std::vector<byte>& buffer):
+shader::shader(hashstr name, const std::vector<byte>& buffer):
     resource(name)
 {
     const char* vShaderCode[2] = { "#version 330\n#define VERTEX_PROGRAM\n",
@@ -94,7 +94,7 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
 
     // print compile errors if any
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-    if(!success)
+    if (!success)
     {
         glGetShaderInfoLog(vertex, 512, NULL, infoLog);
         logger::error("Vertex shader compilation failure!: {}", infoLog);
@@ -106,7 +106,7 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
 
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-    if(!success)
+    if (!success)
     {
         glGetShaderInfoLog(fragment, 512, NULL, infoLog);
         logger::error("Fragment shader compilation failure!: {}", infoLog);
@@ -118,7 +118,7 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
 
     // print errors
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
-    if(success == GL_FALSE)
+    if (success == GL_FALSE)
     {
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
         logger::error("Shader program linking failure!: {}", infoLog);
@@ -130,7 +130,7 @@ shader::shader(hash_str name, const std::vector<byte>& buffer):
 }
 shader::~shader()
 {
-    if(ID) glDeleteProgram(ID);
+    if (ID) glDeleteProgram(ID);
 }
 shader::shader(shader&& other) noexcept:
     resource(std::move(other)), ID(other.ID)
@@ -139,7 +139,7 @@ shader::shader(shader&& other) noexcept:
 }
 shader& shader::operator=(shader&& other) noexcept
 {
-    if(this != &other)
+    if (this != &other)
     {
         resource::operator=(std::move(other));
         std::swap(ID, other.ID);

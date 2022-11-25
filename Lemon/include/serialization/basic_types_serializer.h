@@ -33,6 +33,7 @@ struct LEMON_API basic_types_serializer
     void serialize(const mat4& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void serialize(entity_t value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void serialize(const color& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void serialize(const hashstr& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
     template<class T>
     void serialize(const std::vector<T>& value, rapidjson::Writer<rapidjson::StringBuffer>& writer);
     template<class T>
@@ -55,6 +56,7 @@ struct LEMON_API basic_types_serializer
     void deserialize(mat4& value, const rapidjson::Value& iter);
     void deserialize(entity_t& value, const rapidjson::Value& iter);
     void deserialize(color& value, const rapidjson::Value& iter);
+    void deserialize(hashstr& value, const rapidjson::Value& iter);
     template<class T>
     void deserialize(std::vector<T>& value, const rapidjson::Value& iter);
     template<class T>
@@ -105,7 +107,7 @@ inline void basic_types_serializer::deserialize(std::vector<T>& value, const rap
 template<class T>
 inline void basic_types_serializer::deserialize(asset<T>& value, const rapidjson::Value& iter)
 {
-    hash_str nameid;
+    hashstr nameid;
     deserialize(nameid, iter);
     value = storage.get_asset<T>(nameid);
 }

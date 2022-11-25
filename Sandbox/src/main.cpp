@@ -61,11 +61,11 @@ void Sandbox::initialize()
 
     auto services = scene.get_services();
 
-    auto mainCamera = scene.create_entity(ENT_NAME("Main Camera"));
+    auto mainCamera = scene.create_entity(hashstr("Main Camera"));
     mainCamera.emplace<main_camera_t>();
     mainCamera.emplace<camera>();
 
-    auto player = scene.create_entity(ENT_NAME("Player"));
+    auto player = scene.create_entity(hashstr("Player"));
     player.emplace<player_t>();
     auto&& psr      = player.emplace<sprite_renderer>();
     psr.tex         = services._asset_storage.get_asset<texture>("player_anim"_hs);
@@ -88,7 +88,7 @@ void Sandbox::initialize()
     auto&& scr       = player.emplace<script_component>();
     scr.scriptObject = services._asset_storage.get_asset<script>("player_script"_hs);
 
-    auto tile     = scene.create_entity(ENT_NAME("Tile"));
+    auto tile     = scene.create_entity(hashstr("Tile"));
     auto&& sr     = tile.emplace<sprite_renderer>();
     sr.tex        = services._asset_storage.get_asset<texture>("tile"_hs);
     auto&& tileRb = tile.emplace<rigidbody>();

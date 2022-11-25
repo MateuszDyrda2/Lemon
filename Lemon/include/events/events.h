@@ -26,7 +26,7 @@ inline static constexpr decltype(auto) get_event(event_args* e)
 class LEMON_API event_queue
 {
   public:
-    using event_handle = hash_str;
+    using event_handle = hashstr;
     using callback     = std::function<void(event_args*)>;
     using event_pair   = std::pair<event_handle, event_args*>;
 

@@ -93,7 +93,7 @@ class input::impl
         }
     };
 
-    using action_id = hash_str;
+    using action_id = hashstr;
 
   public:
     impl(window& wnd, event_queue& queue):
@@ -285,7 +285,7 @@ class input::impl
         }
         mouseStates.fill(key_action::up);
     }
-    void add_key(keycode key, key_action action, hash_str actionId)
+    void add_key(keycode key, key_action action, hashstr actionId)
     {
         const auto in = input_action{
             .keyAction = { key, action },
@@ -293,7 +293,7 @@ class input::impl
         };
         actions[in] = actionId;
     }
-    void add_key(mouse button, key_action action, hash_str actionId)
+    void add_key(mouse button, key_action action, hashstr actionId)
     {
         const auto in = input_action{
             .mouseAction = { button, action },
@@ -301,7 +301,7 @@ class input::impl
         };
         actions[in] = actionId;
     }
-    void add_key(gamepad button, key_action action, hash_str actionId)
+    void add_key(gamepad button, key_action action, hashstr actionId)
     {
         const auto in = input_action{
             .gamepadAction = { button, action },
@@ -309,7 +309,7 @@ class input::impl
         };
         actions[in] = actionId;
     }
-    void add_axis(mouse_axis mouse, hash_str actionId)
+    void add_axis(mouse_axis mouse, hashstr actionId)
     {
         const auto in = input_action{
             .mouseAxis = mouse,
@@ -317,7 +317,7 @@ class input::impl
         };
         actions[in] = actionId;
     }
-    void add_axis(gamepad_axis gamepad, hash_str actionId)
+    void add_axis(gamepad_axis gamepad, hashstr actionId)
     {
         const auto in = input_action{
             .gamepadAxis = gamepad,
@@ -325,7 +325,7 @@ class input::impl
         };
         actions[in] = actionId;
     }
-    void add_axis(pair_keycodes axis, hash_str actionId)
+    void add_axis(pair_keycodes axis, hashstr actionId)
     {
         const auto in = input_action{
             .keyboardAxis = { axis.first, axis.second },
@@ -395,32 +395,32 @@ void input::update()
     pImpl->update();
 }
 
-void input::add_key(keycode key, key_action action, hash_str actionId)
+void input::add_key(keycode key, key_action action, hashstr actionId)
 {
     pImpl->add_key(key, action, actionId);
 }
 
-void input::add_key(mouse button, key_action action, hash_str actionId)
+void input::add_key(mouse button, key_action action, hashstr actionId)
 {
     pImpl->add_key(button, action, actionId);
 }
 
-void input::add_key(gamepad button, key_action action, hash_str actionId)
+void input::add_key(gamepad button, key_action action, hashstr actionId)
 {
     pImpl->add_key(button, action, actionId);
 }
 
-void input::add_axis(mouse_axis mouse, hash_str actionId)
+void input::add_axis(mouse_axis mouse, hashstr actionId)
 {
     pImpl->add_axis(mouse, actionId);
 }
 
-void input::add_axis(gamepad_axis gamepad, hash_str actionId)
+void input::add_axis(gamepad_axis gamepad, hashstr actionId)
 {
     pImpl->add_axis(gamepad, actionId);
 }
 
-void input::add_axis(pair_keycodes axis, hash_str actionId)
+void input::add_axis(pair_keycodes axis, hashstr actionId)
 {
     pImpl->add_axis(axis, actionId);
 }

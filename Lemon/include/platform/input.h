@@ -44,34 +44,34 @@ class LEMON_API input
      * @param action key action when the event should be fired
      * @param actionId nameid of the event
      */
-    void add_key(keycode key, key_action action, hash_str actionId);
+    void add_key(keycode key, key_action action, hashstr actionId);
     /** @brief Bind a mouse key with action to event
      * @param button keycode
      * @param action key action when the event should be fired
      * @param actionId nameid of the event
      */
-    void add_key(mouse button, key_action action, hash_str actionId);
+    void add_key(mouse button, key_action action, hashstr actionId);
     /** @brief Bind a gamepad button with action to event
      * @param button keycode
      * @param action key action when the event should be fired
      * @param actionId nameid of the event
      */
-    void add_key(gamepad button, key_action action, hash_str actionId);
+    void add_key(gamepad button, key_action action, hashstr actionId);
     /** @brief Bind a mouse axis to event
      * @param mouse mouse axis (either x or y)
      * @param actionId nameid of the event
      */
-    void add_axis(mouse_axis mouse, hash_str actionId);
+    void add_axis(mouse_axis mouse, hashstr actionId);
     /** @brief Bind a gamepad axis to event
      * @param gamepad gamepad axis
      * @param actionId nameid of the event
      */
-    void add_axis(gamepad_axis gamepad, hash_str actionId);
+    void add_axis(gamepad_axis gamepad, hashstr actionId);
     /** @brief Bind a keyboard axis to event
      * @param axis a pair of keycodes that represent an axis
      * @param actionId nameid of the event
      */
-    void add_axis(pair_keycodes axis, hash_str actionId);
+    void add_axis(pair_keycodes axis, hashstr actionId);
     /** @brief Check if key's current state matches the argument
      * @param key keycode to check
      * @param action action to compare

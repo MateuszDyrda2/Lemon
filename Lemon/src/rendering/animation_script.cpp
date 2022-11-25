@@ -4,7 +4,7 @@
 
 namespace lemon {
 namespace fs = std::filesystem;
-animation_script::animation_script(hash_str nameid, const std::string& path, scripting_engine& _scriptingEngine):
+animation_script::animation_script(hashstr nameid, const std::string& path, scripting_engine& _scriptingEngine):
     resource(nameid)
 {
     this->name = fs::path(path).stem();
@@ -32,12 +32,12 @@ animation_script& animation_script::operator=(animation_script&& other) noexcept
     return *this;
 }
 
-i32 animation_script::execute(hash_str nameid, f32 value)
+i32 animation_script::execute(hashstr nameid, f32 value)
 {
     auto a = animations.find(nameid);
     if (a == animations.end())
     {
-        logger::error("Animation with nameid: {} not found", nameid);
+        logger::error("Animation {} not found", nameid.str);
         return 0;
     }
 

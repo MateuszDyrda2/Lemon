@@ -28,13 +28,13 @@ class LEMON_API texture : public resource
     };
 
   public:
-    texture(hash_str name, const std::string& path);
-    texture(hash_str name, const std::vector<u8>& buffer);
-    texture(hash_str name, const std::string& path, wrap wrapping, filter filtering);
-    texture(hash_str name, const ivec2& size, const color& c);
-    texture(hash_str name, const ivec2& size, const color& c, wrap wrapping, filter filtering);
+    texture(hashstr name, const std::string& path);
+    texture(hashstr name, const std::vector<u8>& buffer);
+    texture(hashstr name, const std::string& path, wrap wrapping, filter filtering);
+    texture(hashstr name, const ivec2& size, const color& c);
+    texture(hashstr name, const ivec2& size, const color& c, wrap wrapping, filter filtering);
     virtual ~texture();
-    texture(const texture&) = delete;
+    texture(const texture&)            = delete;
     texture& operator=(const texture&) = delete;
     texture(texture&& other) noexcept;
     texture& operator=(texture&& other) noexcept;
@@ -46,7 +46,7 @@ class LEMON_API texture : public resource
     void bind() const;
     void unbind() const;
 
-    static hash_str get_mocked() { return hash_string("mock_texture"); }
+    static hashstr get_mocked() { return "mock_texture"_hs; }
 
   private:
     u32 handle;

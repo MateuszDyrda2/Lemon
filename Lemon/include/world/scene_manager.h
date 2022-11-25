@@ -27,12 +27,12 @@ class LEMON_API scene_manager
     /** @brief Create a new scene with a name
      * @param sceneId hashed scene name
      */
-    void create_scene(hash_str sceneId);
+    void create_scene(hashstr sceneId);
     /** @brief Load a pre-defined scene and return it
      * @param sceneId hashed scene name
      * @return current scene
      */
-    scene& load_scene(hash_str sceneId);
+    scene& load_scene(hashstr sceneId);
     /** @brief Get current scene
      * @return current scene
      */
@@ -45,20 +45,20 @@ class LEMON_API scene_manager
      * @param sceneId hashed scene name
      * @return reference to a scene
      */
-    scene& get_scene(hash_str sceneId);
+    scene& get_scene(hashstr sceneId);
     /** @brief Get scene with nameid
      * @param sceneId hashed scene name
      * @return reference to a scene
      */
-    const scene& get_scene(hash_str sceneId) const;
+    const scene& get_scene(hashstr sceneId) const;
     /** @brief Check if the scene with id is the current
      * @param sceneId hashid of the scene
      * @return true if the scene is current
      */
-    bool is_current(hash_str sceneId) const;
+    bool is_current(hashstr sceneId) const;
 
   private:
-    std::unordered_map<hash_str, std::unique_ptr<scene>> scenes;
+    std::unordered_map<hashstr, std::unique_ptr<scene>> scenes;
     scene* currentScene;
     asset_storage& _assetStorage;
     scheduler& _scheduler;

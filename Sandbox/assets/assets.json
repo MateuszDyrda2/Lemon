@@ -1,6 +1,10 @@
 {
     "textures": [
         {
+            "name": "dwarf_leader-m-001",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_leader-m-001.png"
+        },
+        {
             "name": "player_anim",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player_anim.png"
         },
@@ -9,8 +13,28 @@
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player.png"
         },
         {
+            "name": "dwarf-m-002",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf-m-002.png"
+        },
+        {
+            "name": "dwarf_hero-m-001",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_hero-m-001.png"
+        },
+        {
+            "name": "dwarf-m-001",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf-m-001.png"
+        },
+        {
+            "name": "dwarf_guardian-m-001",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_guardian-m-001.png"
+        },
+        {
             "name": "tile",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/tile.png"
+        },
+        {
+            "name": "dwarf_elder-m-001",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_elder-m-001.png"
         }
     ],
     "sounds": [],
@@ -30,6 +54,10 @@
         {
             "name": "player_animation",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player_animation.lua"
+        },
+        {
+            "name": "player2_animation",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player2_animation.lua"
         }
     ]
 }
