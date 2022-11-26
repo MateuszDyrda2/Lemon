@@ -40,6 +40,7 @@ void transform_system::onUpdate([[maybe_unused]] event_args* e)
 
 void transform_system::move_to(entity& _entity, vec2 newPosition)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr   = _entity.get<transform>();
     tr.position = newPosition;
     _entity.emplace_or_replace<dirty_t>();
@@ -47,6 +48,7 @@ void transform_system::move_to(entity& _entity, vec2 newPosition)
 
 void transform_system::move_by(entity& _entity, vec2 distance)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr = _entity.get<transform>();
     tr.position += distance;
     _entity.emplace_or_replace<dirty_t>();
@@ -54,6 +56,7 @@ void transform_system::move_by(entity& _entity, vec2 distance)
 
 void transform_system::rotate_to(entity& _entity, f32 newRotation)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr   = _entity.get<transform>();
     tr.rotation = newRotation;
     _entity.emplace_or_replace<dirty_t>();
@@ -61,6 +64,7 @@ void transform_system::rotate_to(entity& _entity, f32 newRotation)
 
 void transform_system::rotate_by(entity& _entity, f32 degrees)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr = _entity.get<transform>();
     tr.rotation += degrees;
     _entity.emplace_or_replace<dirty_t>();
@@ -68,6 +72,7 @@ void transform_system::rotate_by(entity& _entity, f32 degrees)
 
 void transform_system::scale_to(entity& _entity, vec2 newScale)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr = _entity.get<transform>();
     tr.scale  = newScale;
     _entity.emplace_or_replace<dirty_t>();
@@ -75,6 +80,7 @@ void transform_system::scale_to(entity& _entity, vec2 newScale)
 
 void transform_system::scale_by(entity& _entity, vec2 scale)
 {
+    lemon_assert(_entity.has<transform>());
     auto&& tr = _entity.get<transform>();
     tr.scale *= scale;
     _entity.emplace_or_replace<dirty_t>();

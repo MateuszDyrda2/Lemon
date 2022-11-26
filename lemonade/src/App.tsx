@@ -10,6 +10,8 @@ import { PanelContext } from './state/PanelContext';
 import { theme } from './utils/theme';
 import { registerAll } from '@tauri-apps/api/globalShortcut';
 import { invoke } from '@tauri-apps/api';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const MIN_WIDTH = 200;
 
@@ -59,18 +61,20 @@ const App = () => {
                     <PanelContext.Provider
                         value={{ currentPanel, setCurrentPanel }}
                     >
-                        <Sidebar />
-                        <Sidepanel
-                            width={sidepanelWidth}
-                            setWidth={setSidepanelWidth}
-                        />
-                        <div
-                            className="vertDiv-container"
-                            onMouseDown={onMouseDown}
-                        >
-                            <div className="vertDiv" />
-                        </div>
-                        <Midpanel />
+                        <DndProvider backend={HTML5Backend}>
+                            <Sidebar />
+                            <Sidepanel
+                                width={sidepanelWidth}
+                                setWidth={setSidepanelWidth}
+                            />
+                            <div
+                                className="vertDiv-container"
+                                onMouseDown={onMouseDown}
+                            >
+                                <div className="vertDiv" />
+                            </div>
+                            <Midpanel />
+                        </DndProvider>
                     </PanelContext.Provider>
                 </ThemeProvider>
             </div>

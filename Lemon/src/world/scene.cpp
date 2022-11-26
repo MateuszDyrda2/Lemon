@@ -20,6 +20,11 @@ scene::scene(hashstr nameid,
 scene::~scene()
 { }
 
+void scene::mount() noexcept
+{
+    _eventQueue["OnSceneLoaded"_hs].fire_immediate();
+}
+
 entity scene::create_entity(hashstr name)
 {
     auto ent = _registry.create();
@@ -44,10 +49,12 @@ entity scene::get_entity(entity_t handle)
 {
     return entity(&_registry, handle);
 }
+
 void scene::destroy(const entity_t entity)
 {
     _registry.destroy(entity);
 }
+
 void scene::destroy_entity(const entity entity)
 {
     _registry.destroy(entity.get_handle());

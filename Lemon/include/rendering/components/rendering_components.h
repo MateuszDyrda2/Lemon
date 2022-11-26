@@ -20,7 +20,6 @@ struct LEMON_API [[lemon::component]] sprite_renderer
 /** animation component */
 struct LEMON_API [[lemon::component]] animation_component
 {
-    [[lemon::field]] u32 nFrames{ 1 };
     [[lemon::field]] ivec2 frameSize{};
     [[lemon::field]] asset<animation_script> animation;
 };

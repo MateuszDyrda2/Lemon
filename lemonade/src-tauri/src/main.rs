@@ -11,9 +11,10 @@ use tauri::{
 
 use project::{
     add_component_to_entity, add_entity, change_entity_component, get_animations, get_asset_list,
-    get_components, get_components_for_entity, get_entities, get_rendering_data, get_scenes,
-    get_scripts, get_shaders, get_sounds, get_textures, open_project, remove_component_from_entity,
-    run_engine, save, set_entity_name, stop_engine, Engine, ProjectState,
+    get_components, get_components_for_entity, get_debug_data, get_entities, get_rendering_data,
+    get_scenes, get_scripts, get_shaders, get_sounds, get_textures, open_project,
+    remove_component_from_entity, run_engine, save, set_entity_name, stop_engine, Engine,
+    ProjectState,
 };
 
 #[tauri::command]
@@ -70,6 +71,7 @@ fn main() {
             get_scripts,
             get_shaders,
             get_sounds,
+            get_debug_data,
             save,
         ])
         .run(tauri::generate_context!())

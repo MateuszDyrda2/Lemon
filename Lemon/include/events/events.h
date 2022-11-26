@@ -69,7 +69,7 @@ class LEMON_API event_queue
         void fire(event_args* e);
         /** brief Fire the event synchronously
          * @param e event arguments */
-        void fire_immediate(event_args* e);
+        void fire_immediate(event_args* e = nullptr);
 
         event_sink(const event_sink&) = delete;
 

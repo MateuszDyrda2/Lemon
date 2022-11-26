@@ -220,6 +220,74 @@ pub fn get_entities(state: tauri::State<ProjectState>) -> Result<Vec<EntityDTO>,
 }
 
 #[tauri::command]
+pub fn get_debug_data(
+    state: tauri::State<ProjectState>,
+) -> Result<Vec<DebugData>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    let transforms = (&scene.components).iter().find(|x| x.name == "transform");
+    let transform_entities = &transforms.as_ref().unwrap().entities;
+    let colliders = (&scene.components)
+        .iter()
+        .find(|x| x.name == "box_collider");
+    let collider_entities = &colliders.as_ref().unwrap().entities;
+
+    Ok(collider_entities
+        .into_iter()
+        .filter_map(|(key, value)| {
+            transform_entities.get(key).map(|value_b| {
+                let position = value_b["position"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let h_size = value["hSize"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let offset = value["offset"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let center = &[position[0] + offset[0], position[1] + offset[1]];
+
+                DebugData {
+                    coords: [
+                        center[0] - h_size[0],
+                        center[1] - h_size[1],
+                        center[0] + h_size[0],
+                        center[1] - h_size[1],
+                        center[0] + h_size[0],
+                        center[1] + h_size[1],
+                        center[0] - h_size[0],
+                        center[1] + h_size[1],
+                        center[0] - h_size[0],
+                        center[1] - h_size[1],
+                    ]
+                    .to_vec(),
+                }
+            })
+        })
+        .collect::<Vec<DebugData>>())
+}
+
+#[tauri::command]
 pub fn get_rendering_data(
     state: tauri::State<ProjectState>,
 ) -> Result<Vec<RenderingData>, ProjectErrorCode> {
@@ -658,4 +726,15 @@ pub fn save(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
 
     fs::write(path, slice.unwrap()).expect("Failed to save scene to file");
     Ok(())
+}
+
+#[tauri::command]
+pub fn recreate_assets(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &*state_guard else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let assets = &project.assets_path;
 }

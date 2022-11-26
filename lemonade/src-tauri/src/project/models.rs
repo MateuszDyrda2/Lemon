@@ -135,3 +135,8 @@ pub struct RenderingData {
     pub textureid: u32,
     pub tex_coords: Vec<f32>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DebugData {
+    pub coords: Vec<f32>,
+}

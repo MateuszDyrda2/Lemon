@@ -1,6 +1,11 @@
 import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useDrop } from 'react-dnd';
+import {
+    DraggableAsset,
+    DraggableType,
+} from '../../../../state/draggable_type';
 import {
     ObjectClass,
     ObjectInput,
@@ -21,6 +26,64 @@ interface ObjectProps {
     obj: unknown;
     setObj: { (newObject: unknown): void };
 }
+
+const TextInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(
+        (newValue: string) => {
+            setObj(newValue);
+        },
+        [obj],
+    );
+
+    const [, drop] = useDrop(
+        () => ({
+            accept: DraggableType.ASSET,
+            drop: (item: DraggableAsset) => {
+                console.log(`${item.name} ${item.path} ${item.assetType}`);
+                update(item.name);
+                return undefined;
+            },
+        }),
+        [update],
+    );
+
+    return (
+        <ObjectInput
+            ref={drop}
+            type="text"
+            value={obj as string}
+            onChange={(e) => update(e.target.value)}
+            onBlur={onBlur}
+        />
+    );
+};
+
+const NumberInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(
+        (value: string) => {
+            if (value.length === 0) {
+                setObj(0);
+                return;
+            }
+            const parse = parseFloat(value);
+
+            if (!Object.is(NaN, parse)) {
+                setObj(parse);
+            }
+        },
+        [obj],
+    );
+
+    return (
+        <ObjectInput
+            type="number"
+            value={obj as number}
+            onChange={(e) => update(e.target.value)}
+            onBlur={onBlur}
+            step="any"
+        />
+    );
+};
 
 const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
     return (
@@ -57,42 +120,28 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                         ),
                     )) ||
                 (typeof obj === 'number' && (
-                    <ObjectInput
-                        type="text"
-                        value={obj as number}
-                        onChange={(e) => {
-                            setObj(
-                                parseFloat(
-                                    e.target.value.replace(/[^0-9.-]/g, ''),
-                                ),
-                            );
-                        }}
-                        onBlur={onBlur}
-                    />
+                    <NumberInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 )) ||
                 (typeof obj === 'string' && (
-                    <ObjectInput
-                        type="text"
-                        value={obj as string}
-                        onChange={(e) => setObj(e.target.value)}
-                        onBlur={onBlur}
-                    />
+                    <TextInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 ))}
         </ObjectClass>
     );
 };
 
 const RenderField = ({ entityid, componentName, name, value }: Field) => {
-    const onBlur = () => {
+    const [savedValue, setSavedValue] = useState<unknown>();
+
+    useEffect(() => setSavedValue(value), [value]);
+
+    const onBlur = useCallback(() => {
         invoke('change_entity_component', {
             entityid: entityid,
             componentname: componentName,
             fieldname: name,
             newvalue: savedValue,
         }).catch(console.error);
-    };
-    const [savedValue, setSavedValue] = useState<unknown>(value);
-    console.log('rerender');
+    }, [savedValue]);
 
     return (
         <FieldClass>

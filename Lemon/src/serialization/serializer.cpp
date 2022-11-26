@@ -159,6 +159,11 @@ void serializer::deserialize(registry& _registry, rapidjson::Document& document)
             return;
         }
         auto&& storage = _registry.storage(id->value.GetUint());
+        if (storage == _registry.storage().end())
+        {
+            logger::error("Storage not existing");
+            return;
+        }
         storage->second.reserve(count->value.GetUint());
 
         for (auto&& vv : entities->value.GetObject())

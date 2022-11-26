@@ -57,46 +57,48 @@ void Sandbox::initialize()
                       .register_system<rendering_system>();
 
     _serializer.register_all(scene.get_registry());
-    //    _serializer.deserialize_scene(scene, "build/randompath.json");
+    _serializer.deserialize_scene(scene, SCENE_PATH "/sandbox1.json");
 
-    auto services = scene.get_services();
+    /*auto services = scene.get_services();*/
 
-    auto mainCamera = scene.create_entity(hashstr("Main Camera"));
-    mainCamera.emplace<main_camera_t>();
-    mainCamera.emplace<camera>();
+    /*auto mainCamera = scene.create_entity(hashstr("Main Camera"));*/
+    /*mainCamera.emplace<main_camera_t>();*/
+    /*mainCamera.emplace<camera>();*/
 
-    auto player = scene.create_entity(hashstr("Player"));
-    player.emplace<player_t>();
-    auto&& psr      = player.emplace<sprite_renderer>();
-    psr.tex         = services._asset_storage.get_asset<texture>("player_anim"_hs);
-    const auto size = psr.tex.get()->get_size();
-    psr.texCoords   = { 0, 0, 22.f / size.x, 56.f / size.y };
-    transform_system::move_by(player, { -600, 0 });
+    /*auto player = scene.create_entity(hashstr("Player"));*/
+    /*player.emplace<player_t>();*/
+    /*auto&& psr      = player.emplace<sprite_renderer>();*/
+    /*psr.tex         = services._asset_storage.get_asset<texture>("player_anim"_hs);*/
+    /*const auto size = psr.tex.get()->get_size();*/
+    /*psr.texCoords   = { 0, 0, 22.f / size.x, 56.f / size.y };*/
+    /*transform_system::move_by(player, { -600, 0 });*/
 
-    auto&& rb       = player.emplace<rigidbody>();
-    rb.position     = player.get<transform>().position;
-    rb._oldPosition = rb.position;
-    rb.colliderType = collider_type::box;
-    rb.isKinetic    = false;
-    player.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 35.f, 55.f });
+    /*auto&& rb       = player.emplace<rigidbody>();*/
+    /*rb.position     = player.get<transform>().position;*/
+    /*rb._oldPosition = rb.position;*/
+    /*rb.colliderType = collider_type::box;*/
+    /*rb.isKinetic    = false;*/
+    /*player.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 35.f, 55.f });*/
 
-    auto&& animation    = player.emplace<animation_component>();
-    animation.animation = services._asset_storage.get_asset<animation_script>("player_animation"_hs);
-    animation.frameSize = { 22, 56 };
-    player.emplace<start_animation_m>("idle"_hs);
+    /*auto&& animation    = player.emplace<animation_component>();*/
+    /*animation.animation = services._asset_storage.get_asset<animation_script>("player_animation"_hs);*/
+    /*animation.frameSize = { 22, 56 };*/
+    /*player.emplace<start_animation_m>("idle"_hs);*/
 
-    auto&& scr       = player.emplace<script_component>();
-    scr.scriptObject = services._asset_storage.get_asset<script>("player_script"_hs);
+    /*auto&& scr       = player.emplace<script_component>();*/
+    /*scr.scriptObject = services._asset_storage.get_asset<script>("player_script"_hs);*/
 
-    auto tile     = scene.create_entity(hashstr("Tile"));
-    auto&& sr     = tile.emplace<sprite_renderer>();
-    sr.tex        = services._asset_storage.get_asset<texture>("tile"_hs);
-    auto&& tileRb = tile.emplace<rigidbody>();
-    tile.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 340.f, 220.f });
-    tileRb.colliderType = collider_type::box;
-    tileRb.isKinetic    = true;
+    /*auto tile     = scene.create_entity(hashstr("Tile"));*/
+    /*auto&& sr     = tile.emplace<sprite_renderer>();*/
+    /*sr.tex        = services._asset_storage.get_asset<texture>("tile"_hs);*/
+    /*auto&& tileRb = tile.emplace<rigidbody>();*/
+    /*tile.emplace<box_collider>(vec2{ 0.f, 0.f }, vec2{ 340.f, 220.f });*/
+    /*tileRb.colliderType = collider_type::box;*/
+    /*tileRb.isKinetic    = true;*/
 
-    _serializer.serialize_scene(scene, SCENE_PATH "/sandbox1.json");
+    /*_serializer.serialize_scene(scene, SCENE_PATH "/sandbox1.json");*/
+
+    scene.mount();
 }
 
 GAME_DECL(Sandbox);

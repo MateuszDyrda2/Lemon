@@ -45,6 +45,8 @@ class LEMON_API scene
     entity create_entity(hashstr name, vec2 position);
     entity get_entity(entity_t handle);
 
+    void mount() noexcept;
+
     template<class Component, class... Other, class... Exclude>
     decltype(auto) view(entt::exclude_t<Exclude...> = {});
 

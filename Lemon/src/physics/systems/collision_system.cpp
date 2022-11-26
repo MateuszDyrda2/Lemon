@@ -39,6 +39,7 @@ collision_system::get_aabb(const entity_t _entity, const rigidbody& _rigidbody)
 
 void collision_system::add_box2tree(registry& _reg, entity_t handle)
 {
+    lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, box_collider>(handle);
     tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
                      detail::AABB{
@@ -49,7 +50,7 @@ void collision_system::add_box2tree(registry& _reg, entity_t handle)
 
 void collision_system::add_circle2tree(registry& _reg, entity_t handle)
 {
-
+    lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, circle_collider>(handle);
     tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
                      detail::AABB{
@@ -75,6 +76,30 @@ collision_system::collision_system(scene& _scene, event_queue& _eventQueue):
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
         this->onUpdate(e);
     };
+    mount = _eventQueue["OnSceneLoaded"_hs] += [this](event_args*) {
+        this->onMount();
+    };
+}
+
+void collision_system::onMount()
+{
+    for (auto&& [_entity, _transform, _collider] : _scene.view<transform, box_collider>().each())
+    {
+        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+                         detail::AABB{
+                             .min = _transform.position + _collider.offset - _collider.hSize,
+                             .max = _transform.position + _collider.offset + _collider.hSize,
+                         });
+    }
+
+    for (auto&& [_entity, _transform, _collider] : _scene.view<transform, circle_collider>().each())
+    {
+        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+                         detail::AABB{
+                             .min = _transform.position + _collider.offset - _collider.radius,
+                             .max = _transform.position + _collider.offset + _collider.radius,
+                         });
+    }
 
     auto& _reg = _scene.get_registry();
     _reg.on_construct<box_collider>().connect<&collision_system::add_box2tree>(this);

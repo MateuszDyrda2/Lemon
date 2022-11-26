@@ -53,11 +53,13 @@ void physics_system::onUpdate([[maybe_unused]] event_args* e)
 
 void physics_system::set_velocity(entity& _entity, vec2 newVelocity)
 {
+    lemon_assert(_entity.has<rigidbody>());
     _entity.get<rigidbody>().velocity = newVelocity;
 }
 
 void physics_system::add_velocity(entity& _entity, vec2 velocity)
 {
+    lemon_assert(_entity.has<rigidbody>());
     _entity.get<rigidbody>().velocity += velocity;
 }
 

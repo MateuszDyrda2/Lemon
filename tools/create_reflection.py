@@ -39,7 +39,7 @@ field_template = '''
             s->basicTypesSerializer.serialize(component->{0}, writer);
 '''
 field_out_template = '''
-            s->basicTypesSerializer.deserialize(component->{}, (iter++)->value);
+            s->basicTypesSerializer.deserialize(component->{0}, obj.FindMember(\"{0}\")->value);
 '''
 
 def main(argv):
