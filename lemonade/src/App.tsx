@@ -47,9 +47,11 @@ const App = () => {
     }, [dragging]);
 
     useEffect(() => {
-        registerAll(['CommandOrCtrl+s'], (shortcut) => {
+        registerAll(['CommandOrCtrl+s', 'CommandOrCtrl+r'], (shortcut) => {
             if (shortcut === 'CommandOrCtrl+s') {
                 invoke('save').catch(console.error);
+            } else if (shortcut === 'CommandOrCtrl+r') {
+                invoke('recreate_assets').catch(console.error);
             }
         }).catch(console.error);
     }, []);

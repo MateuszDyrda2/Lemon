@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -103,9 +100,17 @@ pub enum FieldType {
     Str,
     #[serde(rename = "hashstr")]
     HashStr,
+    #[serde(
+        alias = "asset<texture>",
+        alias = "asset<sound>",
+        alias = "asset<shader>",
+        alias = "asset<script>",
+        alias = "asset<animation>"
+    )]
     Asset,
     #[serde(rename = "entity_t")]
     Entity,
+    Color,
     #[serde(other)]
     Unknown,
 }

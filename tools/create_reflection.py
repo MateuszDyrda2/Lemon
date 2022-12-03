@@ -5,11 +5,32 @@ import json
 file_template = '''
 #include <serialization/serializer.h>
 #include <serialization/basic_types_serializer.h>
+#include <scripting/scripting_engine.h>
+#include <world/scene.h>
+
+extern "C"
+{{
+#include <lauxlib.h>
+#include <luajit.h>
+#include <lualib.h>
+}}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
+#include <LuaBridge/LuaBridge.h>
+#pragma GCC diagnostic pop
 {}
 
 namespace lemon {{
 void serializer::register_all([[maybe_unused]] registry& _registry) {{
 {}
+}}
+
+void scripting_engine::register_types() {{
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("lemon")
+        {}
+        .endNamespace();
 }}
 }}
 '''
@@ -42,6 +63,18 @@ field_out_template = '''
             s->basicTypesSerializer.deserialize(component->{0}, obj.FindMember(\"{0}\")->value);
 '''
 
+scripting_template = '''
+    '''
+scripting_component_template = '''
+        .beginClass<{0}>("{0}")
+        {1}
+        .endClass()
+        .addFunction("get_{0}", +[](script_entity* ent) {{ return ent->_scene->get<{0}>(entity_t(ent->handle)); }})
+'''
+scripting_field_template = '''
+        .addProperty("{1}", &{0}::{1})
+'''
+
 def main(argv):
     output_path = argv[1]
     input_path = argv[2]
@@ -55,8 +88,9 @@ def main(argv):
         components = json.load(f)['components']
 
     serialization_components = [component_template.format(k, ''.join(field_template.format(val["name"]) for val in v), ''.join(field_out_template.format(val["name"]) for val in v)) for k,v in components.items()]
+    scripting_components = [scripting_component_template.format(k, ''.join(scripting_field_template.format(k, val["name"]) for val in v)) for k,v in components.items()]
 
-    serialization_file = file_template.format(''.join(include_template.format(i) for i in include_strings),''.join(c for c in serialization_components))
+    serialization_file = file_template.format(''.join(include_template.format(i) for i in include_strings),''.join(c for c in serialization_components), ''.join(c for c in scripting_components))
 
     with open(output_path, 'w+') as f:
         f.write(serialization_file)

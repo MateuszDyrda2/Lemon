@@ -9,6 +9,7 @@
 #include "entt/entity/fwd.hpp"
 #include "entt/entity/registry.hpp"
 #include "service_container.h"
+#include "world/entity_registry.h"
 #include "world/system.h"
 
 #include <core/assert.h>
@@ -79,6 +80,9 @@ class LEMON_API scene
     template<class It>
     void destroy(It first, It second);
 
+    entity_registry& get_entity_registry() { return _entityRegistry; }
+    const entity_registry& get_entity_registry() const { return _entityRegistry; }
+
     service_container get_services()
     {
         return service_container{
@@ -101,6 +105,7 @@ class LEMON_API scene
     input& _input;
     message_bus& _messageBus;
     registry _registry;
+    entity_registry _entityRegistry;
     std::vector<std::unique_ptr<system>> systems;
 };
 

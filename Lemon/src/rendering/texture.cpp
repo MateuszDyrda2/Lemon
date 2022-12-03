@@ -30,7 +30,6 @@ texture::texture(hashstr name, const std::string& path,
     }
     size         = { width, height };
     nrOfChannels = numberOfChannels;
-    logger::info("{}x{}", width, height);
 
     glGenTextures(1, &handle);
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, handle));

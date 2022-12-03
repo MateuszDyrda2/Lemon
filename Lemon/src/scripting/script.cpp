@@ -94,12 +94,14 @@ void lua_pushargument(lua_State* L, message_payload* payload)
 void script::execute(script_entity ent, const std::string& func, message_payload* payload)
 {
     auto L = engine.get_state();
+
     lua_getglobal(L, name.c_str());
     lua_getfield(L, -1, func.c_str());
 
     if (!lua_isfunction(L, -1))
     {
-        lua_pop(L, 1);
+        // lua_pop(L, 2);
+        lua_remove(L, -2);
         return;
     }
     auto p            = payload;
@@ -115,11 +117,40 @@ void script::execute(script_entity ent, const std::string& func, message_payload
         lua_pushargument(L, p);
         p = p->next;
         ++count;
+        luaL_checkstack(L, 1, "too many args");
     }
     if (lua_pcall(L, count, 0, 0) != 0)
     {
         logger::error("Error running function {}: {}", func, lua_tostring(L, -1));
         return;
+    }
+}
+
+void script::update(script_entity ent, f32 delta)
+{
+    auto L            = engine.get_state();
+    auto entNamespace = luabridge::getGlobal(L, name.c_str());
+    auto update       = entNamespace.rawget("on_update");
+    if (!update.isCallable()) return;
+
+    auto res = update(ent, delta);
+    if (res.hasFailed())
+    {
+        logger::warn("Lua script {} failed with {}", name, res.errorMessage());
+    }
+}
+
+void script::start(script_entity ent)
+{
+    auto L            = engine.get_state();
+    auto entNamespace = luabridge::getGlobal(L, name.c_str());
+    auto start        = entNamespace.rawget("on_start");
+    if (!start.isCallable()) return;
+
+    auto res = start(ent);
+    if (res.hasFailed())
+    {
+        logger::warn("Lua script {} failed with {}", name, res.errorMessage());
     }
 }
 }

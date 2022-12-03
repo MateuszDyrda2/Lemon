@@ -25,6 +25,8 @@ class LEMON_API script : public resource
     static hashstr get_mocked() { return "mock_script"_hs; }
 
     void execute(script_entity ent, const std::string& func, message_payload* payload);
+    void update(script_entity ent, f32 delta);
+    void start(script_entity ent);
 
   private:
     std::string path;

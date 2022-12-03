@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { clickable } from '../../../styles/styles';
+import { clickable, medium_text } from '../../../styles/styles';
+import { IoMdClose } from 'react-icons/io';
 
 export const SceneContainer = styled.div`
     height: 100%;
@@ -19,6 +20,8 @@ export const EntityWrapper = styled.div<WrapperProps>`
     position: relative;
     overflow: hidden;
     padding: 2px;
+    display: flex;
+    flex-flow: row nowrap;
 
     background: ${(props) =>
         props.selected ? props.theme.colors.bg1 : 'none'};
@@ -47,4 +50,13 @@ export const AddWrapper = styled.div`
     justify-content: center;
 
     ${clickable}
+`;
+
+export const Close = styled(IoMdClose)`
+    ${medium_text}
+    margin-left: auto;
+
+    &:hover {
+        color: ${(props) => props.theme.colors.red};
+    }
 `;

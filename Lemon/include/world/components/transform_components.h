@@ -19,12 +19,6 @@ struct LEMON_API [[lemon::component]] transform
     [[lemon::field]] vec2 position{ 0.0f, 0.0f };
     [[lemon::field]] vec2 scale{ 1.0f, 1.0f };
     [[lemon::field]] f32 rotation{ 0.0f };
-
-    [[lemon::field]] entity_t first{ entt::null };
-    [[lemon::field]] entity_t next{ entt::null };
-    [[lemon::field]] entity_t parent{ entt::null };
-    [[lemon::field]] std::size_t order{};
-
     [[lemon::field]] i32 layer{ 0 };
 
     transform() = default;

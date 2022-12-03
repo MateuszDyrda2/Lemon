@@ -46,15 +46,15 @@ void Sandbox::initialize()
 
     auto& scene = _sceneManager
                       .load_scene("SandboxScene"_hs)
-                      .register_system<scripting_system>()
                       .register_system<entity_system>()
-                      .register_system<movement_system>()
+                      //.register_system<movement_system>()
                       .register_system<physics_system>()
                       .register_system<collision_system>()
                       .register_system<interpolate_system>()
                       .register_system<transform_system>()
                       .register_system<animation_system>()
-                      .register_system<rendering_system>();
+                      .register_system<rendering_system>()
+                      .register_system<scripting_system>();
 
     _serializer.register_all(scene.get_registry());
     _serializer.deserialize_scene(scene, SCENE_PATH "/sandbox1.json");

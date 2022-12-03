@@ -56,6 +56,7 @@ set(lemon_WORLD_SRC
     src/world/entity.cpp
     src/world/scene.cpp
     src/world/scene_manager.cpp
+    src/world/entity_registry.cpp
     src/world/systems/entity_system.cpp
     src/world/systems/transform_system.cpp
     src/world/systems/interpolate_system.cpp

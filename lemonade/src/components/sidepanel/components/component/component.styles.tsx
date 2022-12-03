@@ -1,4 +1,5 @@
 import { MdArrowDropDown, MdArrowDropUp } from 'react-icons/md';
+import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
 import {
     small_text,
@@ -10,7 +11,7 @@ export const ComponentClass = styled.div`
     border: 1px solid ${(props) => props.theme.colors.bg1};
     margin: 10px 0;
     ${flex_column}
-    border-radius: 2px;
+    border-radius : 2px;
 `;
 export const ComponentHeader = styled.div`
     background: ${(props) => props.theme.colors.bg1};
@@ -20,17 +21,26 @@ export const ComponentHeader = styled.div`
 `;
 export const ComponentName = styled.p`
     ${small_text}
-    padding: 2px 10px 2px 10px;
+    padding : 2px 10px 2px 10px;
     margin: 0;
     overflow: hidden;
 `;
 
 export const DropDown = styled(MdArrowDropDown)`
     ${medium_text}
-    margin-left: 5px;
+    margin-left : 5px;
 `;
 
 export const DropUp = styled(MdArrowDropUp)`
     ${medium_text}
-    margin-left: 5px;
+    margin-left : 5px;
+`;
+
+export const Close = styled(IoMdClose)`
+    ${medium_text}
+    margin-left: auto;
+
+    &:hover {
+        color: ${(props) => props.theme.colors.red};
+    }
 `;

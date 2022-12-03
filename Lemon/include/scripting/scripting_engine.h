@@ -13,7 +13,7 @@ namespace lemon {
 class LEMON_API scripting_engine
 {
   public:
-    scripting_engine();
+    scripting_engine(class input& _input);
     ~scripting_engine();
 
     void load_file(const std::string& path);
@@ -23,5 +23,9 @@ class LEMON_API scripting_engine
 
   private:
     lua_State* L;
+
+  private:
+    void register_math();
+    void register_types();
 };
 }

@@ -25,6 +25,10 @@
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf-m-001.png"
         },
         {
+            "name": "floor",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/floor.png"
+        },
+        {
             "name": "dwarf_guardian-m-001",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_guardian-m-001.png"
         },
@@ -45,6 +49,10 @@
         }
     ],
     "scripts": [
+        {
+            "name": "camera_script",
+            "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/camera_script.lua"
+        },
         {
             "name": "player_script",
             "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/player_script.lua"

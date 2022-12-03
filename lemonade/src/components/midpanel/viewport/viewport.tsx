@@ -151,7 +151,6 @@ const Viewport = () => {
             reloadScene(gl),
         );
         const unlisten2 = appWindow.listen('scene-changed', (_) => {
-            console.log('scene-changed');
             reloadScene(gl);
         });
 

@@ -1,5 +1,17 @@
-#include "scripting/script_entity.h"
 #include <scripting/scripting_engine.h>
+
+#include "core/math/mat4.h"
+#include "core/math/vec2.h"
+#include "core/math/vec3.h"
+#include "core/math/vec4.h"
+#include "physics/systems/physics_system.h"
+#include "platform/input.h"
+#include "platform/keycodes.h"
+#include "scripting/script_entity.h"
+#include "world/systems/transform_system.h"
+#include <events/events.h>
+#include <type_traits>
+#include <world/scene.h>
 
 extern "C"
 {
@@ -61,7 +73,7 @@ std::unordered_map<hashstr, function<i32(f32)>> get_key_value_map(lua_State* L, 
     return result;
 }
 
-scripting_engine::scripting_engine()
+scripting_engine::scripting_engine(input& _input)
 {
     L = luaL_newstate();
     registerMainThread(L);
@@ -92,10 +104,110 @@ scripting_engine::scripting_engine()
         .addProperty("handle", &script_entity::handle)
         .addProperty("animator", &script_entity::get_animator)
         .addFunction("message", &script_entity::create_message)
+        .addFunction(
+            "set_dirty", +[](script_entity* ent) {
+                ent->_scene->get_entity(entity_t(ent->handle)).set_dirty();
+            })
+        .addFunction(
+            "get_entity", +[](script_entity* ent, const char* name) {
+                auto n = ent->_scene->get_entity_registry().get(hashstr::runtime_hash(name));
+                return script_entity(ent->_messageBus, ent->_scene, u32(n));
+            })
+        .endClass()
+        .beginClass<event_queue>("event_queue")
+        .endClass()
+        .beginClass<input>("input")
+        .addFunction(
+            "check_key", +[](input* i, int k, int a) { return i->check_key(keycode(k), key_action(a)); })
+        .addFunction(
+            "check_mouse", +[](input* i, int k, int a) { return i->check_key(mouse(k), key_action(a)); })
+        .addFunction(
+            "check_gamepad", +[](input* i, int k, int a) { return i->check_key(gamepad(k), key_action(a)); })
+        .addFunction(
+            "check_gamepad_axis", +[](input* i, int k) { return i->check_axis(gamepad_axis(k)); })
+        .addFunction(
+            "check_mouse_axis", +[](input* i, int k) { return i->check_axis(mouse_axis(k)); })
+        .addFunction(
+            "check_axis", +[](input* i, int a, int b) { return i->check_axis({ keycode(a), keycode(b) }); })
+        .endClass()
+        .beginClass<physics_system>("physics")
+        .addStaticFunction(
+            "set_velocity", +[](script_entity* ent, f32 x, f32 y) { physics_system::set_velocity(entity(*ent->_scene, entity_t(ent->handle)), { x, y }); })
+        .addStaticFunction(
+            "add_velocity", +[](script_entity* ent, f32 x, f32 y) { physics_system::add_velocity(entity(*ent->_scene, entity_t(ent->handle)), { x, y }); })
+        .addStaticFunction(
+            "move_position", +[](script_entity* ent, f32 x, f32 y) { physics_system::move_position(entity(*ent->_scene, entity_t(ent->handle)), { x, y }); })
+        .endClass()
+        .beginClass<transform_system>("transform_system")
+        .addStaticFunction(
+            "get_transform", +[](script_entity* ent) {
+                transform_system::get_transform(entity(*ent->_scene, entity_t(ent->handle)));
+            })
+        .addStaticFunction(
+            "move_to", +[](script_entity* ent, vec2 pos) {
+                transform_system::move_to(entity(*ent->_scene, entity_t(ent->handle)), pos);
+            })
         .endClass()
         .endNamespace();
 
+    [[maybe_unused]] auto _ = push(L, &_input);
+    lua_setglobal(L, "input");
+    register_math();
+    register_types();
+
     logger::info("Scripting Engine created");
+}
+
+void scripting_engine::register_math()
+{
+    getGlobalNamespace(L)
+        .beginNamespace("lemon")
+        .beginClass<vec2>("vec2")
+        .addProperty("x", &vec2::x)
+        .addProperty("y", &vec2::y)
+        .endClass()
+        .beginClass<ivec2>("ivec2")
+        .addProperty("x", &ivec2::x)
+        .addProperty("y", &ivec2::y)
+        .endClass()
+        .beginClass<uvec2>("uvec2")
+        .addProperty("x", &uvec2::x)
+        .addProperty("y", &uvec2::y)
+        .endClass()
+        .beginClass<vec3>("vec3")
+        .addProperty("x", &vec3::x)
+        .addProperty("y", &vec3::y)
+        .addProperty("z", &vec3::z)
+        .endClass()
+        .beginClass<ivec3>("ivec3")
+        .addProperty("x", &ivec3::x)
+        .addProperty("y", &ivec3::y)
+        .addProperty("z", &ivec3::z)
+        .endClass()
+        .beginClass<uvec3>("uvec3")
+        .addProperty("x", &uvec3::x)
+        .addProperty("y", &uvec3::y)
+        .addProperty("z", &uvec3::z)
+        .endClass()
+        .beginClass<vec4>("vec4")
+        .addProperty("x", &vec4::x)
+        .addProperty("y", &vec4::y)
+        .addProperty("z", &vec4::z)
+        .addProperty("w", &vec4::w)
+        .endClass()
+        .beginClass<ivec4>("ivec4")
+        .addProperty("x", &ivec4::x)
+        .addProperty("y", &ivec4::y)
+        .addProperty("z", &ivec4::z)
+        .addProperty("w", &ivec4::w)
+        .endClass()
+        .beginClass<uvec4>("uvec4")
+        .addProperty("x", &uvec4::x)
+        .addProperty("y", &uvec4::y)
+        .addProperty("z", &uvec4::z)
+        .addProperty("w", &uvec4::w)
+        .endClass()
+        .endNamespace();
 }
 
 scripting_engine::~scripting_engine()

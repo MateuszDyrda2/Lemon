@@ -1,6 +1,7 @@
 #include "core/math/mat2.h"
 #include "core/math/mat4.h"
 #include "core/math/math.h"
+#include "world/components/entity_components.h"
 #include <algorithm>
 #include <cmath>
 #include <physics/systems/collision_system.h>
@@ -126,13 +127,13 @@ void collision_system::onUpdate([[maybe_unused]] event_args* e)
     collision_set newSet;
     auto&& [fixedDelta] = get_event<fixed_update_event>(e);
 
-    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t>().each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t, enabled_t>().each())
     {
         if (auto aabb = get_aabb(_entity, _rigidbody))
             tree.update_leaf(std::underlying_type_t<typeof(_entity)>(_entity), *aabb);
     }
 
-    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody>().each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, enabled_t>().each())
     {
         auto collisions = tree.query_tree(u32(_entity));
         switch (_rigidbody.colliderType)
@@ -236,7 +237,9 @@ void collision_system::handle_box_collisions(
 
     for (const auto& other : collisions)
     {
-        auto otherEntity      = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())
@@ -283,7 +286,9 @@ void collision_system::handle_circle_collisions(
 {
     for (const auto& other : collisions)
     {
-        auto otherEntity      = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())
@@ -331,7 +336,9 @@ void collision_system::handle_capsule_collisions(
 {
     for (const auto& other : collisions)
     {
-        auto otherEntity                       = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         [[maybe_unused]] auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())

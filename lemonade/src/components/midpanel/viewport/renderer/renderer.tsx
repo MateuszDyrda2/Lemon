@@ -20,8 +20,11 @@ const renderScene = (
     debugData: DebugData[],
 ) => {
     const projection = mat4.create();
-    const hWidth = width * 0.5;
+
+    const aspect = width / height;
     const hHeight = height * 0.5;
+    const hWidth = hHeight * aspect;
+
     mat4.ortho(projection, -hWidth, hWidth, -hHeight, hHeight, -1, 1);
     gl.useProgram(program.program);
     var view = getCameraModel(camera);

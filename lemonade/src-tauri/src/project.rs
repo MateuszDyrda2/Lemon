@@ -8,7 +8,8 @@ mod utils;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::io::{self, BufRead, BufReader, Read, Stdout, Write};
+use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::thread::{self, JoinHandle};
 use std::{fs, path::Path, result::Result, str, sync::Mutex};
@@ -18,7 +19,7 @@ use self::component::{
     add_component, change_component, get_entity_components, remove_entity_component,
     EntityComponents,
 };
-use self::entity::{add_new_entity, get_all_entities, EntityDTO};
+use self::entity::{add_new_entity, get_all_entities, remove_one_entity, EntityDTO};
 use self::files::{read_assets_file, read_project_file, read_scene_file, read_types_file};
 use self::models::*;
 use error_codes::ProjectErrorCode;
@@ -66,13 +67,6 @@ fn get_dataset(project: &Project) -> Result<&Types, ProjectErrorCode> {
         .data_set
         .as_ref()
         .ok_or(ProjectErrorCode::NoDatasetLoaded)
-}
-
-fn get_assets(project: &Project) -> Result<&Assets, ProjectErrorCode> {
-    project
-        .assets
-        .as_ref()
-        .ok_or(ProjectErrorCode::NoAssetsLoaded)
 }
 
 fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
@@ -397,7 +391,7 @@ pub fn get_asset_list(
                             height: dim.height,
                         },
                     ),
-                    Err(err) => (
+                    Err(_) => (
                         id,
                         TextureDTO {
                             path: val.clone(),
@@ -491,7 +485,6 @@ pub fn set_entity_name(
     if let Some(c) = components.iter().position(|x| x.name == "tag") {
         let entity = components[c].entities.get_mut(&entityid).unwrap();
         *entity.get_mut("name").unwrap() = json!(name);
-        *entity.get_mut("id").unwrap() = json!(hash_string(name.as_str()));
     }
 
     Ok(name)
@@ -545,7 +538,7 @@ pub fn run_engine(
                     Err(_err) => return Err(ProjectErrorCode::FailedToStartEngine),
                     _ => (),
                 },
-                Err(e) => {
+                Err(_) => {
                     return Err(ProjectErrorCode::FailedToStartEngine);
                 }
             }
@@ -561,33 +554,15 @@ pub fn run_engine(
         .spawn()
         .expect("failed to execute child");
 
-    //let mut stdout = child.stdout.take().unwrap();
     let out = BufReader::new(child.stdout.take().unwrap());
 
     let t = thread::Builder::new()
         .name("engine_stream_to_editor".into())
         .spawn(move || {
-            //let mut f = BufReader::new(stdout);
-            out.lines()
-                .for_each(|line| _ = window.emit("received-output", line.unwrap()));
-            // loop {
-            /*println!("once");*/
-            /*let mut buff = String::new();*/
-            /*match f.read_line(&mut buff) {*/
-            /*Err(err) => {*/
-            /*println!("{}", err);*/
-            /*break;*/
-            /*}*/
-            /*Ok(got) => {*/
-            /*if got == 0 {*/
-            /*break;*/
-            /*} else {*/
-            /*println!("{}", buff);*/
-            /*window.emit("received-output", buff.clone());*/
-            /*}*/
-            /*}*/
-            /*}*/
-            //}
+            out.lines().for_each(|line| {
+                _ = window.emit("received-output", line.unwrap());
+                ()
+            });
         });
     match t {
         Ok(thread) => {
@@ -735,6 +710,46 @@ pub fn recreate_assets(state: tauri::State<ProjectState>) -> Result<(), ProjectE
     let Some(project) = &*state_guard else {
         return Err(ProjectErrorCode::NoProjectLoaded);
     };
-
     let assets = &project.assets_path;
+    let path = &project.path;
+
+    let asset_path = path.join(assets);
+    let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("tools/recreate_assets.py");
+
+    let python = if cfg!(windows) { "py.exe" } else { "python3" };
+
+    Command::new(python)
+        .arg(tool_path)
+        .arg(asset_path)
+        .spawn()
+        .expect("Python script failed");
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn remove_entity(
+    state: tauri::State<ProjectState>,
+    window: Window,
+    entityid: u32,
+) -> Result<Vec<EntityDTO>, ProjectErrorCode> {
+    let mut state_guard = lock_state!(state);
+
+    let Some(project) = &mut *state_guard else  {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &mut project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    remove_one_entity(scene, entityid)?;
+
+    _ = window.emit("scene-changed", ());
+
+    Ok(get_all_entities(scene))
 }

@@ -16,29 +16,27 @@ transform_system::~transform_system() { }
 
 void transform_system::onUpdate([[maybe_unused]] event_args* e)
 {
-    _scene.sort<dirty_t>([this](const auto lhs, const auto rhs) {
-        const auto& clhs = _scene.get<transform>(lhs);
-        const auto& crhs = _scene.get<transform>(rhs);
-        return clhs.order < crhs.order;
-    });
-
     _scene.view<dirty_t>().each(
         [this](const auto ent) {
             auto&& [_transform, _model] =
                 _scene.get<transform, model>(ent);
 
-            _model.matrix = _transform.parent == entt::null
-                                ? mat4(1.0f)
-                                : _scene.get<model>(_transform.parent).matrix;
-
-            _model.matrix = translate(_model.matrix, vec3(_transform.position, _transform.layer * 0.01));
-            _model.matrix = rotate(_model.matrix, _transform.rotation, vec3(0.0f, 0.0f, 1.0f));
-            _model.matrix = scale(_model.matrix, vec3(_transform.scale, 1.0f));
+            /*            _model.matrix = mat4(1.0f);*/
+            /*_model.matrix = translate(_model.matrix, vec3(_transform.position, (f32(_transform.layer) * 0.1f)));*/
+            /*_model.matrix = rotate(_model.matrix, _transform.rotation, vec3(0.0f, 0.0f, 1.0f));*/
+            /*_model.matrix = scale(_model.matrix, vec3(_transform.scale, 1.0f));*/
+            _model.matrix = scale(vec3(_transform.scale, 1.0f)) * rotate(_transform.rotation, vec3(0.0f, 0.0f, 1.0f)) * translate(vec3(_transform.position, _transform.layer * 0.1));
         });
     _scene.clear<dirty_t>();
 }
 
-void transform_system::move_to(entity& _entity, vec2 newPosition)
+transform& transform_system::get_transform(entity _entity)
+{
+    lemon_assert(_entity.has<transform>());
+    return _entity.get<transform>();
+}
+
+void transform_system::move_to(entity _entity, vec2 newPosition)
 {
     lemon_assert(_entity.has<transform>());
     auto&& tr   = _entity.get<transform>();

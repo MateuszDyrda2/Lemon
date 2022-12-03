@@ -1,3 +1,4 @@
+#include "world/components/entity_components.h"
 #include <physics/systems/physics_system.h>
 
 #include <core/math/math.h>
@@ -18,9 +19,9 @@ physics_system::~physics_system() { }
 
 void physics_system::onUpdate([[maybe_unused]] event_args* e)
 {
-    auto rigidbodies = _scene.view<rigidbody>();
+    auto rigidbodies = _scene.view<rigidbody, enabled_t>();
 
-    auto trrb = _scene.group<transform, rigidbody>();
+    auto trrb = _scene.group<transform, rigidbody>(entt::get_t<enabled_t>());
     for (auto&& [_entity, _transform, _rigidbody] : trrb.each())
     {
         _rigidbody.position = _transform.position;
@@ -51,19 +52,19 @@ void physics_system::onUpdate([[maybe_unused]] event_args* e)
     }
 }
 
-void physics_system::set_velocity(entity& _entity, vec2 newVelocity)
+void physics_system::set_velocity(entity _entity, vec2 newVelocity)
 {
     lemon_assert(_entity.has<rigidbody>());
     _entity.get<rigidbody>().velocity = newVelocity;
 }
 
-void physics_system::add_velocity(entity& _entity, vec2 velocity)
+void physics_system::add_velocity(entity _entity, vec2 velocity)
 {
     lemon_assert(_entity.has<rigidbody>());
     _entity.get<rigidbody>().velocity += velocity;
 }
 
-void physics_system::move_position(entity& _entity, vec2 newPosition)
+void physics_system::move_position(entity _entity, vec2 newPosition)
 {
     (void)_entity;
     (void)newPosition;

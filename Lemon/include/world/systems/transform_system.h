@@ -15,7 +15,8 @@ class LEMON_API transform_system : public system
     ~transform_system();
     void onUpdate(event_args* e);
 
-    static void move_to(entity& _entity, vec2 newPosition);
+    static transform& get_transform(entity _entity);
+    static void move_to(entity _entity, vec2 newPosition);
     static void move_by(entity& _entity, vec2 distance);
     static void rotate_to(entity& _entity, f32 newRotation);
     static void rotate_by(entity& _entity, f32 degrees);
