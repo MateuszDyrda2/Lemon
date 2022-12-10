@@ -26,11 +26,16 @@ class LEMON_API script : public resource
 
     void execute(script_entity ent, const std::string& func, message_payload* payload);
     void update(script_entity ent, f32 delta);
+    void early(script_entity ent, f32 delta);
+    void physics(script_entity ent, f32 delta);
     void start(script_entity ent);
 
   private:
     std::string path;
     std::string name;
     scripting_engine& engine;
+    std::function<void(script_entity, f32)> update_f;
+    std::function<void(script_entity, f32)> early_f;
+    std::function<void(script_entity, f32)> physics_f;
 };
 }

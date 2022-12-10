@@ -15,12 +15,16 @@ class LEMON_API scripting_system : public system
     ~scripting_system();
 
     void on_update(event_args* e);
+    void on_early_update(event_args* e);
+    void on_physics(event_args* e);
     void on_mount(event_args* e);
 
   private:
     scene& _scene;
     message_bus& _messageBus;
     event_queue::listener_handle update;
+    event_queue::listener_handle early;
+    event_queue::listener_handle physics;
     event_queue::listener_handle mount;
 
   private:

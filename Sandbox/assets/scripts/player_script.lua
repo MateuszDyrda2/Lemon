@@ -33,8 +33,9 @@ local function animation_frame (ent, x, y)
     end
 end
 
-function player_script.on_update (ent, delta) 
+function player_script.on_physics (ent, delta) 
     x, y = input:check_axis(65, 68), input:check_axis(83, 87)
+    position = lemon.get_transform(ent).position
 
     length = math.sqrt(x * x + y * y)
     if length == 0 then 
@@ -48,6 +49,6 @@ function player_script.on_update (ent, delta)
 
     x, y = x / length, y / length
 
-    lemon.physics.set_velocity(ent, x * speed, y * speed)
+    lemon.physics.move_position(ent, lemon.vec2(position.x + x * speed * delta, position.y + y * speed * delta), delta)
     animation_frame(ent, x, y)
 end

@@ -136,9 +136,12 @@ scripting_engine::scripting_engine(input& _input)
         .addStaticFunction(
             "add_velocity", +[](script_entity* ent, f32 x, f32 y) { physics_system::add_velocity(entity(*ent->_scene, entity_t(ent->handle)), { x, y }); })
         .addStaticFunction(
-            "move_position", +[](script_entity* ent, f32 x, f32 y) { physics_system::move_position(entity(*ent->_scene, entity_t(ent->handle)), { x, y }); })
+            "move_position", +[](script_entity* ent, vec2 newPosition, f32 delta) {
+                physics_system::move_position(entity(*ent->_scene, entity_t(ent->handle)), newPosition, delta);
+            })
         .endClass()
         .beginClass<transform_system>("transform_system")
+        .addStaticFunction("lerp", &transform_system::lerp)
         .addStaticFunction(
             "get_transform", +[](script_entity* ent) {
                 transform_system::get_transform(entity(*ent->_scene, entity_t(ent->handle)));
@@ -163,14 +166,17 @@ void scripting_engine::register_math()
     getGlobalNamespace(L)
         .beginNamespace("lemon")
         .beginClass<vec2>("vec2")
+        .addConstructor<void(f32, f32)>()
         .addProperty("x", &vec2::x)
         .addProperty("y", &vec2::y)
         .endClass()
         .beginClass<ivec2>("ivec2")
+        .addConstructor<void(i32, i32)>()
         .addProperty("x", &ivec2::x)
         .addProperty("y", &ivec2::y)
         .endClass()
         .beginClass<uvec2>("uvec2")
+        .addConstructor<void(u32, u32)>()
         .addProperty("x", &uvec2::x)
         .addProperty("y", &uvec2::y)
         .endClass()

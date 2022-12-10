@@ -22,6 +22,32 @@ script::script(hashstr nameid, const std::string& path, scripting_engine& _scrip
 {
     this->name = fs::path(path).stem();
     _scriptingEngine.load_file(path);
+
+    auto L            = engine.get_state();
+    auto entNamespace = luabridge::getGlobal(L, name.c_str());
+    auto onUpdate     = entNamespace.rawget("on_update");
+    if (onUpdate.isCallable())
+    {
+        update_f = [onUpdate = std::move(onUpdate)](script_entity ent, f32 delta) {
+            onUpdate(ent, delta);
+        };
+    }
+
+    auto onEarly = entNamespace.rawget("on_early_update");
+    if (onEarly.isCallable())
+    {
+        early_f = [onEarly = std::move(onEarly)](script_entity ent, f32 delta) {
+            onEarly(ent, delta);
+        };
+    }
+
+    auto onPhysics = entNamespace.rawget("on_physics");
+    if (onPhysics.isCallable())
+    {
+        physics_f = [onPhysics = std::move(onPhysics)](script_entity ent, f32 delta) {
+            onPhysics(ent, delta);
+        };
+    }
 }
 
 script::~script()
@@ -128,16 +154,20 @@ void script::execute(script_entity ent, const std::string& func, message_payload
 
 void script::update(script_entity ent, f32 delta)
 {
-    auto L            = engine.get_state();
-    auto entNamespace = luabridge::getGlobal(L, name.c_str());
-    auto update       = entNamespace.rawget("on_update");
-    if (!update.isCallable()) return;
+    if (!update_f) return;
+    update_f(ent, delta);
+}
 
-    auto res = update(ent, delta);
-    if (res.hasFailed())
-    {
-        logger::warn("Lua script {} failed with {}", name, res.errorMessage());
-    }
+void script::early(script_entity ent, f32 delta)
+{
+    if (!early_f) return;
+    early_f(ent, delta);
+}
+
+void script::physics(script_entity ent, f32 delta)
+{
+    if (!physics_f) return;
+    physics_f(ent, delta);
 }
 
 void script::start(script_entity ent)

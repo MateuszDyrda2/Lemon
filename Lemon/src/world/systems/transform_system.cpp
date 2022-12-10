@@ -25,7 +25,7 @@ void transform_system::onUpdate([[maybe_unused]] event_args* e)
             /*_model.matrix = translate(_model.matrix, vec3(_transform.position, (f32(_transform.layer) * 0.1f)));*/
             /*_model.matrix = rotate(_model.matrix, _transform.rotation, vec3(0.0f, 0.0f, 1.0f));*/
             /*_model.matrix = scale(_model.matrix, vec3(_transform.scale, 1.0f));*/
-            _model.matrix = scale(vec3(_transform.scale, 1.0f)) * rotate(_transform.rotation, vec3(0.0f, 0.0f, 1.0f)) * translate(vec3(_transform.position, _transform.layer * 0.1));
+            _model.matrix = scale(vec3(_transform.scale, 1.0f)) * rotate(_transform.rotation, vec3(0.0f, 0.0f, 1.0f)) * translate(vec3(_transform.position, _transform.layer));
         });
     _scene.clear<dirty_t>();
 }
@@ -82,5 +82,10 @@ void transform_system::scale_by(entity& _entity, vec2 scale)
     auto&& tr = _entity.get<transform>();
     tr.scale *= scale;
     _entity.emplace_or_replace<dirty_t>();
+}
+
+vec2 transform_system::lerp(vec2 start, vec2 end, f32 time)
+{
+    return start + (end - start) * time;
 }
 }

@@ -13,6 +13,15 @@ scripting_system::scripting_system(scene& _scene, event_queue& _eventQueue, mess
     update = _eventQueue["Update"_hs] += [this](event_args* e) {
         this->on_update(e);
     };
+
+    early = _eventQueue["EarlyUpdate"_hs] += [this](event_args* e) {
+        this->on_early_update(e);
+    };
+
+    physics = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
+        this->on_physics(e);
+    };
+
     mount = _eventQueue["OnSceneLoaded"_hs] += [this](event_args* e) {
         this->on_mount(e);
     };
@@ -56,6 +65,28 @@ void scripting_system::on_update([[maybe_unused]] event_args* e)
                     message.messageName, message.payload);
             }
         }
+    }
+    _messageBus.clear();
+}
+
+void scripting_system::on_early_update([[maybe_unused]] event_args* e)
+{
+    auto delta = get_event<update_event>(e).deltaTime;
+    for (auto&& [_entity, _scriptComponent] : _scene.view<script_component>().each())
+    {
+        [[maybe_unused]] auto scr = _scriptComponent.scriptObject.get();
+        scr->early(script_entity(_messageBus, &_scene, u32(_entity)), delta);
+    }
+    _messageBus.clear();
+}
+
+void scripting_system::on_physics([[maybe_unused]] event_args* e)
+{
+    auto delta = get_event<fixed_update_event>(e).fixedDelta;
+    for (auto&& [_entity, _scriptComponent] : _scene.view<script_component>().each())
+    {
+        [[maybe_unused]] auto scr = _scriptComponent.scriptObject.get();
+        scr->physics(script_entity(_messageBus, &_scene, u32(_entity)), delta);
     }
     _messageBus.clear();
 }

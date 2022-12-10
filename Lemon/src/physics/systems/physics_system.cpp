@@ -64,9 +64,12 @@ void physics_system::add_velocity(entity _entity, vec2 velocity)
     _entity.get<rigidbody>().velocity += velocity;
 }
 
-void physics_system::move_position(entity _entity, vec2 newPosition)
+void physics_system::move_position(entity _entity, vec2 newPosition, f32 deltaTime)
 {
-    (void)_entity;
-    (void)newPosition;
+    lemon_assert(_entity.has<rigidbody>());
+    lemon_assert(_entity.has<transform>());
+    auto&& [rb, tr] = _entity.get<rigidbody, transform>();
+    auto& oldPos    = tr.position;
+    rb.velocity     = (newPosition - oldPos) / deltaTime;
 }
 }

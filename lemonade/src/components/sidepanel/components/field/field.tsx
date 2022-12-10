@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api';
-import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useEffect, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import {
@@ -61,7 +60,7 @@ const TextInput = ({ onBlur, obj, setObj }: ObjectProps) => {
 const NumberInput = ({ onBlur, obj, setObj }: ObjectProps) => {
     const update = useCallback(
         (value: string) => {
-            if (value.length === 0) {
+            if (value.length == 0) {
                 setObj(0);
                 return;
             }
@@ -85,10 +84,23 @@ const NumberInput = ({ onBlur, obj, setObj }: ObjectProps) => {
     );
 };
 
+const BoolInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(() => setObj((old: boolean) => !old), [obj]);
+
+    return (
+        <ObjectInput
+            type="checkbox"
+            checked={obj as boolean}
+            onChange={update}
+            onBlur={onBlur}
+        />
+    );
+};
+
 const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
     return (
         <ObjectClass>
-            {(Object.prototype.toString.call(obj) === '[object Array]' &&
+            {(Object.prototype.toString.call(obj) == '[object Array]' &&
                 (obj as object[]).map((key, index) => (
                     <RenderObject
                         onBlur={onBlur}
@@ -103,7 +115,7 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                         }
                     />
                 ))) ||
-                (typeof obj === 'object' &&
+                (typeof obj == 'object' &&
                     Object.keys(obj as { [key: string]: object }).map(
                         (k, index) => (
                             <div>
@@ -119,11 +131,14 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                             </div>
                         ),
                     )) ||
-                (typeof obj === 'number' && (
+                (typeof obj == 'number' && (
                     <NumberInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 )) ||
-                (typeof obj === 'string' && (
+                (typeof obj == 'string' && (
                     <TextInput obj={obj} setObj={setObj} onBlur={onBlur} />
+                )) ||
+                (typeof obj === 'boolean' && (
+                    <BoolInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 ))}
         </ObjectClass>
     );

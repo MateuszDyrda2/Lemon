@@ -22,6 +22,7 @@ class LEMON_API transform_system : public system
     static void rotate_by(entity& _entity, f32 degrees);
     static void scale_to(entity& _entity, vec2 newScale);
     static void scale_by(entity& _entity, vec2 scale);
+    static vec2 lerp(vec2 start, vec2 end, f32 time);
 
   private:
     scene& _scene;
