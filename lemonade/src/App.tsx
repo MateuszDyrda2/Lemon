@@ -1,4 +1,4 @@
-import { createRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
 import './App.css';
@@ -8,6 +8,10 @@ import Sidepanel from './components/sidepanel/sidepanel';
 import { PanelTypes } from './props/panel-types';
 import { PanelContext } from './state/PanelContext';
 import { theme } from './utils/theme';
+import { registerAll } from '@tauri-apps/api/globalShortcut';
+import { invoke } from '@tauri-apps/api';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const MIN_WIDTH = 200;
 
@@ -42,6 +46,16 @@ const App = () => {
         return () => window.removeEventListener('mouseup', onMouseUp);
     }, [dragging]);
 
+    useEffect(() => {
+        registerAll(['CommandOrCtrl+s', 'CommandOrCtrl+r'], (shortcut) => {
+            if (shortcut === 'CommandOrCtrl+s') {
+                invoke('save').catch(console.error);
+            } else if (shortcut === 'CommandOrCtrl+r') {
+                invoke('recreate_assets').catch(console.error);
+            }
+        }).catch(console.error);
+    }, []);
+
     return (
         <RecoilRoot>
             <div className="App">
@@ -49,18 +63,20 @@ const App = () => {
                     <PanelContext.Provider
                         value={{ currentPanel, setCurrentPanel }}
                     >
-                        <Sidebar />
-                        <Sidepanel
-                            width={sidepanelWidth}
-                            setWidth={setSidepanelWidth}
-                        />
-                        <div
-                            className="vertDiv-container"
-                            onMouseDown={onMouseDown}
-                        >
-                            <div className="vertDiv" />
-                        </div>
-                        <Midpanel />
+                        <DndProvider backend={HTML5Backend}>
+                            <Sidebar />
+                            <Sidepanel
+                                width={sidepanelWidth}
+                                setWidth={setSidepanelWidth}
+                            />
+                            <div
+                                className="vertDiv-container"
+                                onMouseDown={onMouseDown}
+                            >
+                                <div className="vertDiv" />
+                            </div>
+                            <Midpanel />
+                        </DndProvider>
                     </PanelContext.Provider>
                 </ThemeProvider>
             </div>

@@ -25,10 +25,6 @@ class movement_system : public system
         RIGHT,
         BACK,
         FORWARD,
-        LEFT_BACK,
-        RIGHT_BACK,
-        LEFT_FORWARD,
-        RIGHT_FORWARD,
     } currentDirection;
 
     static direction get_direction(const vec2& velocity);

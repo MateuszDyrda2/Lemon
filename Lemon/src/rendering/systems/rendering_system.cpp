@@ -1,3 +1,4 @@
+#include "world/components/entity_components.h"
 #include <rendering/systems/rendering_system.h>
 
 #include <rendering/rendering_context.h>
@@ -42,18 +43,24 @@ void rendering_system::onRender([[maybe_unused]] event_args* e)
         -halfWidth,
         halfWidth,
         -halfHeight,
-        halfHeight);
-    const auto viewProj = proj * mod.matrix;
+        halfHeight, 0.f, 10.f);
+    const auto viewProj = proj * glm::inverse(mod.matrix);
 
     rendering_context::set_viewport(newViewport);
-    rendering_context::clear_screen(color{ 0.5f, 0.5f, 0.5f, 1.0f });
+    rendering_context::clear_screen(color{ 0.0f, 0.0f, 0.0f, 1.0f });
     renderer.start_render(viewProj);
 
-    _scene.view<sprite_renderer, model>().each(
-        [this](const auto, auto& sr, auto& m) {
-            if (sr.tex)
-                renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);
-        });
+    auto group = _scene.group<sprite_renderer, model>(entt::get<enabled_t>);
+    group.sort([&](auto entl, auto entr) {
+        auto&& [ls, lm] = group.get<sprite_renderer, model>(entl);
+        auto&& [rs, rm] = group.get<sprite_renderer, model>(entr);
+        return lm.matrix[3].z < rm.matrix[3].z;
+    });
+
+    group.each([this](const auto, auto& sr, auto& m) {
+        if (sr.tex)
+            renderer.render_sprite(sr.col, sr.texCoords, sr.tex, m.matrix);
+    });
     renderer.end_render();
 }
 }

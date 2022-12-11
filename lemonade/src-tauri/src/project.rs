@@ -8,17 +8,18 @@ mod utils;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::io::{self, BufRead, BufReader, Read, Stdout, Write};
+use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::thread::{self, JoinHandle};
-use std::{path::Path, result::Result, str, sync::Mutex};
+use std::{fs, path::Path, result::Result, str, sync::Mutex};
 use tauri::Window;
 
 use self::component::{
     add_component, change_component, get_entity_components, remove_entity_component,
     EntityComponents,
 };
-use self::entity::{add_new_entity, get_all_entities, EntityDTO};
+use self::entity::{add_new_entity, get_all_entities, remove_one_entity, EntityDTO};
 use self::files::{read_assets_file, read_project_file, read_scene_file, read_types_file};
 use self::models::*;
 use error_codes::ProjectErrorCode;
@@ -66,13 +67,6 @@ fn get_dataset(project: &Project) -> Result<&Types, ProjectErrorCode> {
         .data_set
         .as_ref()
         .ok_or(ProjectErrorCode::NoDatasetLoaded)
-}
-
-fn get_assets(project: &Project) -> Result<&Assets, ProjectErrorCode> {
-    project
-        .assets
-        .as_ref()
-        .ok_or(ProjectErrorCode::NoAssetsLoaded)
 }
 
 fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
@@ -144,12 +138,17 @@ pub fn open_project(
 
     if let Some(project) = &mut (*state_guard) {
         let parent = Path::new(path).parent();
+        project.path = parent.unwrap().to_path_buf();
         let scenes_path = parent.unwrap().join(&project.scene_path);
         let scene_name = project.scenes.first().unwrap().to_owned();
-        let scene_path = scenes_path.join(scene_name + ".json");
+
+        let scene_path = scenes_path.join(scene_name.clone() + ".json");
 
         match read_scene_file(scene_path.to_str().unwrap()) {
-            Ok(s) => project.current_scene = Some(s),
+            Ok(mut s) => {
+                s.name = scene_name;
+                project.current_scene = Some(s)
+            }
             Err(e) => println!("{}", e.to_string()),
         };
 
@@ -215,6 +214,74 @@ pub fn get_entities(state: tauri::State<ProjectState>) -> Result<Vec<EntityDTO>,
 }
 
 #[tauri::command]
+pub fn get_debug_data(
+    state: tauri::State<ProjectState>,
+) -> Result<Vec<DebugData>, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &(*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    let transforms = (&scene.components).iter().find(|x| x.name == "transform");
+    let transform_entities = &transforms.as_ref().unwrap().entities;
+    let colliders = (&scene.components)
+        .iter()
+        .find(|x| x.name == "box_collider");
+    let collider_entities = &colliders.as_ref().unwrap().entities;
+
+    Ok(collider_entities
+        .into_iter()
+        .filter_map(|(key, value)| {
+            transform_entities.get(key).map(|value_b| {
+                let position = value_b["position"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let h_size = value["hSize"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let offset = value["offset"]
+                    .as_array()
+                    .unwrap()
+                    .into_iter()
+                    .map(|x| x.as_f64().unwrap() as f32)
+                    .collect::<Vec<f32>>();
+
+                let center = &[position[0] + offset[0], position[1] + offset[1]];
+
+                DebugData {
+                    coords: [
+                        center[0] - h_size[0],
+                        center[1] - h_size[1],
+                        center[0] + h_size[0],
+                        center[1] - h_size[1],
+                        center[0] + h_size[0],
+                        center[1] + h_size[1],
+                        center[0] - h_size[0],
+                        center[1] + h_size[1],
+                        center[0] - h_size[0],
+                        center[1] - h_size[1],
+                    ]
+                    .to_vec(),
+                }
+            })
+        })
+        .collect::<Vec<DebugData>>())
+}
+
+#[tauri::command]
 pub fn get_rendering_data(
     state: tauri::State<ProjectState>,
 ) -> Result<Vec<RenderingData>, ProjectErrorCode> {
@@ -240,6 +307,8 @@ pub fn get_rendering_data(
                     .into_iter()
                     .map(|x| x.as_f64().unwrap() as f32)
                     .collect::<Vec<f32>>();
+                let layer = value_b["layer"].as_u64().unwrap();
+
                 let rotation = value_b["rotation"].as_f64().unwrap() as f32;
                 let scale = value_b["scale"]
                     .as_array()
@@ -252,7 +321,7 @@ pub fn get_rendering_data(
                     [1f32, 0f32, 0f32, 0f32],
                     [0f32, 1f32, 0f32, 0f32],
                     [0f32, 0f32, 1f32, 0f32],
-                    [position[0], position[1], 0f32, 1f32],
+                    [position[0], position[1], layer as f32 * 0.1f32, 1f32],
                 ]);
 
                 let scale_matrix = arr2(&[
@@ -285,7 +354,7 @@ pub fn get_rendering_data(
                 RenderingData {
                     nameid: *key,
                     model,
-                    textureid: value["tex"].as_u64().unwrap() as u32,
+                    textureid: hash_string(value["tex"].as_str().unwrap()).unwrap(),
                     tex_coords,
                 }
             })
@@ -322,7 +391,7 @@ pub fn get_asset_list(
                             height: dim.height,
                         },
                     ),
-                    Err(err) => (
+                    Err(_) => (
                         id,
                         TextureDTO {
                             path: val.clone(),
@@ -416,7 +485,6 @@ pub fn set_entity_name(
     if let Some(c) = components.iter().position(|x| x.name == "tag") {
         let entity = components[c].entities.get_mut(&entityid).unwrap();
         *entity.get_mut("name").unwrap() = json!(name);
-        *entity.get_mut("id").unwrap() = json!(hash_string(name.as_str()));
     }
 
     Ok(name)
@@ -425,6 +493,7 @@ pub fn set_entity_name(
 #[tauri::command]
 pub fn change_entity_component(
     state: tauri::State<ProjectState>,
+    window: Window,
     entityid: u32,
     componentname: String,
     fieldname: String,
@@ -440,12 +509,18 @@ pub fn change_entity_component(
         return Err(ProjectErrorCode::NoSceneOpened);
     };
 
-    change_component(scene, entityid, componentname, fieldname, newvalue)
+    change_component(scene, entityid, componentname, fieldname, newvalue)?;
+    window
+        .emit("scene-changed", ())
+        .expect("Failed to emit event on scene changed");
+
+    Ok(())
 }
 
 #[tauri::command]
 pub fn run_engine(
     state: tauri::State<ProjectState>,
+    window: Window,
     engine_state: tauri::State<Engine>,
 ) -> Result<(), ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -463,7 +538,7 @@ pub fn run_engine(
                     Err(_err) => return Err(ProjectErrorCode::FailedToStartEngine),
                     _ => (),
                 },
-                Err(e) => {
+                Err(_) => {
                     return Err(ProjectErrorCode::FailedToStartEngine);
                 }
             }
@@ -475,32 +550,19 @@ pub fn run_engine(
 
     let mut child = Command::new(project.executable.as_ref().unwrap())
         .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
         .spawn()
         .expect("failed to execute child");
 
-    let mut stdout = child.stdout.take().unwrap();
+    let out = BufReader::new(child.stdout.take().unwrap());
 
     let t = thread::Builder::new()
         .name("engine_stream_to_editor".into())
         .spawn(move || {
-            let mut f = BufReader::new(stdout);
-            loop {
-                println!("once");
-                let mut buff = String::new();
-                match f.read_line(&mut buff) {
-                    Err(err) => {
-                        println!("{}", err);
-                        break;
-                    }
-                    Ok(got) => {
-                        if got == 0 {
-                            break;
-                        } else {
-                            println!("{}", buff);
-                        }
-                    }
-                }
-            }
+            out.lines().for_each(|line| {
+                _ = window.emit("received-output", line.unwrap());
+                ()
+            });
         });
     match t {
         Ok(thread) => {
@@ -588,6 +650,7 @@ pub fn get_scripts(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, Proj
 
     Ok(assets.scripts.clone())
 }
+
 #[tauri::command]
 pub fn get_animations(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -602,6 +665,7 @@ pub fn get_animations(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, P
 
     Ok(assets.animations.clone())
 }
+
 #[tauri::command]
 pub fn get_shaders(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, ProjectErrorCode> {
     let state_guard = lock_state!(state);
@@ -615,4 +679,77 @@ pub fn get_shaders(state: tauri::State<ProjectState>) -> Result<Vec<Asset>, Proj
     };
 
     Ok(assets.shaders.clone())
+}
+
+#[tauri::command]
+pub fn save(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
+    let mut state_guard = lock_state!(state);
+
+    let Some(project) = &mut (*state_guard) else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &mut project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    let slice = serde_json::to_vec(&scene);
+    let path = project
+        .path
+        .join(&project.scene_path)
+        .join(scene.name.clone() + ".json");
+
+    fs::write(path, slice.unwrap()).expect("Failed to save scene to file");
+    Ok(())
+}
+
+#[tauri::command]
+pub fn recreate_assets(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &*state_guard else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+    let assets = &project.assets_path;
+    let path = &project.path;
+
+    let asset_path = path.join(assets);
+    let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("tools/recreate_assets.py");
+
+    let python = if cfg!(windows) { "py.exe" } else { "python3" };
+
+    Command::new(python)
+        .arg(tool_path)
+        .arg(asset_path)
+        .spawn()
+        .expect("Python script failed");
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn remove_entity(
+    state: tauri::State<ProjectState>,
+    window: Window,
+    entityid: u32,
+) -> Result<Vec<EntityDTO>, ProjectErrorCode> {
+    let mut state_guard = lock_state!(state);
+
+    let Some(project) = &mut *state_guard else  {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    let Some(scene) = &mut project.current_scene else {
+        return Err(ProjectErrorCode::NoSceneOpened);
+    };
+
+    remove_one_entity(scene, entityid)?;
+
+    _ = window.emit("scene-changed", ());
+
+    Ok(get_all_entities(scene))
 }

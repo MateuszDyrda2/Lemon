@@ -5,8 +5,8 @@ use serde_json::Value;
 
 use super::{
     error_codes::ProjectErrorCode,
-    models::{Scene, Types},
-    utils::field_to_value,
+    models::{Component, Scene, Types},
+    utils::{field_to_value, hash_string},
 };
 
 #[derive(Serialize, Debug)]
@@ -59,10 +59,17 @@ pub fn add_component(
 
     if let Some(c) = components.iter().position(|x| x.name == componentname) {
         components[c].entities.entry(entityid).or_insert_with(|| md);
-        Ok(())
+        components[c].count += 1;
     } else {
-        Err(ProjectErrorCode::NoComponentFound)
+        components.push(Component {
+            name: componentname.clone(),
+            id: hash_string(&componentname).unwrap() as u64,
+            count: 1,
+            entities: HashMap::from([(entityid, md)]),
+        });
     }
+
+    Ok(())
 }
 
 pub fn remove_entity_component(

@@ -23,6 +23,7 @@ class LEMON_API collision_system : public system
     SYSTEM(collision_system, scene, event_queue);
     ~collision_system();
     void onUpdate(event_args* e);
+    void onMount();
 
   private:
     bvh_tree tree;
@@ -31,6 +32,7 @@ class LEMON_API collision_system : public system
     event_queue& _eventQueue;
     collision_set set;
     event_queue::listener_handle update;
+    event_queue::listener_handle mount;
 
   private:
     void add_box2tree(registry& _reg, entity_t handle);

@@ -73,7 +73,7 @@ bool batch_renderer::batch::is_full() const
 }
 void batch_renderer::batch::flush(const mat4& viewProj, shader* textureShader)
 {
-    if(usedVertices == 0) return;
+    if (usedVertices == 0) return;
     textureShader->use();
     textureShader->set_uniform("viewProj", viewProj);
     _texture->bind();
@@ -85,7 +85,7 @@ void batch_renderer::batch::flush(const mat4& viewProj, shader* textureShader)
 }
 batch_renderer::batch_renderer(asset_storage& storage):
     renderer2d(storage),
-    textureShader(storage.get_asset<shader>(hash_string("mock_shader"))),
+    textureShader(storage.get_asset<shader>("mock_shader"_hs)),
     batches()
 { }
 batch_renderer::~batch_renderer()
@@ -100,23 +100,23 @@ void batch_renderer::render_sprite(const color& col, const vec4& texCoords, asse
     static batch* biggestBatch = &batches.front();
     batch* empty{};
     batch* found{};
-    for(auto& b : batches)
+    for (auto& b : batches)
     {
-        if(b.is_texture(tex.get()))
+        if (b.is_texture(tex.get()))
         {
             found = &b;
         }
-        else if(b.is_empty())
+        else if (b.is_empty())
         {
             empty = &b;
         }
     }
-    if(found)
+    if (found)
     {
-        if(found->is_full())
+        if (found->is_full())
             found->flush(viewProj, textureShader.get());
     }
-    else if(empty)
+    else if (empty)
     {
         empty->set_texture(tex.get());
         found = empty;
@@ -132,7 +132,7 @@ void batch_renderer::render_sprite(const color& col, const vec4& texCoords, asse
 }
 void batch_renderer::end_render()
 {
-    for(auto& b : batches)
+    for (auto& b : batches)
         b.flush(viewProj, textureShader.get());
 }
 } // namespace lemon

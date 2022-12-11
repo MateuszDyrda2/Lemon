@@ -1,17 +1,11 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { ViewportCanvas, ViewportContainer } from './viewport.styles';
 import { useResizeDetector } from 'react-resize-detector';
-import {
-    fragmentSource,
-    highlightFragmentSource,
-    initializeShaders,
-    ProgramInfo,
-    vertexSource,
-} from './shader/shader';
+import { initializeShaders, ProgramInfo } from './shader/shader';
 import { Buffers, initializeBuffers } from './buffer/buffer';
 import { appWindow } from '@tauri-apps/api/window';
 import { invoke } from '@tauri-apps/api';
-import { RenderingData } from '../../../props/rendering_data';
+import { DebugData, RenderingData } from '../../../props/rendering_data';
 import load_textures, { Texture, TextureDefinition } from './assets/assets';
 import renderScene, { testMouse } from './renderer/renderer';
 import {
@@ -23,6 +17,7 @@ import {
 } from './camera/camera';
 import { useRecoilState } from 'recoil';
 import { chosenEntity } from '../../../state/chosen_entity';
+import { selectedTools } from '../../../state/selected_tools';
 
 interface RenderingState {
     buffers: Buffers;
@@ -40,6 +35,7 @@ const Viewport = () => {
     const [renderingState, setRenderingState] = useState<RenderingState>();
     const [size, setSize] = useState<Size>({ width: 300, height: 300 });
     const [renderingData, setRenderingData] = useState<RenderingData[]>();
+    const [debugData, setDebugData] = useState<DebugData[]>();
     const [textures, setTextures] = useState<{ [nameid: number]: Texture }>();
     const [update, forceUpdate] = useReducer((x) => x + 1, 0);
     const [mouseDown, setMouseDown] = useState(false);
@@ -49,6 +45,7 @@ const Viewport = () => {
     });
     const [camera, setCamera] = useState<Camera | undefined>(undefined);
     const [chEntity, setChEntity] = useRecoilState(chosenEntity);
+    const [tools] = useRecoilState(selectedTools);
 
     const onResize = useCallback(
         (width: number | undefined, height: number | undefined) => {
@@ -72,7 +69,8 @@ const Viewport = () => {
             );
             gl.viewport(0, 0, size.width, size.height);
 
-            if (!renderingState || !renderingData || !textures) return;
+            if (!renderingState || !renderingData || !textures || !debugData)
+                return;
 
             const { program, buffers } = renderingState;
 
@@ -86,10 +84,45 @@ const Viewport = () => {
                 size.width,
                 size.height,
                 chEntity,
+                tools.grid,
+                debugData,
             );
         },
         [renderingState, size, update, camera, chEntity],
     );
+
+    const reloadScene = useCallback((gl: WebGLRenderingContext) => {
+        invoke('get_rendering_data')
+            .then((data) => {
+                const rd = data as RenderingData[];
+                setRenderingData(rd);
+
+                const arr: number[] = [];
+                for (var i = 0; i < rd.length; ++i) arr.push(rd[i].textureid);
+
+                invoke('get_asset_list', { ids: arr })
+                    .then((ret) => {
+                        load_textures(
+                            gl,
+                            ret as { [key: number]: TextureDefinition },
+                        )
+                            .then((texs) => {
+                                setTextures(texs);
+                                setCamera(resetCamera());
+
+                                invoke('get_debug_data')
+                                    .then((data) =>
+                                        setDebugData(data as DebugData[]),
+                                    )
+                                    .catch(console.error);
+                                forceUpdate();
+                            })
+                            .catch(console.error);
+                    })
+                    .catch(console.error);
+            })
+            .catch(console.error);
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current as HTMLCanvasElement;
@@ -103,12 +136,7 @@ const Viewport = () => {
         gl.enable(gl.STENCIL_TEST);
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
         gl.stencilMask(0x00);
-        const program = initializeShaders(
-            gl,
-            vertexSource,
-            fragmentSource,
-            highlightFragmentSource,
-        );
+        const program = initializeShaders(gl);
         const buffers = initializeBuffers(gl);
         setCamera(createCamera(1.0));
         if (program === null || buffers === null) return;
@@ -119,29 +147,18 @@ const Viewport = () => {
             gl: gl,
         });
 
-        appWindow.listen('project-opened', async (_) => {
-            try {
-                const data = await invoke('get_rendering_data');
-                const rd = data as RenderingData[];
-                setRenderingData(rd);
-
-                const arr: number[] = [];
-                for (var i = 0; i < rd.length; ++i) {
-                    arr.push(rd[i].textureid);
-                }
-                const ret = await invoke('get_asset_list', { ids: arr });
-                const texs = await load_textures(
-                    gl,
-                    ret as { [key: number]: TextureDefinition },
-                );
-                setTextures(texs);
-                setCamera(resetCamera());
-                forceUpdate();
-            } catch (e) {
-                console.log(e);
-            }
+        const unlisten1 = appWindow.listen('project-opened', (_) =>
+            reloadScene(gl),
+        );
+        const unlisten2 = appWindow.listen('scene-changed', (_) => {
+            reloadScene(gl);
         });
-    }, []);
+
+        return () => {
+            unlisten1.then((unlisten) => unlisten).catch(console.log);
+            unlisten2.then((unlisten) => unlisten).catch(console.log);
+        };
+    }, [reloadScene]);
 
     useEffect(() => {
         if (!renderingState) return;

@@ -32,12 +32,15 @@ pub struct AssetLookup {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Component {
     pub name: String,
+    pub id: u64,
     pub count: u32,
     pub entities: HashMap<u32, HashMap<String, Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Scene {
+    #[serde(skip)]
+    pub name: String,
     pub entities: Entities,
     pub components: Vec<Component>,
 }
@@ -51,6 +54,8 @@ pub struct Project {
     pub types_path: String,
     pub exec_path: String,
     pub scenes: Vec<String>,
+    #[serde(skip)]
+    pub path: PathBuf,
     #[serde(skip)]
     pub current_scene: Option<Scene>,
     #[serde(skip)]
@@ -93,11 +98,19 @@ pub enum FieldType {
     Mat4,
     #[serde(rename = "std::string", alias = "string")]
     Str,
-    #[serde(rename = "hash_str")]
+    #[serde(rename = "hashstr")]
     HashStr,
+    #[serde(
+        alias = "asset<texture>",
+        alias = "asset<sound>",
+        alias = "asset<shader>",
+        alias = "asset<script>",
+        alias = "asset<animation>"
+    )]
     Asset,
     #[serde(rename = "entity_t")]
     Entity,
+    Color,
     #[serde(other)]
     Unknown,
 }
@@ -126,4 +139,9 @@ pub struct RenderingData {
     pub model: Vec<f32>,
     pub textureid: u32,
     pub tex_coords: Vec<f32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DebugData {
+    pub coords: Vec<f32>,
 }

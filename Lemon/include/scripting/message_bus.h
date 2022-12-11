@@ -27,7 +27,7 @@ struct LEMON_API message_payload
         f32 asFloat;
         bool asBool;
         vec2 asVector;
-        hash_str asHashString;
+        hashstr asHashString;
     };
 
     message_payload* next{ nullptr };
@@ -75,7 +75,7 @@ class LEMON_API message_bus
     message_payload* get_payload(f32 value);
     message_payload* get_payload(bool value);
     message_payload* get_payload(vec2 value);
-    message_payload* get_payload(hash_str value);
+    message_payload* get_payload(hashstr value);
 };
 
 template<class T>

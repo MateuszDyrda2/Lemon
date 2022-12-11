@@ -4,3 +4,7 @@ export interface RenderingData {
     textureid: number;
     tex_coords: Float32Array;
 }
+
+export interface DebugData {
+    coords: Float32Array;
+}

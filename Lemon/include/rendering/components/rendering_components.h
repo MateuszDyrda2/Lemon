@@ -20,7 +20,6 @@ struct LEMON_API [[lemon::component]] sprite_renderer
 /** animation component */
 struct LEMON_API [[lemon::component]] animation_component
 {
-    [[lemon::field]] u32 nFrames{ 1 };
     [[lemon::field]] ivec2 frameSize{};
     [[lemon::field]] asset<animation_script> animation;
 };
@@ -28,7 +27,7 @@ struct LEMON_API [[lemon::component]] animation_component
 /** message for specifying animation start */
 struct LEMON_API start_animation_m
 {
-    hash_str name;
+    hashstr name;
 };
 
 /** message for specifying animation stop */
@@ -39,9 +38,9 @@ struct LEMON_API stop_animation_m
 struct LEMON_API animating_t
 {
     f32 duration;
-    hash_str animationName;
+    hashstr animationName;
 
-    animating_t(hash_str animationName):
+    animating_t(hashstr animationName):
         duration(0.0f), animationName(animationName) { }
 };
 }

@@ -1,47 +1,10 @@
-export const vertexSource = `
-    attribute vec2 position;
-    attribute vec2 texCoords;
-    
-    uniform mat4 model;
-    uniform mat4 projection;
-
-    varying highp vec2 vTextureCoord;
-    
-    void main() {
-        gl_Position = projection * model * vec4(position, 0.0, 1.0);
-        vTextureCoord = texCoords;
-    }
-`;
-
-export const fragmentSource = `
-    precision mediump float;
-
-    varying highp vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-
-    void main() {
-        vec4 color = texture2D(uSampler, vTextureCoord);
-        if (color.a <= 0.04)
-            discard;
-
-        gl_FragColor = color;
-    }
-`;
-
-export const highlightFragmentSource = `
-    precision mediump float;
-
-    varying highp vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-
-    void main() {
-        vec4 color = vec4(1,0.8,0,0);
-        vec4 alpha = vec4(0,0,0,1) * texture2D(uSampler, vTextureCoord);
-        gl_FragColor = color + alpha;
-    }
-`;
+import {
+    vertexSource,
+    fragmentSource,
+    highlightFragmentSource,
+    colliderVertexSource,
+    colliderFragmentSource,
+} from '../../../../props/shaders';
 
 const loadShader = (
     gl: WebGLRenderingContext,
@@ -70,18 +33,16 @@ const loadShader = (
 export interface ProgramInfo {
     program: WebGLProgram;
     hProgram: WebGLProgram;
+    dProgram: WebGLProgram;
     attribLocations: Record<string, number>;
     uniformLocations: Record<string, WebGLUniformLocation | null>;
     hAttribLocations: Record<string, number>;
     hUniformLocations: Record<string, WebGLUniformLocation | null>;
+    dAttribLocations: Record<string, number>;
+    dUniformLocations: Record<string, WebGLUniformLocation | null>;
 }
 
-export const initializeShaders = (
-    gl: WebGLRenderingContext,
-    vertexSource: string,
-    fragmentSource: string,
-    highlightFragmentSource: string,
-) => {
+export const initializeShaders = (gl: WebGLRenderingContext) => {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
 
@@ -122,10 +83,40 @@ export const initializeShaders = (
     gl.attachShader(hShaderProgram, hFragmentShader);
     gl.linkProgram(hShaderProgram);
 
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(hShaderProgram, gl.LINK_STATUS)) {
         console.log(
             `Unable to initialize the shader program: ${gl.getProgramInfoLog(
-                shaderProgram,
+                hShaderProgram,
+            )}`,
+        );
+        return null;
+    }
+
+    // debug
+    const dVertexShader = loadShader(
+        gl,
+        gl.VERTEX_SHADER,
+        colliderVertexSource,
+    );
+    const dFragmentShader = loadShader(
+        gl,
+        gl.FRAGMENT_SHADER,
+        colliderFragmentSource,
+    );
+
+    if (!dVertexShader || !dFragmentShader) return null;
+
+    const dShaderProgram = gl.createProgram();
+    if (!dShaderProgram) return null;
+
+    gl.attachShader(dShaderProgram, dVertexShader);
+    gl.attachShader(dShaderProgram, dFragmentShader);
+    gl.linkProgram(dShaderProgram);
+
+    if (!gl.getProgramParameter(dShaderProgram, gl.LINK_STATUS)) {
+        console.log(
+            `Unable to initialize the shader program: ${gl.getProgramInfoLog(
+                dShaderProgram,
             )}`,
         );
         return null;
@@ -135,6 +126,7 @@ export const initializeShaders = (
     const programInfo: ProgramInfo = {
         program: shaderProgram,
         hProgram: hShaderProgram,
+        dProgram: dShaderProgram,
         attribLocations: {
             vertexPosition: gl.getAttribLocation(shaderProgram, 'position'),
             textureCoords: gl.getAttribLocation(shaderProgram, 'texCoords'),
@@ -159,6 +151,15 @@ export const initializeShaders = (
             modelViewMatrix: gl.getUniformLocation(hShaderProgram, 'model'),
             uSampler: gl.getUniformLocation(hShaderProgram, 'uSampler'),
         },
+        dAttribLocations: {
+            vertexPosition: gl.getAttribLocation(dShaderProgram, 'position'),
+        },
+        dUniformLocations: {
+            projectionMatrix: gl.getUniformLocation(
+                dShaderProgram,
+                'projection',
+            ),
+        },
     };
 
     if (programInfo.attribLocations.vertexPosition < 0) {
@@ -170,15 +171,23 @@ export const initializeShaders = (
     }
 
     if (!programInfo.uniformLocations.projectionMatrix) {
-        console.log('no attribute named projection');
+        console.log('no uniform named projection');
     }
 
     if (!programInfo.uniformLocations.modelViewMatrix) {
-        console.log('no attribute named model');
+        console.log('no uniform named model');
     }
 
     if (!programInfo.uniformLocations.uSampler) {
-        console.log('no attribute named uSampler');
+        console.log('no uniform named uSampler');
+    }
+
+    if (!programInfo.dUniformLocations.projectionMatrix) {
+        console.log('no uniform named projection');
+    }
+
+    if (programInfo.dAttribLocations.vertexPosition < 0) {
+        console.log('no attribute named position');
     }
 
     return programInfo;

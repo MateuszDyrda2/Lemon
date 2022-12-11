@@ -71,15 +71,15 @@ class asset
     bool operator==(const asset<T>& other) const noexcept;
     bool operator!=(const asset<T>& other) const noexcept;
     explicit operator bool() const noexcept { return bool(res); }
-    inline hash_str get_id() const { return res; }
+    inline hashstr get_id() const { return res; }
 
   private:
     friend class asset_storage;
     asset_storage* storage; ///< reference to the cached resources
-    hash_str res;           ///< id of the stored resource
+    hashstr res;            ///< id of the stored resource
 
   private:
-    asset(hash_str name, asset_storage* storage);
+    asset(hashstr name, asset_storage* storage);
 };
 /** Class storing the actual assets, allowing for caching assets
  * that are used in many places and managing their lifetime.
@@ -96,19 +96,19 @@ class LEMON_API asset_storage
      * @return asset
      */
     template<class T>
-    [[nodiscard]] asset<T> get_asset(hash_str nameid);
+    [[nodiscard]] asset<T> get_asset(hashstr nameid);
     /** @brief Remove not used resources */
     void update();
 
   private:
     template<class T>
-    T* get_asset_ptr(hash_str name) const;
+    T* get_asset_ptr(hashstr name) const;
 
-    void release_asset(hash_str name);
-    hash_str clone_asset(hash_str name);
+    void release_asset(hashstr name);
+    hashstr clone_asset(hashstr name);
 
   private:
-    std::unordered_map<hash_str, std::unique_ptr<resource>>
+    std::unordered_map<hashstr, std::unique_ptr<resource>>
         cachedAssets;                     ///< map of the resources
     std::unique_ptr<asset_loader> loader; ///< asset loader
     std::vector<std::unique_ptr<resource>> toDelete;
@@ -121,7 +121,7 @@ class LEMON_API asset_storage
 };
 
 template<class T>
-asset<T> asset_storage::get_asset(hash_str nameid)
+asset<T> asset_storage::get_asset(hashstr nameid)
 {
     lemon_assert(nameid);
     auto res = cachedAssets.find(nameid);
@@ -145,7 +145,7 @@ T* asset_storage::get_mock_asset() const
 }
 
 template<class T>
-T* asset_storage::get_asset_ptr(hash_str nameid) const
+T* asset_storage::get_asset_ptr(hashstr nameid) const
 {
     if (!nameid) return nullptr;
 
@@ -161,7 +161,7 @@ asset<T>::asset():
 { }
 
 template<class T>
-asset<T>::asset(hash_str name, asset_storage* storage):
+asset<T>::asset(hashstr name, asset_storage* storage):
     storage(storage), res(name)
 { }
 
@@ -187,7 +187,7 @@ template<class T>
 asset<T>::asset(asset<T>&& other) noexcept:
     storage(other.storage), res(other.res)
 {
-    other.res = 0U;
+    other.res = hashstr();
 }
 
 template<class T>

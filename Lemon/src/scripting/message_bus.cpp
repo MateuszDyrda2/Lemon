@@ -64,7 +64,7 @@ message_payload* message_bus::get_payload(vec2 value)
     return p;
 }
 
-message_payload* message_bus::get_payload(hash_str value)
+message_payload* message_bus::get_payload(hashstr value)
 {
     auto p          = payloads.get();
     p->asHashString = value;

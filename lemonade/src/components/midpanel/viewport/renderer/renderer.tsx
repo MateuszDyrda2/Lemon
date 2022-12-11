@@ -1,5 +1,5 @@
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { RenderingData } from '../../../../props/rendering_data';
+import { DebugData, RenderingData } from '../../../../props/rendering_data';
 import { Entity } from '../../../../state/chosen_entity';
 import { Texture } from '../assets/assets';
 import { Buffers } from '../buffer/buffer';
@@ -16,10 +16,15 @@ const renderScene = (
     width: number,
     height: number,
     chosen: Entity | undefined,
+    debug: boolean,
+    debugData: DebugData[],
 ) => {
     const projection = mat4.create();
-    const hWidth = width * 0.5;
+
+    const aspect = width / height;
     const hHeight = height * 0.5;
+    const hWidth = hHeight * aspect;
+
     mat4.ortho(projection, -hWidth, hWidth, -hHeight, hHeight, -1, 1);
     gl.useProgram(program.program);
     var view = getCameraModel(camera);
@@ -175,6 +180,38 @@ const renderScene = (
             gl.stencilMask(0xff);
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);
             gl.enable(gl.DEPTH_TEST);
+        }
+    }
+
+    if (debug) {
+        gl.useProgram(program.dProgram);
+        gl.uniformMatrix4fv(
+            program.dUniformLocations.projectionMatrix,
+            false,
+            view,
+        );
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(10), gl.STREAM_DRAW);
+        if (buffer === null) console.log('null buffer');
+
+        gl.vertexAttribPointer(
+            program.dAttribLocations.vertexPosition,
+            2,
+            gl.FLOAT,
+            false,
+            0,
+            0,
+        );
+        gl.enableVertexAttribArray(program.dAttribLocations.vertexPosition);
+
+        for (var i = 0; i < debugData.length; ++i) {
+            gl.bufferSubData(
+                gl.ARRAY_BUFFER,
+                0,
+                new Float32Array(debugData[i].coords),
+            );
+            gl.drawArrays(gl.LINE_STRIP, 0, 5);
         }
     }
 };

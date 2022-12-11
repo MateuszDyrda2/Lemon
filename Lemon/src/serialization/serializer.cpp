@@ -1,4 +1,5 @@
 #include "entt/core/type_info.hpp"
+#include "physics/components/physics_components.h"
 #include "serialization/basic_types_serializer.h"
 #include "world/components/transform_components.h"
 #include <fstream>
@@ -159,6 +160,11 @@ void serializer::deserialize(registry& _registry, rapidjson::Document& document)
             return;
         }
         auto&& storage = _registry.storage(id->value.GetUint());
+        if (storage == _registry.storage().end())
+        {
+            logger::error("Storage not existing");
+            return;
+        }
         storage->second.reserve(count->value.GetUint());
 
         for (auto&& vv : entities->value.GetObject())
@@ -172,10 +178,14 @@ void serializer::deserialize(registry& _registry, rapidjson::Document& document)
             deserialize_f(this, inserted, component);
         }
     }
+
+    _registry.view<rigidbody, transform>().each([](auto, auto& rb, auto& tr) {
+        rb.position = rb._oldPosition = tr.position;
+    });
+
     _registry.each([&_registry](const auto ent) {
         _registry.emplace<dirty_t>(ent);
         _registry.emplace<model>(ent);
     });
 }
-
 }

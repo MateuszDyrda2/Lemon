@@ -1,5 +1,4 @@
-use super::models::Scene;
-use super::utils::hash_string;
+use super::{error_codes::ProjectErrorCode, models::Scene};
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -32,11 +31,29 @@ pub fn add_new_entity(scene: &mut Scene) {
 
     let components = &mut scene.components;
     if let Some(c) = components.iter().position(|x| x.name == "tag") {
-        components[c].entities.entry(new_id).or_insert_with(|| {
-            HashMap::from([
-                (String::from("name"), json!("scene_object")),
-                (String::from("id"), json!(hash_string("scene_object"))),
-            ])
-        });
+        components[c].count += 1;
+        components[c]
+            .entities
+            .entry(new_id)
+            .or_insert_with(|| HashMap::from([(String::from("name"), json!("scene_object"))]));
     }
+}
+
+pub fn remove_one_entity(scene: &mut Scene, entityid: u32) -> Result<(), ProjectErrorCode> {
+    let entities = &mut scene.entities;
+
+    let Some(pos) = entities.ids.iter().position(|x| *x == entityid) else {
+        return Err(ProjectErrorCode::NoEntityFound);
+    };
+
+    entities.ids.remove(pos);
+    entities.count -= 1;
+
+    let components = &mut scene.components;
+    components.iter_mut().for_each(|x| {
+        x.entities.remove(&entityid);
+        ()
+    });
+
+    Ok(())
 }

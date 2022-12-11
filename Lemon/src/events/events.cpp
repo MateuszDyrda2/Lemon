@@ -12,7 +12,7 @@ event_queue::listener_handle::listener_handle(std::list<callback>& listeners,
 { }
 event_queue::listener_handle::~listener_handle()
 {
-    if(listeners)
+    if (listeners)
     {
         listeners->erase(iter);
     }
@@ -24,7 +24,7 @@ event_queue::listener_handle::listener_handle(listener_handle&& other) noexcept:
 }
 event_queue::listener_handle& event_queue::listener_handle::operator=(listener_handle&& other) noexcept
 {
-    if(this != &other)
+    if (this != &other)
     {
         std::swap(listeners, other.listeners);
         std::swap(iter, other.iter);
@@ -76,7 +76,7 @@ void event_queue::process()
     std::queue<event_pair> currentQueue;
     eventQueue.swap(currentQueue);
 
-    while(!currentQueue.empty())
+    while (!currentQueue.empty())
     {
         auto&& front = currentQueue.front();
         auto& l      = listeners[front.first];

@@ -1,7 +1,7 @@
 #include <assets/resource.h>
 
 namespace lemon {
-resource::resource(hash_str name):
+resource::resource(hashstr name):
     _count{ 1 }, name(name)
 { }
 resource::resource(self_type&& other) noexcept:
@@ -10,7 +10,7 @@ resource::resource(self_type&& other) noexcept:
 resource::self_type&
 resource::operator=(self_type&& other) noexcept
 {
-    if(this != &other)
+    if (this != &other)
     {
         _count.store(other._count.load(), std::memory_order_relaxed);
         name = other.name;

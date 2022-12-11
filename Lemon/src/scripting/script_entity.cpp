@@ -6,7 +6,7 @@
 namespace lemon {
 void script_animator::start_animation(const char* animation) const
 {
-    _scene->get_entity(entity_t(handle)).emplace<start_animation_m>(hash_string_d(animation));
+    _scene->get_entity(entity_t(handle)).emplace<start_animation_m>(hashstr::runtime_hash(animation));
 }
 
 void script_animator::stop_animations() const
@@ -40,7 +40,7 @@ script_message_proxy& script_message_proxy::arg(vec2 arg)
 
 script_message_proxy& script_message_proxy::arg(const char* arg)
 {
-    builder.add_arg(hash_string_d(arg));
+    builder.add_arg(hashstr::runtime_hash(arg));
     return *this;
 }
 

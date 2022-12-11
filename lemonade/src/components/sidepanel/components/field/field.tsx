@@ -1,5 +1,10 @@
 import { invoke } from '@tauri-apps/api';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useDrop } from 'react-dnd';
+import {
+    DraggableAsset,
+    DraggableType,
+} from '../../../../state/draggable_type';
 import {
     ObjectClass,
     ObjectInput,
@@ -21,13 +26,81 @@ interface ObjectProps {
     setObj: { (newObject: unknown): void };
 }
 
-const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-        setObj(e.target.value);
+const TextInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(
+        (newValue: string) => {
+            setObj(newValue);
+        },
+        [obj],
+    );
+
+    const [, drop] = useDrop(
+        () => ({
+            accept: DraggableType.ASSET,
+            drop: (item: DraggableAsset) => {
+                console.log(`${item.name} ${item.path} ${item.assetType}`);
+                update(item.name);
+                return undefined;
+            },
+        }),
+        [update],
+    );
 
     return (
+        <ObjectInput
+            ref={drop}
+            type="text"
+            value={obj as string}
+            onChange={(e) => update(e.target.value)}
+            onBlur={onBlur}
+        />
+    );
+};
+
+const NumberInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(
+        (value: string) => {
+            if (value.length == 0) {
+                setObj(0);
+                return;
+            }
+            const parse = parseFloat(value);
+
+            if (!Object.is(NaN, parse)) {
+                setObj(parse);
+            }
+        },
+        [obj],
+    );
+
+    return (
+        <ObjectInput
+            type="number"
+            value={obj as number}
+            onChange={(e) => update(e.target.value)}
+            onBlur={onBlur}
+            step="any"
+        />
+    );
+};
+
+const BoolInput = ({ onBlur, obj, setObj }: ObjectProps) => {
+    const update = useCallback(() => setObj((old: boolean) => !old), [obj]);
+
+    return (
+        <ObjectInput
+            type="checkbox"
+            checked={obj as boolean}
+            onChange={update}
+            onBlur={onBlur}
+        />
+    );
+};
+
+const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
+    return (
         <ObjectClass>
-            {(Object.prototype.toString.call(obj) === '[object Array]' &&
+            {(Object.prototype.toString.call(obj) == '[object Array]' &&
                 (obj as object[]).map((key, index) => (
                     <RenderObject
                         onBlur={onBlur}
@@ -42,7 +115,7 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                         }
                     />
                 ))) ||
-                (typeof obj === 'object' &&
+                (typeof obj == 'object' &&
                     Object.keys(obj as { [key: string]: object }).map(
                         (k, index) => (
                             <div>
@@ -58,37 +131,32 @@ const RenderObject = ({ onBlur, obj, setObj }: ObjectProps) => {
                             </div>
                         ),
                     )) ||
-                (typeof obj === 'number' && (
-                    <ObjectInput
-                        type="number"
-                        value={obj as number}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                    />
+                (typeof obj == 'number' && (
+                    <NumberInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 )) ||
-                (typeof obj === 'string' && (
-                    <ObjectInput
-                        type="string"
-                        value={obj as string}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                    />
+                (typeof obj == 'string' && (
+                    <TextInput obj={obj} setObj={setObj} onBlur={onBlur} />
+                )) ||
+                (typeof obj === 'boolean' && (
+                    <BoolInput obj={obj} setObj={setObj} onBlur={onBlur} />
                 ))}
         </ObjectClass>
     );
 };
 
 const RenderField = ({ entityid, componentName, name, value }: Field) => {
-    const onBlur = () => {
-        console.log(`${savedValue}`);
+    const [savedValue, setSavedValue] = useState<unknown>();
+
+    useEffect(() => setSavedValue(value), [value]);
+
+    const onBlur = useCallback(() => {
         invoke('change_entity_component', {
             entityid: entityid,
             componentname: componentName,
             fieldname: name,
             newvalue: savedValue,
         }).catch(console.error);
-    };
-    const [savedValue, setSavedValue] = useState<unknown>(value);
+    }, [savedValue]);
 
     return (
         <FieldClass>

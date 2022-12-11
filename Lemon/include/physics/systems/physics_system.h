@@ -12,9 +12,9 @@ class LEMON_API physics_system : public system
     ~physics_system();
     void onUpdate(event_args* e);
 
-    static void set_velocity(entity& _entity, vec2 newVelocity);
-    static void add_velocity(entity& _entity, vec2 velocity);
-    static void move_position(entity& _entity, vec2 newPosition);
+    static void set_velocity(entity _entity, vec2 newVelocity);
+    static void add_velocity(entity _entity, vec2 velocity);
+    static void move_position(entity _entity, vec2 newPosition, f32 deltaTime);
 
   private:
     scene& _scene;

@@ -53,23 +53,9 @@ void movement_system::onUpdate([[maybe_unused]] event_args* e)
         case FORWARD:
             player.emplace<start_animation_m>("forward"_hs);
             break;
-        case LEFT_BACK:
-            player.emplace<start_animation_m>("left_back"_hs);
-            break;
-        case RIGHT_BACK:
-            player.emplace<start_animation_m>("right_back"_hs);
-            break;
-        case LEFT_FORWARD:
-            player.emplace<start_animation_m>("left_forward"_hs);
-            break;
-        case RIGHT_FORWARD:
-            player.emplace<start_animation_m>("right_forward"_hs);
-            break;
         }
         currentDirection = newDirection;
     }
-    if (currentDirection == direction::LEFT)
-        _messageBus.push_message(u32(player.get_handle()), "test", 3, 2, 1);
 
     physics_system::set_velocity(player, velocity * speed);
 }
@@ -77,31 +63,24 @@ void movement_system::onUpdate([[maybe_unused]] event_args* e)
 movement_system::direction
 movement_system::get_direction(const vec2& velocity)
 {
-    if (velocity.x > 0.f)
+    if (velocity.x > 0)
     {
-        if (velocity.y > 0.f)
-            return direction::RIGHT_FORWARD;
-        else if (velocity.y < 0.f)
-            return direction::RIGHT_BACK;
-        else
-            return direction::RIGHT;
+        return direction::RIGHT;
     }
-    else if (velocity.x < 0.f)
+    else if (velocity.x < 0)
     {
-        if (velocity.y > 0.f)
-            return direction::LEFT_FORWARD;
-        else if (velocity.y < 0.f)
-            return direction::LEFT_BACK;
-        else
-            return direction::LEFT;
+        return direction::LEFT;
+    }
+    else if (velocity.y > 0)
+    {
+        return direction::BACK;
+    }
+    else if (velocity.y < 0)
+    {
+        return direction::FORWARD;
     }
     else
     {
-        if (velocity.y > 0.f)
-            return direction::FORWARD;
-        else if (velocity.y < 0.f)
-            return direction::BACK;
-        else
-            return direction::NONE;
+        return direction::NONE;
     }
 }

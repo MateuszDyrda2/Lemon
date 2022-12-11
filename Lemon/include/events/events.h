@@ -26,7 +26,7 @@ inline static constexpr decltype(auto) get_event(event_args* e)
 class LEMON_API event_queue
 {
   public:
-    using event_handle = hash_str;
+    using event_handle = hashstr;
     using callback     = std::function<void(event_args*)>;
     using event_pair   = std::pair<event_handle, event_args*>;
 
@@ -69,7 +69,7 @@ class LEMON_API event_queue
         void fire(event_args* e);
         /** brief Fire the event synchronously
          * @param e event arguments */
-        void fire_immediate(event_args* e);
+        void fire_immediate(event_args* e = nullptr);
 
         event_sink(const event_sink&) = delete;
 

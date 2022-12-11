@@ -18,7 +18,6 @@ struct LEMON_API [[lemon::component]] enabled_t
 
 struct LEMON_API [[lemon::component]] tag
 {
-    [[lemon::field]] std::string name;
-    [[lemon::field]] hash_str id;
+    [[lemon::field]] hashstr name;
 };
 }

@@ -12,7 +12,7 @@ namespace lemon {
 class LEMON_API animation_script : public resource
 {
   public:
-    animation_script(hash_str nameid, const std::string& path, scripting_engine& _scriptingEngine);
+    animation_script(hashstr nameid, const std::string& path, scripting_engine& _scriptingEngine);
     virtual ~animation_script();
 
     animation_script(const animation_script&)            = delete;
@@ -20,15 +20,15 @@ class LEMON_API animation_script : public resource
     animation_script(animation_script&& other) noexcept;
     animation_script& operator=(animation_script&& other) noexcept;
 
-    i32 execute(hash_str nameid, f32 value);
+    i32 execute(hashstr nameid, f32 value);
 
     const std::string& get_path() const { return path; }
 
-    static hash_str get_mocked() { return hash_string("mock_animation"); }
+    static hashstr get_mocked() { return "mock_animation"_hs; }
 
   private:
     std::string path;
     std::string name;
-    std::unordered_map<hash_str, std::function<i32(f32)>> animations;
+    std::unordered_map<hashstr, std::function<i32(f32)>> animations;
 };
 }

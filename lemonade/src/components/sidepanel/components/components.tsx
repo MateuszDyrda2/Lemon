@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import { chosenEntity } from '../../../state/chosen_entity';
 import { RiAddFill } from 'react-icons/ri';
@@ -14,6 +14,7 @@ import {
 import Dropdown from './dropdown/dropdown';
 
 import Component from './component/component';
+import { appWindow } from '@tauri-apps/api/window';
 
 interface EntityComponents {
     components: { [name: string]: { [key: string]: object } };
@@ -21,14 +22,14 @@ interface EntityComponents {
 }
 
 const Components = () => {
-    const [chEntity, setChEntity] = useRecoilState(chosenEntity);
+    const [chEntity] = useRecoilState(chosenEntity);
     const [components, setComponents] = useState<EntityComponents | undefined>(
         undefined,
     );
     const [dropdown, setDropdown] = useState(false);
     const [componentDefs, setComponentDefs] = useState<string[]>([]);
 
-    useEffect(() => {
+    const getComponents = useCallback(() => {
         if (chEntity) {
             invoke('get_components_for_entity', {
                 entityid: chEntity.id,
@@ -36,10 +37,22 @@ const Components = () => {
                 .then((value) => setComponents(value as EntityComponents))
                 .catch(console.error);
         }
+    }, [chEntity]);
+
+    useEffect(() => {
+        const unlisten = appWindow.listen('scene-changed', (_) =>
+            getComponents(),
+        );
+        getComponents();
+
         invoke('get_components')
             .then((value) => setComponentDefs(value as string[]))
             .catch(console.error);
-    }, [chEntity]);
+
+        return () => {
+            unlisten.then((u) => u());
+        };
+    }, [getComponents]);
 
     const chooseComponent = (ch: string) => {
         setDropdown(false);
@@ -54,13 +67,12 @@ const Components = () => {
     const changeName = (e: React.ChangeEvent<HTMLInputElement>) => {
         setComponents({ ...components!, name: e.target.value });
     };
+
     const acceptNameChange = (e: React.FocusEvent<HTMLInputElement>) => {
         invoke('set_entity_name', {
             entityid: chEntity?.id,
             name: e.target.value,
-        })
-            .then((ret) => setChEntity({ ...chEntity!, name: ret as string }))
-            .catch(console.error);
+        }).catch(console.error);
     };
 
     return (

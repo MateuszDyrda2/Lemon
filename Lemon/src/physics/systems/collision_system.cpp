@@ -1,6 +1,7 @@
 #include "core/math/mat2.h"
 #include "core/math/mat4.h"
 #include "core/math/math.h"
+#include "world/components/entity_components.h"
 #include <algorithm>
 #include <cmath>
 #include <physics/systems/collision_system.h>
@@ -39,6 +40,7 @@ collision_system::get_aabb(const entity_t _entity, const rigidbody& _rigidbody)
 
 void collision_system::add_box2tree(registry& _reg, entity_t handle)
 {
+    lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, box_collider>(handle);
     tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
                      detail::AABB{
@@ -49,7 +51,7 @@ void collision_system::add_box2tree(registry& _reg, entity_t handle)
 
 void collision_system::add_circle2tree(registry& _reg, entity_t handle)
 {
-
+    lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, circle_collider>(handle);
     tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
                      detail::AABB{
@@ -75,6 +77,30 @@ collision_system::collision_system(scene& _scene, event_queue& _eventQueue):
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
         this->onUpdate(e);
     };
+    mount = _eventQueue["OnSceneLoaded"_hs] += [this](event_args*) {
+        this->onMount();
+    };
+}
+
+void collision_system::onMount()
+{
+    for (auto&& [_entity, _transform, _collider] : _scene.view<transform, box_collider>().each())
+    {
+        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+                         detail::AABB{
+                             .min = _transform.position + _collider.offset - _collider.hSize,
+                             .max = _transform.position + _collider.offset + _collider.hSize,
+                         });
+    }
+
+    for (auto&& [_entity, _transform, _collider] : _scene.view<transform, circle_collider>().each())
+    {
+        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+                         detail::AABB{
+                             .min = _transform.position + _collider.offset - _collider.radius,
+                             .max = _transform.position + _collider.offset + _collider.radius,
+                         });
+    }
 
     auto& _reg = _scene.get_registry();
     _reg.on_construct<box_collider>().connect<&collision_system::add_box2tree>(this);
@@ -101,13 +127,13 @@ void collision_system::onUpdate([[maybe_unused]] event_args* e)
     collision_set newSet;
     auto&& [fixedDelta] = get_event<fixed_update_event>(e);
 
-    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t>().each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t, enabled_t>().each())
     {
         if (auto aabb = get_aabb(_entity, _rigidbody))
             tree.update_leaf(std::underlying_type_t<typeof(_entity)>(_entity), *aabb);
     }
 
-    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody>().each())
+    for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, enabled_t>().each())
     {
         auto collisions = tree.query_tree(u32(_entity));
         switch (_rigidbody.colliderType)
@@ -211,7 +237,9 @@ void collision_system::handle_box_collisions(
 
     for (const auto& other : collisions)
     {
-        auto otherEntity      = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())
@@ -258,7 +286,9 @@ void collision_system::handle_circle_collisions(
 {
     for (const auto& other : collisions)
     {
-        auto otherEntity      = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())
@@ -306,7 +336,9 @@ void collision_system::handle_capsule_collisions(
 {
     for (const auto& other : collisions)
     {
-        auto otherEntity                       = _scene.get_entity(entity_t(other));
+        auto otherEntity = _scene.get_entity(entity_t(other));
+        if (!otherEntity.has<enabled_t>()) continue;
+
         [[maybe_unused]] auto&& otherRigidbody = otherEntity.get<rigidbody>();
 
         if (otherEntity.has<box_collider>())

@@ -36,8 +36,8 @@ void animation_system::on_render([[maybe_unused]] event_args* e) noexcept
     auto group = _scene.group<animation_component, animating_t>(entt::get<sprite_renderer>);
     for (auto&& [_entity, _animationComponent, _animating, _sr] : group.each())
     {
-        auto&& [nFrames, frameSize, animation] = _animationComponent;
-        auto res                               = animation.get()->execute(_animating.animationName, _animating.duration);
+        auto&& [frameSize, animation] = _animationComponent;
+        auto res                      = animation.get()->execute(_animating.animationName, _animating.duration);
         if (res < 0)
         {
             toRemove.push_back(_entity);

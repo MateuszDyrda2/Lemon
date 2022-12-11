@@ -95,6 +95,11 @@ void basic_types_serializer::serialize(const color& value, rapidjson::Writer<rap
     serialize(value.rgba, writer);
 }
 
+void basic_types_serializer::serialize(const hashstr& value, rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.String(value.str);
+}
+
 void basic_types_serializer::deserialize(i32& value, const rapidjson::Value& iter)
 {
     value = iter.GetInt();
@@ -208,5 +213,10 @@ void basic_types_serializer::deserialize(entity_t& value, const rapidjson::Value
 void basic_types_serializer::deserialize(color& value, const rapidjson::Value& iter)
 {
     deserialize(value.rgba, iter);
+}
+
+void basic_types_serializer::deserialize(hashstr& value, const rapidjson::Value& iter)
+{
+    value = hashstr::runtime_hash(iter.GetString());
 }
 }

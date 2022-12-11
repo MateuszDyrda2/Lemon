@@ -14,8 +14,8 @@ enum collider_type
 };
 struct LEMON_API [[lemon::component]] rigidbody
 {
-    [[lemon::field]] vec2 position              = {};
-    [[lemon::field]] f32 rotation               = {};
+    vec2 position                               = {};
+    f32 rotation                                = {};
     [[lemon::field]] vec2 velocity              = {};
     [[lemon::field]] f32 angularRotation        = {};
     [[lemon::field]] f32 linearDrag             = {};

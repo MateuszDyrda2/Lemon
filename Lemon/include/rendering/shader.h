@@ -18,9 +18,9 @@ namespace lemon {
 class LEMON_API shader : public resource
 {
   public:
-    shader(hash_str name, const std::string& shaderPath);
-    shader(hash_str name, const std::vector<byte>& buffer);
-    shader(const shader&) = delete;
+    shader(hashstr name, const std::string& shaderPath);
+    shader(hashstr name, const std::vector<byte>& buffer);
+    shader(const shader&)            = delete;
     shader& operator=(const shader&) = delete;
     shader(shader&& other) noexcept;
     shader& operator=(shader&& other) noexcept;
@@ -49,7 +49,7 @@ class LEMON_API shader : public resource
     void set_uniform(const char* name, const uvec4& value);
     void set_uniform(const char* name, const mat4& value);
 
-    static hash_str get_mocked() { return hash_string("mock_shader"); }
+    static hashstr get_mocked() { return "mock_shader"_hs; }
 
   private:
     unsigned int ID;

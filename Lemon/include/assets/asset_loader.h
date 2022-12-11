@@ -17,7 +17,7 @@ class LEMON_API asset_loader
 {
   public:
     using self_type      = asset_loader;
-    using container_type = std::unordered_map<hash_str, std::string>;
+    using container_type = std::unordered_map<hashstr, std::string>;
 
   public:
     /** @brief Creates the asset loader, reading the specified
@@ -31,13 +31,13 @@ class LEMON_API asset_loader
      * @return pointer to the resource
      */
     template<class T>
-    std::unique_ptr<T> load_resource(hash_str nameid);
+    std::unique_ptr<T> load_resource(hashstr nameid);
     /** @brief Checks whether the resource with the specified name
      * is available for loading
      * @param nameid id of the resource
      * @return true if the resource exists
      */
-    bool resource_exists(hash_str nameid) const noexcept;
+    bool resource_exists(hashstr nameid) const noexcept;
 
   private:
     container_type resourcePaths; ///< map of paths of the resources
@@ -49,21 +49,21 @@ class LEMON_API asset_loader
 };
 
 template<class T>
-inline std::unique_ptr<T> asset_loader::load_resource(hash_str nameid)
+inline std::unique_ptr<T> asset_loader::load_resource(hashstr nameid)
 {
     return std::make_unique<T>(nameid, resourcePaths[nameid]);
 }
 
 template<>
 inline std::unique_ptr<animation_script>
-asset_loader::load_resource<animation_script>(hash_str nameid)
+asset_loader::load_resource<animation_script>(hashstr nameid)
 {
     return std::make_unique<animation_script>(nameid, resourcePaths[nameid], _scriptingEngine);
 }
 
 template<>
 inline std::unique_ptr<script>
-asset_loader::load_resource<script>(hash_str nameid)
+asset_loader::load_resource<script>(hashstr nameid)
 {
     return std::make_unique<script>(nameid, resourcePaths[nameid], _scriptingEngine);
 }
