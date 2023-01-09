@@ -1,5 +1,5 @@
 /** @file input.h
- * input manager
+ * @brief input manager
  */
 #pragma once
 

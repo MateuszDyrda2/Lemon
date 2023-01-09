@@ -1,3 +1,6 @@
+/** @file mat4.h
+ * @brief File containing typedef from glm library for mat4
+ */
 #pragma once
 
 #include <glm/matrix.hpp>

@@ -1,3 +1,6 @@
+/** @file engine.h
+ * @brief File with a definition of an engine type
+ */
 #pragma once
 
 #include "serialization/serializer.h"
@@ -11,11 +14,20 @@
 #include <world/scene_manager.h>
 
 namespace lemon {
+/** engine class */
 class LEMON_API engine
 {
   public:
-    engine(int argc, char** argv, const std::string& assetPath);
+    /** @brief Constructs an engine
+     * @param argc number of arguments the program was started with
+     * @param argv arguments the program was started with
+     * @param assetPath path to a file containing all the assets
+     */
+    engine(int argc, char** argv, const std::string& assetPath, const std::string& settingsPath);
     virtual ~engine();
+    /** @brief Start the engine
+     * @return return code
+     */
     int run();
 
   protected:

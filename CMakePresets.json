@@ -47,7 +47,7 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS": "/Wall /Wx /wd5030",
+                "CMAKE_CXX_FLAGS": "/W4 /wd5030 /EHsc /wd5045 /wd4702",
                 "LEMON_PLATFORM": "LEMON_WINDOWS"
             }
         },
@@ -57,7 +57,7 @@
             "description": "Windows release build",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CXX_FLAGS": "/O0 /wd5030"
+                "CMAKE_CXX_FLAGS": "/W0 /wd5030 /EHsc /wd5045 /wd4702"
             }
         }
     ]

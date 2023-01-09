@@ -1,24 +1,27 @@
-[submodule "Lemon/LemonCore/libs/rapidjson"]
-	path = Lemon/libs/rapidjson
-	url = https://github.com/Tencent/rapidjson.git
-[submodule "Lemon/LemonCore/libs/glm"]
-	path = Lemon/libs/glm
-	url = https://github.com/g-truc/glm.git
-[submodule "Lemon/LemonCore/libs/fmt"]
-	path = Lemon/libs/fmt
-	url = https://github.com/fmtlib/fmt.git
-[submodule "Lemon/LemonCore/libs/glfw"]
-	path = Lemon/libs/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "Lemon/LemonCore/libs/concurrentqueue"]
+[submodule "tests/googletest"]
+	path = tests/googletest
+	url = https://github.com/google/googletest.git
+[submodule "Lemon/libs/concurrentqueue"]
 	path = Lemon/libs/concurrentqueue
 	url = https://github.com/cameron314/concurrentqueue.git
 [submodule "Lemon/libs/entt"]
 	path = Lemon/libs/entt
 	url = https://github.com/skypjack/entt.git
-[submodule "tests/googletest"]
-	path = tests/googletest
-	url = https://github.com/google/googletest.git
+[submodule "Lemon/libs/fmt"]
+	path = Lemon/libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "Lemon/libs/glfw"]
+	path = Lemon/libs/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Lemon/libs/glm"]
+	path = Lemon/libs/glm
+	url = https://github.com/g-truc/glm.git
 [submodule "Lemon/libs/luabridge3"]
 	path = Lemon/libs/luabridge3
-	url = git@github.com:kunitoki/LuaBridge3.git
+	url = https://github.com/kunitoki/LuaBridge3.git
+[submodule "Lemon/libs/rapidjson"]
+	path = Lemon/libs/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "Lemon/libs/luajit"]
+	path = Lemon/libs/luajit
+	url = https://github.com/aerospike/luajit.git

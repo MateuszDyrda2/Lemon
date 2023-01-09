@@ -1,3 +1,6 @@
+/** @file math.h
+ * @brief File containing typedefs from glm
+ */
 #pragma once
 
 #include "glm/common.hpp"

@@ -1,3 +1,6 @@
+/** @file system.h
+ * @brief File with system base class definition
+ */
 #pragma once
 
 #include "service_container.h"
@@ -22,12 +25,14 @@ struct LEMON_API fixed_update_event : public event_args
 
     f32 fixedDelta;
 };
-
+/** System base class */
 class LEMON_API system
 {
   public:
+    /** @return name of the system */
     virtual const char* get_name() const = 0;
-    virtual hash_str get_nameid() const  = 0;
-    virtual ~system()                    = default;
+    /** @return nameid of the system */
+    virtual hashstr get_nameid() const = 0;
+    virtual ~system()                  = default;
 };
 }

@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
+use std::sync::MutexGuard;
 use std::thread::{self, JoinHandle};
 use std::{fs, path::Path, result::Result, str, sync::Mutex};
 use tauri::Window;
@@ -121,14 +122,11 @@ fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
     })
 }
 
-#[tauri::command]
-pub fn open_project(
+fn open_project_impl(
     window: Window,
-    state: tauri::State<ProjectState>,
+    mut state_guard: MutexGuard<Option<Project>>,
     path: &str,
 ) -> Result<String, &'static str> {
-    let mut state_guard = lock_state!(state);
-
     match read_project_file(path) {
         Ok(p) => {
             *state_guard = Some(p);
@@ -181,6 +179,16 @@ pub fn open_project(
         Err("Error occured while reading the file")
     }
 }
+
+#[tauri::command]
+pub fn open_project(
+    window: Window,
+    state: tauri::State<ProjectState>,
+    path: &str,
+) -> Result<String, &'static str> {
+    let mut state_guard = lock_state!(state);
+    open_project_impl(window, state_guard, path)
+}
 #[tauri::command]
 pub fn get_components(state: tauri::State<ProjectState>) -> Result<Vec<String>, ProjectErrorCode> {
     let state_guard = state.0.lock().unwrap();
@@ -228,11 +236,18 @@ pub fn get_debug_data(
     };
 
     let transforms = (&scene.components).iter().find(|x| x.name == "transform");
-    let transform_entities = &transforms.as_ref().unwrap().entities;
+    let Some(transform_entities_m) = transforms.as_ref() else {
+        return Err(ProjectErrorCode::NoEntityFound);
+    };
+    let transform_entities = &transform_entities_m.entities;
+
     let colliders = (&scene.components)
         .iter()
         .find(|x| x.name == "box_collider");
-    let collider_entities = &colliders.as_ref().unwrap().entities;
+    let Some(collider_entities_m) = colliders.as_ref() else {
+        return Err(ProjectErrorCode::NoEntityFound);
+    };
+    let collider_entities = &collider_entities_m.entities;
 
     Ok(collider_entities
         .into_iter()
@@ -291,11 +306,20 @@ pub fn get_rendering_data(
     let scene = unwrap_or_return!(get_scene(project));
 
     let transforms = (&scene.components).iter().find(|x| x.name == "transform");
-    let transform_entities = &transforms.as_ref().unwrap().entities;
+
+    let Some(transform_entities_m) = transforms.as_ref() else {
+        return Err(ProjectErrorCode::NoEntityFound);
+    };
+    let transform_entities = &transform_entities_m.entities;
+
     let sprite_renderers = (&scene.components)
         .iter()
         .find(|x| x.name == "sprite_renderer");
-    let rendering_entities = &sprite_renderers.as_ref().unwrap().entities;
+
+    let Some(rendering_entities_m) = sprite_renderers.as_ref() else {
+        return Err(ProjectErrorCode::NoEntityFound);
+    };
+    let rendering_entities = &rendering_entities_m.entities;
 
     Ok(rendering_entities
         .into_iter()
@@ -351,11 +375,22 @@ pub fn get_rendering_data(
                     .map(|x| x.as_f64().unwrap() as f32)
                     .collect::<Vec<f32>>();
 
-                RenderingData {
-                    nameid: *key,
-                    model,
-                    textureid: hash_string(value["tex"].as_str().unwrap()).unwrap(),
-                    tex_coords,
+                let hashed = hash_string(value["tex"].as_str().unwrap());
+
+                if let Some(textureid) = hashed {
+                    RenderingData {
+                        nameid: *key,
+                        model,
+                        textureid,
+                        tex_coords,
+                    }
+                } else {
+                    RenderingData {
+                        nameid: *key,
+                        model,
+                        textureid: 0,
+                        tex_coords,
+                    }
                 }
             })
         })
@@ -752,4 +787,83 @@ pub fn remove_entity(
     _ = window.emit("scene-changed", ());
 
     Ok(get_all_entities(scene))
+}
+
+#[tauri::command]
+pub fn get_settings(
+    state: tauri::State<ProjectState>,
+) -> Result<ProjectSettings, ProjectErrorCode> {
+    let state_guard = lock_state!(state);
+
+    let Some(project) = &*state_guard else {
+        return Err(ProjectErrorCode::NoProjectLoaded);
+    };
+
+    Ok(ProjectSettings {
+        project_name: project.project_name.clone(),
+        assets_path: project.assets_path.clone(),
+        scene_path: project.scene_path.clone(),
+        src_path: project.src_path.clone(),
+        types_path: project.types_path.clone(),
+        exec_path: project.exec_path.clone(),
+        scenes: project.scenes.clone(),
+    })
+}
+
+#[tauri::command]
+pub fn set_settings(
+    state: tauri::State<ProjectState>,
+    window: Window,
+    project_settings: ProjectSettings,
+) -> Result<String, &'static str> {
+    let mut state_guard = lock_state!(state);
+
+    let Some(project) = &mut *state_guard else {
+        return Err("No project loaded");
+    };
+
+    let settings_path = project
+        .path
+        .join(project.project_name.to_lowercase() + ".lmnproj");
+
+    std::fs::write(
+        settings_path.clone(),
+        serde_json::to_string_pretty(&project_settings).unwrap(),
+    )
+    .unwrap();
+
+    open_project_impl(window, state_guard, settings_path.to_str().unwrap())
+}
+
+#[tauri::command]
+pub fn create_project(
+    state: tauri::State<ProjectState>,
+    window: Window,
+    path: String,
+) -> Result<String, &'static str> {
+    let mut state_guard = lock_state!(state);
+
+    let project_name = Path::new(&path).file_name().unwrap().to_str().unwrap();
+
+    let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("tools/create_project.py");
+
+    let python = if cfg!(windows) { "py.exe" } else { "python3" };
+
+    Command::new(python)
+        .arg(tool_path)
+        .arg(project_name)
+        .arg(path.clone())
+        .spawn()
+        .expect("Python script failed")
+        .wait()
+        .unwrap();
+
+    let mut project_file_path = Path::new(&path).join(project_name);
+    project_file_path.set_extension("lmnproj");
+
+    open_project_impl(window, state_guard, project_file_path.to_str().unwrap())
 }

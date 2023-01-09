@@ -68,6 +68,17 @@ pub struct Project {
     pub executable: Option<PathBuf>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectSettings {
+    pub project_name: String,
+    pub assets_path: String,
+    pub scene_path: String,
+    pub src_path: String,
+    pub types_path: String,
+    pub exec_path: String,
+    pub scenes: Vec<String>,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase", tag = "type")]
 pub enum FieldType {
@@ -105,7 +116,7 @@ pub enum FieldType {
         alias = "asset<sound>",
         alias = "asset<shader>",
         alias = "asset<script>",
-        alias = "asset<animation>"
+        alias = "asset<animation_script>"
     )]
     Asset,
     #[serde(rename = "entity_t")]

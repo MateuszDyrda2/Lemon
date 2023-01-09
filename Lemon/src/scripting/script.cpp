@@ -7,7 +7,7 @@
 extern "C"
 {
 #include <lauxlib.h>
-#include <luajit.h>
+#include <lua.h>
 #include <lualib.h>
 }
 
@@ -20,7 +20,7 @@ script::script(hashstr nameid, const std::string& path, scripting_engine& _scrip
     resource(nameid),
     path(path), engine(_scriptingEngine)
 {
-    this->name = fs::path(path).stem();
+    this->name = fs::path(path).stem().string();
     _scriptingEngine.load_file(path);
 
     auto L            = engine.get_state();
@@ -145,7 +145,7 @@ void script::execute(script_entity ent, const std::string& func, message_payload
         ++count;
         luaL_checkstack(L, 1, "too many args");
     }
-    if (lua_pcall(L, count, 0, 0) != 0)
+    if (lua_pcall(L, int(count), 0, 0) != 0)
     {
         logger::error("Error running function {}: {}", func, lua_tostring(L, -1));
         return;

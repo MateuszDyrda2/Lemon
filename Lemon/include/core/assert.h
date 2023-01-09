@@ -1,3 +1,6 @@
+/** @file assert.h
+ * @brief File containing assert and static assert definitions
+ */
 #pragma once
 
 #if defined(LEMON_DEBUG)
@@ -9,9 +12,9 @@
 #    else
 #        error "No debug break for the platform"
 #    endif // LEMON_WINDOWS
-#    define lemon_assert(arg)      \
-        {                          \
-            if(!(arg)) LEMON_DB(); \
+#    define lemon_assert(arg)       \
+        {                           \
+            if (!(arg)) LEMON_DB(); \
         }
 #else
 #    define LEMON_DB()

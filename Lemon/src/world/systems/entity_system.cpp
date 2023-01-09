@@ -14,7 +14,7 @@ entity_system::entity_system(scene& _scene, event_queue& eventQueue, message_bus
     _scene(_scene), _messageBus(_messageBus)
 {
     update = eventQueue["EarlyUpdate"_hs] += [this](event_args* e) {
-        this->onEarlyUpdate(e);
+        this->on_early_update(e);
     };
 
     mount = eventQueue["OnSceneLoaded"] += [this](event_args* e) {
@@ -41,7 +41,7 @@ void entity_system::on_mount([[maybe_unused]] event_args* e)
     _reg.on_construct<tag>().connect<&entity_system::add_to_registry>(this);
 }
 
-void entity_system::onEarlyUpdate([[maybe_unused]] event_args* e)
+void entity_system::on_early_update([[maybe_unused]] event_args* e)
 {
     auto&& toDestroy = _scene.view<destroy_m>();
     _scene.destroy(toDestroy.begin(), toDestroy.end());

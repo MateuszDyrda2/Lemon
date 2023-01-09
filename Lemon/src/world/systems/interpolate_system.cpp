@@ -7,13 +7,13 @@ interpolate_system::interpolate_system(scene& _scene, event_queue& _eventQueue):
     _scene(_scene)
 {
     update = _eventQueue["Update"_hs] += [this](event_args* e) {
-        this->onUpdate(e);
+        this->on_update(e);
     };
 }
 
 interpolate_system::~interpolate_system() { }
 
-void interpolate_system::onUpdate(event_args* e)
+void interpolate_system::on_update(event_args* e)
 {
     auto&& [delta, alpha] = get_event<update_event>(e);
     auto omalpha          = 1.0f - alpha;

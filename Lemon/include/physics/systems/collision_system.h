@@ -1,3 +1,6 @@
+/** @file collision_system.h
+ * @brief Collision system implementation
+ */
 #pragma once
 
 #include "../bvh_tree.h"
@@ -17,19 +20,25 @@ struct rigidbody;
 struct box_collider;
 struct circle_collider;
 struct capsule_collider;
+/** Class responsible for detecting collisions in the engine */
 class LEMON_API collision_system : public system
 {
   public:
-    SYSTEM(collision_system, scene, event_queue);
+    SYSTEM(collision_system, scene, event_queue, message_bus);
     ~collision_system();
-    void onUpdate(event_args* e);
-    void onMount();
+    /** @brief Function called on each update
+     * @param e event arguments
+     */
+    void on_update(event_args* e);
+    /** @brief Funciton called on system mount */
+    void on_mount();
 
   private:
     bvh_tree tree;
     sat_algorithm narrowPhase;
     scene& _scene;
     event_queue& _eventQueue;
+    message_bus& _messageBus;
     collision_set set;
     event_queue::listener_handle update;
     event_queue::listener_handle mount;

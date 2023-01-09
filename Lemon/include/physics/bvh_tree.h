@@ -1,3 +1,6 @@
+/** @file bvh_tree.h
+ * @brief BVH tree implementation
+ */
 #pragma once
 
 #include "detail/physics_utils.h"

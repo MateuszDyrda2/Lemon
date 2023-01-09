@@ -11,7 +11,7 @@ file_template = '''
 extern "C"
 {{
 #include <lauxlib.h>
-#include <luajit.h>
+#include <lua.h>
 #include <lualib.h>
 }}
 
@@ -40,6 +40,8 @@ include_template = '#include <{}>\n'
 component_template = '''
     [[maybe_unused]] auto&& {0}_storage = _registry.storage<{0}>();
     [[maybe_unused]] auto {0}_id = entt::type_hash<{0}>::value();
+    [[maybe_unused]] auto {0}_hashid = hashstr::runtime_hash(\"{0}\").value;
+    componentIds[{0}_hashid] = {0}_id;
     serializationData[{0}_id] = serialization_data {{
         .name = \"{0}\",
         .id = {0}_id,
@@ -75,22 +77,25 @@ scripting_field_template = '''
         .addProperty("{1}", &{0}::{1})
 '''
 
+
 def main(argv):
     output_path = argv[1]
     input_path = argv[2]
     include_path = argv[3]
     components = {}
-    print(argv)
 
     include_strings = include_path.split(' ')
 
     with open(input_path, 'r') as f:
         components = json.load(f)['components']
 
-    serialization_components = [component_template.format(k, ''.join(field_template.format(val["name"]) for val in v), ''.join(field_out_template.format(val["name"]) for val in v)) for k,v in components.items()]
-    scripting_components = [scripting_component_template.format(k, ''.join(scripting_field_template.format(k, val["name"]) for val in v)) for k,v in components.items()]
+    serialization_components = [component_template.format(k, ''.join(field_template.format(val["name"]) for val in v), ''.join(
+        field_out_template.format(val["name"]) for val in v)) for k, v in components.items()]
+    scripting_components = [scripting_component_template.format(k, ''.join(
+        scripting_field_template.format(k, val["name"]) for val in v)) for k, v in components.items()]
 
-    serialization_file = file_template.format(''.join(include_template.format(i) for i in include_strings),''.join(c for c in serialization_components), ''.join(c for c in scripting_components))
+    serialization_file = file_template.format(''.join(include_template.format(i) for i in include_strings), ''.join(
+        c for c in serialization_components), ''.join(c for c in scripting_components))
 
     with open(output_path, 'w+') as f:
         f.write(serialization_file)
@@ -101,4 +106,3 @@ if __name__ == '__main__':
         print('Not enough arguments')
     else:
         main(sys.argv)
-

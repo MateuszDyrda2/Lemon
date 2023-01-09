@@ -6,7 +6,9 @@
 #include "assert.h"
 #include "defines.h"
 #include "lemon_types.h"
+
 #include <functional>
+#include <string>
 #include <vector>
 
 namespace lemon {
@@ -18,12 +20,19 @@ static consteval hash_str hash_string_impl(const char* str, hash_str val) noexce
 }
 } // namespace detail
 
+/** @brief Structure representation of a hashed string */
 struct LEMON_API hashstr
 {
+    /** @brief Creates a basic hashstring */
     constexpr hashstr() = default;
+    /** @brief Creates a hash string from a string
+     * @param str string to be hashed
+     */
     consteval hashstr(const char* str):
         value((*str == 0 ? 0 : detail::hash_string_impl(str, 5381U))), str(str) { }
-
+    /** @brief Creates a hash string from a string and a hash
+     * @param str string and already calculated hash
+     */
     constexpr hashstr(const char* str, u32 value):
         value(value), str(str) { }
 
@@ -36,7 +45,10 @@ struct LEMON_API hashstr
     {
         return !(*this == other);
     }
-
+    /** @brief Computes a hash at a runtime
+     * @param str string to be hashed
+     * @return calculated hashstr
+     */
     static hashstr runtime_hash(const char* str)
     {
         if (*str == 0) return (hashstr(str, 0));
@@ -63,29 +75,9 @@ struct LEMON_API hashstr
  * @param str null terminated string
  * @return hashed id
  */
-[[nodiscard]] static consteval hash_str hash_string(const char* str) noexcept
-{
-    return (*str == 0) ? 0 : detail::hash_string_impl(str, 5381U);
-}
-/** @brief Creates a string hash for id comparison
- * @param str null terminated string
- * @return hashed id
- */
 [[nodiscard]] static consteval hashstr operator""_hs(const char* str, size_t) noexcept
 {
     return hashstr(str);
-}
-/** @brief Creates a string hash at runtime for id comparison
- * @param str null terminated string
- * @return hashed id
- */
-[[nodiscard]] static __attribute__((unused)) hash_str hash_string_d(const char* str) noexcept
-{
-    if (*str == 0) return 0;
-    hash_str hash = 5381;
-    char c;
-    while ((c = *str++) != 0) hash = ((hash << 5) + hash) + c;
-    return hash;
 }
 } // namespace lemon
 

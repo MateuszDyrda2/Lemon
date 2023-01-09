@@ -1,0 +1,39 @@
+
+using namespace lemon;
+class {{name}} : public engine
+{
+  public:
+    {{name}}(int argc, char** argv);
+    ~{{name}}();
+
+  private:
+    void initialize();
+};
+
+{{name}}::{{name}}(int argc, char** argv):
+    engine(argc, argv, ASSET_PATH, SETTINGS_FILE)
+{
+    initialize();
+}
+
+{{name}}::~{{name}}
+{ }
+
+void {{name}}::initialize()
+{
+    logger::info("{{name}} created");
+    auto& scene = _sceneManager.create_scene_defined("scene1", _serializer);
+
+    scene.register_system<entity_system>()
+        .register_system<physics_system>()
+        .register_system<collision_system>()
+        .register_system<interpolate_system>()
+        .register_system<transform_system>()
+        .register_system<animation_system>()
+        .register_system<rendering_system>()
+        .register_system<scripting_system>();
+
+    scene.mount();
+}
+
+GAME_DECL({{name}})

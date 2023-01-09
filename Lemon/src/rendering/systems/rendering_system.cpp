@@ -13,7 +13,7 @@ rendering_system::rendering_system(
     viewport(_window.get_size())
 {
     update = _eventQueue["Render"_hs] += [this](event_args* e) {
-        this->onRender(e);
+        this->on_render(e);
     };
     framebufferSize = _eventQueue["FramebufferSize"_hs] += [this](event_args* e) {
         auto&& [width, height] = get_event<framebuffer_size>(e);
@@ -25,7 +25,7 @@ rendering_system::rendering_system(
 rendering_system::~rendering_system()
 { }
 
-void rendering_system::onRender([[maybe_unused]] event_args* e)
+void rendering_system::on_render([[maybe_unused]] event_args* e)
 {
     mainCamera        = _scene.view<main_camera_t>().front();
     auto&& [cam, mod] = _scene.get<const camera, const model>(mainCamera);

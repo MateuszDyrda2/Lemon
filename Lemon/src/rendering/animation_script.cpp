@@ -7,7 +7,7 @@ namespace fs = std::filesystem;
 animation_script::animation_script(hashstr nameid, const std::string& path, scripting_engine& _scriptingEngine):
     resource(nameid)
 {
-    this->name = fs::path(path).stem();
+    this->name = fs::path(path).stem().string();
     _scriptingEngine.load_file(path);
     animations = _scriptingEngine.get_animation(name);
 }

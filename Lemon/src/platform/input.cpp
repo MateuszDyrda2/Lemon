@@ -107,6 +107,10 @@ class input::impl
                 auto in            = reinterpret_cast<impl*>(glfwGetWindowUserPointer(wnd));
                 in->keyStates[key] = key_action(1 << action);
             });
+
+        windowClose = queue["CloseWindow"_hs] += [&wnd](event_args*) {
+            glfwSetWindowShouldClose(reinterpret_cast<GLFWwindow*>(wnd.get_handle()), GLFW_TRUE);
+        };
         glfwSetMouseButtonCallback(
             reinterpret_cast<GLFWwindow*>(wnd.get_handle()),
             [](GLFWwindow* wnd, int button, int action, int /*mods*/) {
@@ -377,6 +381,7 @@ class input::impl
 
     i32 jid;
     event_queue& queue;
+    event_queue::listener_handle windowClose;
 };
 
 input::input(window& wnd, event_queue& queue):

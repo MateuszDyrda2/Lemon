@@ -34,6 +34,10 @@ class logger
             stream(),
             "\n");
     }
+    /** @brief Log as info with a basic c string
+     * @param message the message to be logger
+     * @param args format parameters
+     */
     inline static void info_c(const char* message)
     {
         stream() << "[INFO]:\t" << message << '\n';
@@ -55,6 +59,10 @@ class logger
             stream(),
             "\n");
     }
+    /** @brief Log as warning with a basic c string
+     * @param message the message to be logger
+     * @param args format parameters
+     */
     inline static void warn_c(const char* message)
     {
         stream() << "[WARN]:\t" << message << '\n';
@@ -76,6 +84,10 @@ class logger
             stream(),
             "\n");
     }
+    /** @brief Log as error with a basic c string
+     * @param message the message to be logger
+     * @param args format parameters
+     */
     inline static void error_c(const char* message)
     {
         stream() << "[ERROR]:\t" << message << '\n';
@@ -98,6 +110,10 @@ class logger
             "\n");
         lemon_assert(false);
     }
+    /** @brief Log as fatal with a basic c string and stop program execution
+     * @param message the message to be logger
+     * @param args format parameters
+     */
     inline static void fatal_c(const char* message)
     {
         stream() << "[FATAL]:\t" << message << '\n';

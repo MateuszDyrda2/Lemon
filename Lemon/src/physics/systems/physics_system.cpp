@@ -11,13 +11,13 @@ physics_system::physics_system(scene& _scene, event_queue& _eventQueue):
     _scene(_scene)
 {
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
-        this->onUpdate(e);
+        this->on_update(e);
     };
 }
 
 physics_system::~physics_system() { }
 
-void physics_system::onUpdate([[maybe_unused]] event_args* e)
+void physics_system::on_update([[maybe_unused]] event_args* e)
 {
     auto rigidbodies = _scene.view<rigidbody, enabled_t>();
 

@@ -1,3 +1,6 @@
+/** @file basic_renderer.h
+ * @brief File with a basic 2d sprite renderer definition
+ */
 #pragma once
 
 #include "renderer2d.h"

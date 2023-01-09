@@ -1,3 +1,6 @@
+/** @file renderer2d.h
+ * @brief File with the 2d renderer base class
+ */
 #pragma once
 
 #include "texture.h"

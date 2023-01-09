@@ -1,11 +1,11 @@
 #include <assets/resource.h>
 
 namespace lemon {
-resource::resource(hashstr name):
-    _count{ 1 }, name(name)
+resource::resource(hashstr nameid):
+    _count{ 1 }, nameid(nameid)
 { }
 resource::resource(self_type&& other) noexcept:
-    _count(other._count.load()), name(other.name)
+    _count(other._count.load()), nameid(other.nameid)
 { }
 resource::self_type&
 resource::operator=(self_type&& other) noexcept
@@ -13,7 +13,7 @@ resource::operator=(self_type&& other) noexcept
     if (this != &other)
     {
         _count.store(other._count.load(), std::memory_order_relaxed);
-        name = other.name;
+        nameid = other.nameid;
     }
     return *this;
 }

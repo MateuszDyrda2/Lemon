@@ -1,3 +1,6 @@
+/** @file message_bus.h
+ * @brief File with a class definition for passing messages to entities
+ */
 #pragma once
 
 #include "core/math/vec2.h"
@@ -10,6 +13,7 @@
 #include <vector>
 
 namespace lemon {
+/** message argumnets */
 struct LEMON_API message_payload
 {
     enum type
@@ -32,13 +36,13 @@ struct LEMON_API message_payload
 
     message_payload* next{ nullptr };
 };
-
+/** message definition */
 struct LEMON_API message
 {
     std::string messageName;
     message_payload* payload;
 };
-
+/** Class for passing messages */
 class LEMON_API message_bus
 {
   public:
@@ -56,13 +60,28 @@ class LEMON_API message_bus
     };
 
   public:
+    /** @brief Creates a message bus */
     message_bus();
     ~message_bus();
-
+    /** @brief Push a message to the message queue
+     * @param entityid entity the message is for
+     * @param messageName name of the message
+     * @param ...args message arguments
+     */
     template<class... Args>
     void push_message(u32 entityid, const std::string& messageName, Args&&... args);
+    /** @brief Create a message using a builder
+     * @param entityid entity the message is for
+     * @param messageName name of the message
+     * @return message builder object
+     */
     message_builder create_message(u32 entityid, const char* messageName);
+    /** @brief Get messages for entity
+     * @param entityid id of the entity
+     * @return optional object containing vector of messages
+     */
     std::optional<std::vector<message>> get_messages(u32 entityid);
+    /** @brief Clear the message bus */
     void clear();
 
   private:

@@ -17,6 +17,7 @@ struct LEMON_API event_args
 {
     virtual ~event_args() = default;
 };
+/** @brief Get event cast as a proper type */
 template<class T>
 inline static constexpr decltype(auto) get_event(event_args* e)
 {

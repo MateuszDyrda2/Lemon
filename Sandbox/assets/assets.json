@@ -1,71 +1,75 @@
 {
     "textures": [
         {
-            "name": "dwarf_leader-m-001",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_leader-m-001.png"
-        },
-        {
-            "name": "player_anim",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player_anim.png"
-        },
-        {
-            "name": "player",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/player.png"
+            "name": "dwarf-m-001",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf-m-001.png"
         },
         {
             "name": "dwarf-m-002",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf-m-002.png"
-        },
-        {
-            "name": "dwarf_hero-m-001",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_hero-m-001.png"
-        },
-        {
-            "name": "dwarf-m-001",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf-m-001.png"
-        },
-        {
-            "name": "floor",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/floor.png"
-        },
-        {
-            "name": "dwarf_guardian-m-001",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_guardian-m-001.png"
-        },
-        {
-            "name": "tile",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/tile.png"
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf-m-002.png"
         },
         {
             "name": "dwarf_elder-m-001",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/textures/dwarf_elder-m-001.png"
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_elder-m-001.png"
+        },
+        {
+            "name": "dwarf_guardian-m-001",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_guardian-m-001.png"
+        },
+        {
+            "name": "dwarf_hero-m-001",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_hero-m-001.png"
+        },
+        {
+            "name": "dwarf_leader-m-001",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_leader-m-001.png"
+        },
+        {
+            "name": "fire",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\fire.png"
+        },
+        {
+            "name": "floor",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\floor.png"
+        },
+        {
+            "name": "player",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\player.png"
+        },
+        {
+            "name": "player_anim",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\player_anim.png"
+        },
+        {
+            "name": "tile",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\tile.png"
         }
     ],
     "sounds": [],
     "shaders": [
         {
             "name": "sprite_renderer_shader",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/shaders/sprite_renderer_shader.glsl"
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\shaders\\sprite_renderer_shader.glsl"
         }
     ],
     "scripts": [
         {
             "name": "camera_script",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/camera_script.lua"
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\scripts\\camera_script.lua"
         },
         {
             "name": "player_script",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/scripts/player_script.lua"
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\scripts\\player_script.lua"
         }
     ],
     "animations": [
         {
-            "name": "player_animation",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player_animation.lua"
+            "name": "player2_animation",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\animations\\player2_animation.lua"
         },
         {
-            "name": "player2_animation",
-            "path": "/home/mxda/coffee/lemon/Sandbox/assets/animations/player2_animation.lua"
+            "name": "player_animation",
+            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\animations\\player_animation.lua"
         }
     ]
 }

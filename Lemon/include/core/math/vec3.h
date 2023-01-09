@@ -1,5 +1,9 @@
+/** @file vec3.h
+ * @brief File containing typedefs from glm for vec3
+ */
 #pragma once
 
+#include "../../../libs/glm/glm/vec3.hpp"
 #include <glm/vec3.hpp>
 
 namespace lemon {

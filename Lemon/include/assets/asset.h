@@ -1,5 +1,5 @@
 /** @file asset_storage.h
- * Caching resources
+ * @brief Caching and managing game resources
  */
 #pragma once
 

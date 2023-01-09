@@ -1,3 +1,6 @@
+/** @file physics_components.h
+ * @brief File containing component declarations used with physics
+ */
 #pragma once
 
 #include <core/defines.h>
@@ -5,6 +8,7 @@
 #include <core/math/vec2.h>
 
 namespace lemon {
+/** Type of a collider */
 enum collider_type
 {
     none,
@@ -12,6 +16,7 @@ enum collider_type
     circle,
     capsule,
 };
+/** rigidbody */
 struct LEMON_API [[lemon::component]] rigidbody
 {
     vec2 position                               = {};
@@ -26,7 +31,9 @@ struct LEMON_API [[lemon::component]] rigidbody
     vec2 _oldPosition = {};
 };
 
-/** @note Don't change collider properties after assignment! */
+/** Box collider
+ * @note Don't change collider properties after assignment!
+ */
 struct LEMON_API [[lemon::component]] box_collider
 {
     [[lemon::field]] f32 bounciness = {};
@@ -41,7 +48,9 @@ struct LEMON_API [[lemon::component]] box_collider
         bounciness(bounciness), friction(friction), offset(offset), hSize(hSize) { }
 };
 
-/** @note Don't change collider properties after assignment! */
+/** Circle collider
+ *  @note Don't change collider properties after assignment!
+ */
 struct LEMON_API [[lemon::component]] circle_collider
 {
     [[lemon::field]] f32 bounciness = {};
@@ -50,7 +59,9 @@ struct LEMON_API [[lemon::component]] circle_collider
     [[lemon::field]] f32 radius     = { 0.5f };
 };
 
-/** @note Don't change collider properties after assignment! */
+/** Capsule collider
+ * @note Don't change collider properties after assignment!
+ */
 struct LEMON_API [[lemon::component]] capsule_collider
 {
     [[lemon::field]] f32 bounciness = {};

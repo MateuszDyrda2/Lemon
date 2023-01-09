@@ -9,14 +9,13 @@
 #include "platform/keycodes.h"
 #include "scripting/script_entity.h"
 #include "world/systems/transform_system.h"
-#include <events/events.h>
 #include <type_traits>
 #include <world/scene.h>
 
 extern "C"
 {
 #include <lauxlib.h>
-#include <luajit.h>
+#include <lua.h>
 #include <lualib.h>
 }
 
@@ -73,7 +72,7 @@ std::unordered_map<hashstr, function<i32(f32)>> get_key_value_map(lua_State* L, 
     return result;
 }
 
-scripting_engine::scripting_engine(input& _input)
+scripting_engine::scripting_engine(input& _input, event_queue& _eventQueue)
 {
     L = luaL_newstate();
     registerMainThread(L);
@@ -81,6 +80,14 @@ scripting_engine::scripting_engine(input& _input)
 
     getGlobalNamespace(L)
         .beginNamespace("lemon")
+        .beginClass<hashstr>("hashstr")
+        .addProperty("str", &hashstr::str)
+        .addProperty("value", &hashstr::value)
+        .endClass()
+        .beginClass<event_queue>("events")
+        .addFunction(
+            "close_window", +[](event_queue* q) { q->event("CloseWindow"_hs).fire(new event_args); })
+        .endClass()
         .beginClass<logger>("logger")
         .addStaticFunction("info", &logger::info_c)
         .addStaticFunction("warn", &logger::warn_c)
@@ -113,10 +120,18 @@ scripting_engine::scripting_engine(input& _input)
                 auto n = ent->_scene->get_entity_registry().get(hashstr::runtime_hash(name));
                 return script_entity(ent->_messageBus, ent->_scene, u32(n));
             })
-        .endClass()
-        .beginClass<event_queue>("event_queue")
+        .addFunction(
+            "get_script_entity", +[](script_entity* ent, u32 id) {
+                return script_entity(ent->_messageBus, ent->_scene, id);
+            })
         .endClass()
         .beginClass<input>("input")
+        .addFunction(
+            "add_key", +[](input* i, int k, int a, const char* name) { return i->add_key(keycode(k), key_action(a), hashstr::runtime_hash(name)); })
+        .addFunction(
+            "add_mouse", +[](input* i, int k, int a, const char* name) { return i->add_key(mouse(k), key_action(a), hashstr::runtime_hash(name)); })
+        .addFunction(
+            "add_gamepad", +[](input* i, int k, int a, const char* name) { return i->add_key(gamepad(k), key_action(a), hashstr::runtime_hash(name)); })
         .addFunction(
             "check_key", +[](input* i, int k, int a) { return i->check_key(keycode(k), key_action(a)); })
         .addFunction(
@@ -155,6 +170,8 @@ scripting_engine::scripting_engine(input& _input)
 
     [[maybe_unused]] auto _ = push(L, &_input);
     lua_setglobal(L, "input");
+    [[maybe_unused]] auto __ = push(L, &_eventQueue);
+    lua_setglobal(L, "event_queue");
     register_math();
     register_types();
 

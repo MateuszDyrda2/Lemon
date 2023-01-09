@@ -1,4 +1,4 @@
-import { open } from '@tauri-apps/api/dialog';
+import { open, save } from '@tauri-apps/api/dialog';
 import { exit } from '@tauri-apps/api/process';
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -38,6 +38,23 @@ const Project = () => {
             .catch(console.error);
     };
 
+    const saveProject = () => {
+        invoke('save').catch(console.error);
+    };
+
+    const createProject = () => {
+        save({
+            filters: [
+                {
+                    name: 'NewProject',
+                    extensions: [],
+                },
+            ],
+        }).then((path) => {
+            invoke('create_project', { path: path }).catch(console.error);
+        });
+    };
+
     return (
         <ProjectContainer>
             <LemonImg src={LemonIcon} alt="Lemon logo" width={150} />
@@ -45,9 +62,9 @@ const Project = () => {
                 {projectState !== undefined && projectState.name}
             </ProjectName>
             <ButtonGroup>
-                <Button>New project</Button>
-                <Button onClick={() => openProject()}>Open Project</Button>
-                <Button>Save</Button>
+                <Button onClick={createProject}>New project</Button>
+                <Button onClick={openProject}>Open Project</Button>
+                <Button onClick={saveProject}>Save</Button>
                 <Button>Save as</Button>
                 <Button onClick={() => exit(0)}>Exit</Button>
             </ButtonGroup>
