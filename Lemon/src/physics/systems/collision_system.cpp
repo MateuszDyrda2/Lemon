@@ -1,11 +1,13 @@
+#include <physics/systems/collision_system.h>
+
 #include "core/math/mat2.h"
 #include "core/math/mat4.h"
 #include "core/math/math.h"
 #include "world/components/entity_components.h"
 #include <algorithm>
 #include <cmath>
-#include <physics/systems/collision_system.h>
 
+#include <scripting/message_bus.h>
 #include <physics/components/physics_components.h>
 #include <type_traits>
 #include <world/components/transform_components.h>
@@ -42,7 +44,7 @@ void collision_system::add_box2tree(registry& _reg, entity_t handle)
 {
     lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, box_collider>(handle);
-    tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
+    tree.insert_leaf(std::underlying_type_t<decltype(handle)>(handle),
                      detail::AABB{
                          .min = _transform.position + _collider.offset - _collider.hSize,
                          .max = _transform.position + _collider.offset + _collider.hSize,
@@ -53,7 +55,7 @@ void collision_system::add_circle2tree(registry& _reg, entity_t handle)
 {
     lemon_assert((_reg.all_of<transform, box_collider>(handle)));
     const auto&& [_transform, _collider] = _reg.get<transform, circle_collider>(handle);
-    tree.insert_leaf(std::underlying_type_t<typeof(handle)>(handle),
+    tree.insert_leaf(std::underlying_type_t<decltype(handle)>(handle),
                      detail::AABB{
                          .min = _transform.position + _collider.offset - _collider.radius,
                          .max = _transform.position + _collider.offset + _collider.radius,
@@ -68,25 +70,25 @@ void collision_system::add_capsule2tree(registry& _reg, entity_t handle)
 
 void collision_system::remove_from_tree([[maybe_unused]] registry& _reg, entity_t handle)
 {
-    tree.remove_leaf(std::underlying_type_t<typeof(handle)>(handle));
+    tree.remove_leaf(std::underlying_type_t<decltype(handle)>(handle));
 }
 
-collision_system::collision_system(scene& _scene, event_queue& _eventQueue):
-    _scene(_scene), _eventQueue(_eventQueue)
+collision_system::collision_system(scene& _scene, event_queue& _eventQueue, message_bus& _messageBus):
+    _scene(_scene), _eventQueue(_eventQueue), _messageBus(_messageBus)
 {
     update = _eventQueue["PhysicsUpdate"_hs] += [this](event_args* e) {
-        this->onUpdate(e);
+        this->on_update(e);
     };
     mount = _eventQueue["OnSceneLoaded"_hs] += [this](event_args*) {
-        this->onMount();
+        this->on_mount();
     };
 }
 
-void collision_system::onMount()
+void collision_system::on_mount()
 {
     for (auto&& [_entity, _transform, _collider] : _scene.view<transform, box_collider>().each())
     {
-        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+        tree.insert_leaf(std::underlying_type_t<decltype(_entity)>(_entity),
                          detail::AABB{
                              .min = _transform.position + _collider.offset - _collider.hSize,
                              .max = _transform.position + _collider.offset + _collider.hSize,
@@ -95,7 +97,7 @@ void collision_system::onMount()
 
     for (auto&& [_entity, _transform, _collider] : _scene.view<transform, circle_collider>().each())
     {
-        tree.insert_leaf(std::underlying_type_t<typeof(_entity)>(_entity),
+        tree.insert_leaf(std::underlying_type_t<decltype(_entity)>(_entity),
                          detail::AABB{
                              .min = _transform.position + _collider.offset - _collider.radius,
                              .max = _transform.position + _collider.offset + _collider.radius,
@@ -122,7 +124,7 @@ collision_system::~collision_system()
     _reg.on_destroy<capsule_collider>().disconnect<&collision_system::remove_from_tree>(this);
 }
 
-void collision_system::onUpdate([[maybe_unused]] event_args* e)
+void collision_system::on_update([[maybe_unused]] event_args* e)
 {
     collision_set newSet;
     auto&& [fixedDelta] = get_event<fixed_update_event>(e);
@@ -130,7 +132,7 @@ void collision_system::onUpdate([[maybe_unused]] event_args* e)
     for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, dirty_t, enabled_t>().each())
     {
         if (auto aabb = get_aabb(_entity, _rigidbody))
-            tree.update_leaf(std::underlying_type_t<typeof(_entity)>(_entity), *aabb);
+            tree.update_leaf(std::underlying_type_t<decltype(_entity)>(_entity), *aabb);
     }
 
     for (auto&& [_entity, _rigidbody] : _scene.view<rigidbody, enabled_t>().each())
@@ -163,7 +165,8 @@ void collision_system::onUpdate([[maybe_unused]] event_args* e)
 
     // clear collisions
     set.diff(newSet, [&](entity_t a, entity_t b) {
-        _eventQueue["CollisionEnded"_hs].fire(new detail::collision_event(a, b));
+        _messageBus.push_message(u32(a), "collision_ended", i32(b));
+        _messageBus.push_message(u32(b), "collision_ended", i32(a));
     });
     set.swap(newSet);
 }
@@ -173,14 +176,14 @@ void collision_system::collision_events(entity_t a, entity_t b)
     if (set.has(a, b))
     {
         // collision repeated
-        _eventQueue["CollisionRepeated"_hs].fire(
-            new detail::collision_event(a, b));
+        _messageBus.push_message(u32(a), "collision_repeated", i32(b));
+        _messageBus.push_message(u32(b), "collision_repeated", i32(a));
     }
     else
     {
         // collision started
-        _eventQueue["CollisionStarted"_hs].fire(
-            new detail::collision_event(a, b));
+        _messageBus.push_message(u32(a), "collision_started", i32(b));
+        _messageBus.push_message(u32(b), "collision_started", i32(a));
     }
 }
 
@@ -207,6 +210,7 @@ void collision_system::physics_reponse([[maybe_unused]] f32 fixedDelta,
         bRigidbody.position += axis * vec.overlap * 0.5f;
         aRigidbody.position -= axis * vec.overlap * 0.5f;
     }
+
 
     // J = (-(1 + e)Vab * n) / (n * n(1/ma + 1/mb))
     // Va+ = Va- + J/ma * n

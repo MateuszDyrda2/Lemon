@@ -1,3 +1,6 @@
+/** @file rendering_context.h
+ * @brief File with the rendering context abstraction
+ */
 #pragma once
 
 #include <core/lemon_types.h>

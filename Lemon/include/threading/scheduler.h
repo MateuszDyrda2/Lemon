@@ -1,7 +1,10 @@
+/** @file scheduler.h
+ * @brief Scheduler implementation
+ */
 #pragma once
 
-#include <core/lemon_types.h>
 #include <core/defines.h>
+#include <core/lemon_types.h>
 
 #include <concurrentqueue.h>
 
@@ -35,6 +38,7 @@ struct LEMON_API job
         return wakeTime < other.wakeTime;
     }
 };
+/** Scheduler implementation */
 class LEMON_API scheduler
 {
   public:
@@ -63,7 +67,17 @@ class LEMON_API scheduler
      * @param sig waitable object
      */
     void wait(waitable* sig);
+    /** @brief Run function in seconds
+     * @param jobs jobs that are to be scheduled
+     * @param count number of jobs
+     * @param delta time offset
+     */
     void run_in(job* jobs, std::size_t count, const std::chrono::milliseconds& delta);
+    /** @brief Run function at time
+     * @param jobs jobs that are to be scheduled
+     * @param count number of jobs
+     * @param at scheduled time
+     */
     void run_at(job* jobs, std::size_t count, const std::chrono::high_resolution_clock::time_point& at);
     /** @returns index of the calling thread */
     std::size_t get_thread_index(std::size_t init = 0);
@@ -96,9 +110,9 @@ template<class Iter, class F>
 void scheduler::for_each(Iter beg, Iter end, F callable)
 {
     std::size_t _size = std::distance(beg, end);
-    if(_size < nbWorkers)
+    if (_size < nbWorkers)
     {
-        for(; beg != end; ++beg)
+        for (; beg != end; ++beg)
         {
             callable(*beg);
         }
@@ -107,10 +121,10 @@ void scheduler::for_each(Iter beg, Iter end, F callable)
     {
         auto step = _size / nbWorkers;
         std::vector<job> jobs(nbWorkers - 1);
-        for(std::size_t i = 0; i < nbWorkers - 1; ++i)
+        for (std::size_t i = 0; i < nbWorkers - 1; ++i)
         {
             jobs[i].callable = [&, it = beg]() mutable {
-                for(std::size_t j = 0; j < step; ++j, ++it)
+                for (std::size_t j = 0; j < step; ++j, ++it)
                 {
                     callable(*it);
                 }
@@ -119,7 +133,7 @@ void scheduler::for_each(Iter beg, Iter end, F callable)
         }
         lemon::waitable sig;
         run(jobs.data(), nbWorkers - 1, &sig);
-        for(; beg != end; ++beg)
+        for (; beg != end; ++beg)
         {
             callable(*beg);
         }

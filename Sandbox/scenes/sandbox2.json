@@ -1,1 +1,150 @@
-{"entities":{"count":3,"ids":[2,1,0]},"components":[{"name":"player_t","id":2666205691,"count":1,"entities":{"1":{}}},{"name":"transform","id":905643800,"count":3,"entities":{"2":{"position":[0.0,0.0],"scale":[1.0,1.0],"rotation":0.0,"first":1048575,"next":1048575,"parent":1048575,"order":0,"layer":0},"1":{"position":[-600.0,0.0],"scale":[1.0,1.0],"rotation":0.0,"first":1048575,"next":1048575,"parent":1048575,"order":0,"layer":0},"0":{"position":[0.0,0.0],"scale":[1.0,1.0],"rotation":0.0,"first":1048575,"next":1048575,"parent":1048575,"order":0,"layer":0}}},{"name":"main_camera_t","id":3629395194,"count":1,"entities":{"0":{}}},{"name":"camera","id":2030175323,"count":1,"entities":{"0":{"viewport":[0.0,0.0,1.0,1.0],"size":1.0}}},{"name":"script_component","id":881543751,"count":1,"entities":{"1":{}}},{"name":"enabled_t","id":259568374,"count":0,"entities":{}},{"name":"tag","id":2217576196,"count":3,"entities":{"2":{"name":"Tile"},"1":{"name":"Player"},"0":{"name":"Main Camera"}}},{"name":"sprite_renderer","id":26763685,"count":2,"entities":{"2":{"col":[1.0,1.0,1.0,1.0],"texCoords":[0.0,0.0,1.0,1.0],"tex":"tile"},"1":{"col":[1.0,1.0,1.0,1.0],"texCoords":[0.0,0.0,0.25,0.125],"tex":"player_anim"}}},{"name":"animation_component","id":2622231946,"count":1,"entities":{"1":{"frameSize":[22,56],"animation":"player_animation"}}},{"name":"rigidbody","id":3266103519,"count":2,"entities":{"2":{"position":[0.0,0.0],"rotation":0.0,"velocity":[0.0,0.0],"angularRotation":0.0,"linearDrag":0.0,"mass":1.0,"isKinetic":true,"colliderType":1},"1":{"position":[-600.0,0.0],"rotation":0.0,"velocity":[0.0,0.0],"angularRotation":0.0,"linearDrag":0.0,"mass":1.0,"isKinetic":false,"colliderType":1}}},{"name":"box_collider","id":2862004686,"count":2,"entities":{"2":{"bounciness":0.0,"friction":0.0,"offset":[0.0,0.0],"hSize":[340.0,220.0]},"1":{"bounciness":0.0,"friction":0.0,"offset":[0.0,0.0],"hSize":[35.0,55.0]}}},{"name":"circle_collider","id":506013541,"count":0,"entities":{}},{"name":"capsule_collider","id":2717336104,"count":0,"entities":{}}]}
+{
+  "entities": { "count": 3, "ids": [2, 1, 0] },
+  "components": [
+    {
+      "name": "player_t",
+      "id": 2666205691,
+      "count": 1,
+      "entities": { "1": {} }
+    },
+    {
+      "name": "transform",
+      "id": 905643800,
+      "count": 3,
+      "entities": {
+        "2": {
+          "position": [0.0, 0.0],
+          "scale": [1.0, 1.0],
+          "rotation": 0.0,
+          "first": 1048575,
+          "next": 1048575,
+          "parent": 1048575,
+          "order": 0,
+          "layer": 0
+        },
+        "1": {
+          "position": [-600.0, 0.0],
+          "scale": [1.0, 1.0],
+          "rotation": 0.0,
+          "first": 1048575,
+          "next": 1048575,
+          "parent": 1048575,
+          "order": 0,
+          "layer": 0
+        },
+        "0": {
+          "position": [0.0, 0.0],
+          "scale": [1.0, 1.0],
+          "rotation": 0.0,
+          "first": 1048575,
+          "next": 1048575,
+          "parent": 1048575,
+          "order": 0,
+          "layer": 0
+        }
+      }
+    },
+    {
+      "name": "main_camera_t",
+      "id": 3629395194,
+      "count": 1,
+      "entities": { "0": {} }
+    },
+    {
+      "name": "camera",
+      "id": 2030175323,
+      "count": 1,
+      "entities": { "0": { "viewport": [0.0, 0.0, 1.0, 1.0], "size": 1.0 } }
+    },
+    {
+      "name": "script_component",
+      "id": 881543751,
+      "count": 1,
+      "entities": { "1": {} }
+    },
+    { "name": "enabled_t", "id": 259568374, "count": 0, "entities": {} },
+    {
+      "name": "tag",
+      "id": 2217576196,
+      "count": 3,
+      "entities": {
+        "2": { "name": "Tile" },
+        "1": { "name": "Player" },
+        "0": { "name": "Main Camera" }
+      }
+    },
+    {
+      "name": "sprite_renderer",
+      "id": 26763685,
+      "count": 2,
+      "entities": {
+        "2": {
+          "col": [1.0, 1.0, 1.0, 1.0],
+          "texCoords": [0.0, 0.0, 1.0, 1.0],
+          "tex": "tile"
+        },
+        "1": {
+          "col": [1.0, 1.0, 1.0, 1.0],
+          "texCoords": [0.0, 0.0, 0.25, 0.125],
+          "tex": "player_anim"
+        }
+      }
+    },
+    {
+      "name": "animation_component",
+      "id": 2622231946,
+      "count": 1,
+      "entities": {
+        "1": { "frameSize": [22, 56], "animation": "player_animation" }
+      }
+    },
+    {
+      "name": "rigidbody",
+      "id": 3266103519,
+      "count": 2,
+      "entities": {
+        "2": {
+          "position": [0.0, 0.0],
+          "rotation": 0.0,
+          "velocity": [0.0, 0.0],
+          "angularRotation": 0.0,
+          "linearDrag": 0.0,
+          "mass": 1.0,
+          "isKinetic": true,
+          "colliderType": 1
+        },
+        "1": {
+          "position": [-600.0, 0.0],
+          "rotation": 0.0,
+          "velocity": [0.0, 0.0],
+          "angularRotation": 0.0,
+          "linearDrag": 0.0,
+          "mass": 1.0,
+          "isKinetic": false,
+          "colliderType": 1
+        }
+      }
+    },
+    {
+      "name": "box_collider",
+      "id": 2862004686,
+      "count": 2,
+      "entities": {
+        "2": {
+          "bounciness": 0.0,
+          "friction": 0.0,
+          "offset": [0.0, 0.0],
+          "hSize": [340.0, 220.0]
+        },
+        "1": {
+          "bounciness": 0.0,
+          "friction": 0.0,
+          "offset": [0.0, 0.0],
+          "hSize": [35.0, 55.0]
+        }
+      }
+    },
+    { "name": "circle_collider", "id": 506013541, "count": 0, "entities": {} },
+    { "name": "capsule_collider", "id": 2717336104, "count": 0, "entities": {} }
+  ]
+}

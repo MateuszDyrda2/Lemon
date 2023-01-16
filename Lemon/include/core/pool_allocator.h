@@ -1,3 +1,6 @@
+/** @file pool_allocator.h
+ * @brief File with a pool allocator definition
+ */
 #pragma once
 
 #include "defines.h"
@@ -9,9 +12,14 @@
 #include <type_traits>
 
 namespace lemon {
+/** Pool allocator
+ * @tparam T object type
+ * @tparam BlockSize size of a block
+ * @tparam ChunkSize size of a chunk
+ */
 template<class T, std::size_t BlockSize = 32,
          std::size_t ChunkSize = (sizeof(T) > sizeof(void*) ? sizeof(T) : sizeof(void*))>
-class LEMON_API pool_allocator
+class pool_allocator
 {
   private:
     struct alignas(T) chunk_t
@@ -20,9 +28,17 @@ class LEMON_API pool_allocator
     };
 
   public:
+    /** @brief Creates a pool allocator */
     pool_allocator();
+    /** @brief Get a pointer to a free object
+     * @return Free object pointer
+     */
     T* get();
+    /** @brief Free an element
+     * @param element pointer to element to be freed
+     */
     void free(T* element);
+    /** @brief Clear the memory from the allocator */
     void clear();
 
   private:

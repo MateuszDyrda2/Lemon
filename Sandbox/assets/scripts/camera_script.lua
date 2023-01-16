@@ -3,7 +3,7 @@ camera_script = {}
 local player = {}
 
 function camera_script.on_start (ent)
-    player = ent:get_entity("Player")
+    player = ent:get_entity("player")
 end
 
 function camera_script.on_physics (ent, delta)

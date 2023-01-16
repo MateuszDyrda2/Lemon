@@ -1,11 +1,18 @@
+/** @file defines.h
+ * @brief File containing basic macros used throughout the engine
+ */
 #pragma once
 
-#ifdef LEMON_WINDOWS
-#    ifdef LEMON_EXPORTS
-#        define LEMON_API __declspec(dllexport)
+#ifdef LEMON_SHARED
+#    ifdef LEMON_WINDOWS
+#        ifdef LEMON_EXPORTS
+#            define LEMON_API __declspec(dllexport)
+#        else
+#            define LEMON_API __declspec(dllimport)
+#        endif // !LEMONCORE_EXPORTS
 #    else
-#        define LEMON_API __declspec(dllimport)
-#    endif // !LEMONCORE_EXPORTS
+#        define LEMON_API
+#    endif
 
 #else
 #    define LEMON_API

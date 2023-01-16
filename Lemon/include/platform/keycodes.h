@@ -1,3 +1,6 @@
+/** @file keycodes.h
+ * @brief File with enum classes representing keys
+ */
 #pragma once
 
 namespace lemon {

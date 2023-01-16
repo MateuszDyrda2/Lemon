@@ -10,11 +10,11 @@ use tauri::{
 };
 
 use project::{
-    add_component_to_entity, add_entity, change_entity_component, get_animations, get_asset_list,
-    get_components, get_components_for_entity, get_debug_data, get_entities, get_rendering_data,
-    get_scenes, get_scripts, get_shaders, get_sounds, get_textures, open_project, recreate_assets,
-    remove_component_from_entity, remove_entity, run_engine, save, set_entity_name, stop_engine,
-    Engine, ProjectState,
+    add_component_to_entity, add_entity, change_entity_component, create_project, get_animations,
+    get_asset_list, get_components, get_components_for_entity, get_debug_data, get_entities,
+    get_rendering_data, get_scenes, get_scripts, get_settings, get_shaders, get_sounds,
+    get_textures, open_project, recreate_assets, remove_component_from_entity, remove_entity,
+    run_engine, save, set_entity_name, set_settings, stop_engine, Engine, ProjectState,
 };
 
 #[tauri::command]
@@ -75,6 +75,9 @@ fn main() {
             recreate_assets,
             remove_entity,
             save,
+            get_settings,
+            set_settings,
+            create_project,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

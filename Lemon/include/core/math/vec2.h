@@ -1,3 +1,6 @@
+/** @file vec2.h
+ * @brief File containing typedefs from glm for vec2
+ */
 #pragma once
 
 #include <glm/vec2.hpp>

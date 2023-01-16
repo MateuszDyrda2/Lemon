@@ -30,6 +30,7 @@ entity scene::create_entity(hashstr name)
     auto ent = _registry.create();
     _registry.emplace<transform>(ent);
     _registry.emplace<tag>(ent, name);
+    _registry.emplace<enabled_t>(ent);
     _registry.emplace<dirty_t>(ent);
     _registry.emplace<model>(ent);
     return entity(&_registry, ent);
@@ -40,6 +41,7 @@ entity scene::create_entity(hashstr name, vec2 position)
     auto ent = _registry.create();
     _registry.emplace<transform>(ent, position);
     _registry.emplace<tag>(ent, name);
+    _registry.emplace<enabled_t>(ent);
     _registry.emplace<dirty_t>(ent);
     _registry.emplace<model>(ent);
     return entity(&_registry, ent);

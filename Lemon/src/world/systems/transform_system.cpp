@@ -8,13 +8,13 @@ transform_system::transform_system(scene& _scene, event_queue& _eventQueue):
     _scene(_scene)
 {
     update = _eventQueue["Update"_hs] += [this](event_args* e) {
-        this->onUpdate(e);
+        this->on_update(e);
     };
 }
 
 transform_system::~transform_system() { }
 
-void transform_system::onUpdate([[maybe_unused]] event_args* e)
+void transform_system::on_update([[maybe_unused]] event_args* e)
 {
     _scene.view<dirty_t>().each(
         [this](const auto ent) {

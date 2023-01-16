@@ -77,7 +77,6 @@ void scripting_system::on_early_update([[maybe_unused]] event_args* e)
         [[maybe_unused]] auto scr = _scriptComponent.scriptObject.get();
         scr->early(script_entity(_messageBus, &_scene, u32(_entity)), delta);
     }
-    _messageBus.clear();
 }
 
 void scripting_system::on_physics([[maybe_unused]] event_args* e)
@@ -88,6 +87,5 @@ void scripting_system::on_physics([[maybe_unused]] event_args* e)
         [[maybe_unused]] auto scr = _scriptComponent.scriptObject.get();
         scr->physics(script_entity(_messageBus, &_scene, u32(_entity)), delta);
     }
-    _messageBus.clear();
 }
 }

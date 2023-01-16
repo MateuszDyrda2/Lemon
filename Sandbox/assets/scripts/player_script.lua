@@ -52,3 +52,10 @@ function player_script.on_physics (ent, delta)
     lemon.physics.move_position(ent, lemon.vec2(position.x + x * speed * delta, position.y + y * speed * delta), delta)
     animation_frame(ent, x, y)
 end
+
+function player_script.collision_started (ent, b)
+    second = ent:get_script_entity(b)
+    if lemon.get_tag(second).name.str == "fireball" then
+        event_queue:close_window()
+    end
+end

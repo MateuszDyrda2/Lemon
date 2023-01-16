@@ -14,7 +14,7 @@
     "allowlist": {
       "all": true,
       "fs": {
-          "scope": ["**"]
+          "scope": ["**", "$RESOURCE/*"]
       },
       "globalShortcut": {
           "all": true
@@ -35,7 +35,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.lemonade.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -44,7 +44,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "tools/*"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {

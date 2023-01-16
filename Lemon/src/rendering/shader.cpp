@@ -7,8 +7,8 @@
 
 namespace lemon {
 using namespace std;
-shader::shader(hashstr name, const std::string& shaderPath):
-    resource(name)
+shader::shader(hashstr nameid, const std::string& shaderPath):
+    resource(nameid)
 {
     string shaderCode;
     ifstream shaderFile(shaderPath, ios::binary);

@@ -17,8 +17,9 @@ project(Lemon DESCRIPTION ${lemon_DESC} LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 # ----------------------------------------------
 find_package(Threads REQUIRED)
-find_package(LuaJIT REQUIRED)
+# find_package(LuaJIT REQUIRED)
 # ----------------------------------------------
+
 
 # --------------- Add library ------------------
 set(lemon_ASSETS_SRC
@@ -100,13 +101,19 @@ add_library(lemon ${lemon_SRC})
 add_library(lemon::lemon ALIAS lemon)
 target_include_directories(lemon 
   PUBLIC 
-    include/
-    ${LUAJIT_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lemon>"
 )
+
+set(LINUX_INC )
+
+if(!MSVC)
+   set(LINUX_INC Threads::Threads)
+endif()
 
 target_link_libraries(lemon
   PUBLIC
-    Threads::Threads
+    ${LINUX_INC}
     concurrentqueue
     fmt
     glad
@@ -115,7 +122,7 @@ target_link_libraries(lemon
     rapidjson
     stb
     EnTT::EnTT
-    ${LUAJIT_LIBRARIES}
+    lua::lua
     LuaBridge
 )
 # ----------------------------------------------
@@ -156,38 +163,41 @@ set(COMPONENTS_LIST_LEMON
     "${CMAKE_CURRENT_SOURCE_DIR}/include/physics/components/physics_components.h"
     PARENT_SCOPE
 )
+include(Macros)
 
+set(serialization_files ${CMAKE_BINARY_DIR}/_generated/types.cpp PARENT_SCOPE)
 
-#foreach(path IN LISTS COMPONENTS_LIST_LEMON)
-#    set(filename)
-#    get_filename_component(filename ${path} NAME_WE)
-#    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
-#    add_custom_command(
-#        OUTPUT ${output}
-#        DEPENDS ${path}
-#        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_components.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-#        COMMENT "Generated editor data for ${filename}")
-#    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
-#endforeach(path in LISTS ARGN)
-#
-#foreach(path IN LISTS SYSTEMS_LIST_LEMON)
-#    set(filename)
-#    get_filename_component(filename ${path} NAME_WE)
-#    set(output "${CMAKE_BINARY_DIR}/_generated/${filename}.json")
-#    add_custom_command(
-#        OUTPUT ${output}
-#        DEPENDS ${path}
-#        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/export_systems.py "${output}" "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
-#        COMMENT "Generated editor data for ${filename}"
-#    )
-#    set(ENGINE_TYPES ${ENGINE_TYPES} ${output})
-#endforeach(path in LISTS ARGN)
-#set(ENGINE_TYPES ${ENGINE_TYPES} PARENT_SCOPE)
-#
-#add_custom_target(lemon_engine_types
-#  ALL DEPENDS
-#    ${ENGINE_TYPES}
+#include(GNUInstallDirs)
+#install(TARGETS lemon fmt glad glm glfw rapidjson stb lua LuaBridge
+#    EXPORT lemonTargets
+#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 #)
+#install(DIRECTORY include/ 
+#    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lemon
+#)
+#
+#install(EXPORT lemonTargets
+#    FILE lemonTargets.cmake
+#    NAMESPACE lemon::
+#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lemon
+#)
+#
+#include(CMakePackageConfigHelpers)
+#configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+#    "${CMAKE_CURRENT_BINARY_DIR}/lemonConfig.cmake"
+#    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lemon
+#)
+#install(FILES 
+#    "${CMAKE_CURRENT_BINARY_DIR}/lemonConfig.cmake"
+#    "${CMAKE_CURRENT_BINARY_DIR}/lemonConfigVersion.cmake"
+#    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Macros.cmake"
+#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lemon
+#)
+#
 
 # ----------------------------------------------
 

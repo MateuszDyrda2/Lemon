@@ -1,3 +1,6 @@
+/** @file rendering_components.h
+ * @brief File containing rendering components declarations
+ */
 #pragma once
 
 #include "../texture.h"

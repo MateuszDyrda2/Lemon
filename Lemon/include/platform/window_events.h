@@ -1,3 +1,6 @@
+/** @file window_events.h
+ * @brief File declaring event types send by a window
+ */
 #pragma once
 
 #include <core/lemon_types.h>

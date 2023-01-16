@@ -1,3 +1,6 @@
+/** @file asset_loader.h
+ * @brief File containing definitions for asset loading class
+ */
 #pragma once
 
 #include "rendering/animation_script.h"

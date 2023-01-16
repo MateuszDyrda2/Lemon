@@ -1,3 +1,6 @@
+/** @file vec4.h
+ * @brief File containing typedefs from glm for vec4
+ */
 #pragma once
 
 #include <glm/vec4.hpp>

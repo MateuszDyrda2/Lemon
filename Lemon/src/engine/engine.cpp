@@ -4,13 +4,13 @@
 #include <chrono>
 
 namespace lemon {
-engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath):
+engine::engine(int /* argc*/, char** /*argv*/, const std::string& assetPath, const std::string& settingsPath):
     _eventQueue{}, _window("engine", { 1080, 720 }),
     _input(_window, _eventQueue), _renderingContext{},
-    _scriptingEngine(_input),
+    _scriptingEngine(_input, _eventQueue),
     _assetStorage(assetPath, _scriptingEngine),
     _scheduler(std::thread::hardware_concurrency() - 1),
-    _sceneManager(_assetStorage, _scheduler, _eventQueue, _window, _input, _messageBus),
+    _sceneManager(_assetStorage, _scheduler, _eventQueue, _window, _input, _messageBus, settingsPath),
     _serializer(_assetStorage)
 {
 }

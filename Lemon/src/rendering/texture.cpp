@@ -6,9 +6,9 @@
 #include <rendering/gl_errors.h>
 
 namespace lemon {
-texture::texture(hashstr name, const std::string& path,
+texture::texture(hashstr nameid, const std::string& path,
                  wrap wrapping, filter filtering):
-    resource(name),
+    resource(nameid),
     handle(0),
     wrapping(wrapping), filtering(filtering)
 {
@@ -45,8 +45,8 @@ texture::texture(hashstr name, const std::string& path,
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
     stbi_image_free(data);
 }
-texture::texture(hashstr name, const std::vector<u8>& buffer):
-    resource(name), handle(0),
+texture::texture(hashstr nameid, const std::vector<u8>& buffer):
+    resource(nameid), handle(0),
     wrapping(wrap::clampToBorder), filtering(filter::nearest)
 {
     int width;
@@ -83,14 +83,14 @@ texture::texture(hashstr name, const std::vector<u8>& buffer):
 
     stbi_image_free(data);
 }
-texture::texture(hashstr name, const std::string& path):
-    texture(name, path, wrap::clampToBorder, filter::nearest)
+texture::texture(hashstr nameid, const std::string& path):
+    texture(nameid, path, wrap::clampToBorder, filter::nearest)
 { }
-texture::texture(hashstr name, const ivec2& size, const color& c):
-    texture(name, size, c, wrap::clampToBorder, filter::nearest)
+texture::texture(hashstr nameid, const ivec2& size, const color& c):
+    texture(nameid, size, c, wrap::clampToBorder, filter::nearest)
 { }
-texture::texture(hashstr name, const ivec2& size, const color& c, wrap wrapping, filter filtering):
-    resource(name), size(size), wrapping(wrapping), filtering(filtering)
+texture::texture(hashstr nameid, const ivec2& size, const color& c, wrap wrapping, filter filtering):
+    resource(nameid), size(size), wrapping(wrapping), filtering(filtering)
 {
     lemon_assert(!(size.x % 4) && !(size.y % 4));
     std::vector<unsigned char> data(size.x * size.y * 4);

@@ -1,5 +1,5 @@
 /** @file sat_algorithm.h
- * Separating Axis Theorem algorihtm implementation
+ * @brief Separating Axis Theorem algorihtm implementation
  */
 #pragma once
 
