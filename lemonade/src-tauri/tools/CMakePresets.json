@@ -1,0 +1,64 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 22,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "description": "Default build",
+            "binaryDir": "build",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_CXX_STANDARD_REQUIRED": "YES",
+                "BUILD_SHARED_LIBS": "OFF",
+                "LEMON_PROFILE": "OFF"
+            }
+        },
+        {
+            "name": "linux-debug",
+            "inherits": "default",
+            "description": "Linux debug build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wformat=2 -Wno-attributes -g -Og",
+                "LEMON_PLATFORM": "LEMON_LINUX"
+            }
+        },
+        {
+            "name": "linux-release",
+            "inherits": "linux-debug",
+            "description": "Linux release build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS": "-Wno-attributes -O3"
+            }
+        },
+        {
+            "name": "windows-debug",
+            "inherits": "default",
+            "description": "Windows debug build",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS": "/W4 /wd5030 /EHsc /wd5045 /wd4702",
+                "LEMON_PLATFORM": "LEMON_WINDOWS"
+            }
+        },
+        {
+            "name": "windows-release",
+            "inherits": "windows-debug",
+            "description": "Windows release build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS": "/W0 /wd5030 /EHsc /wd5045 /wd4702"
+            }
+        }
+    ]
+}

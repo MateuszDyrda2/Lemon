@@ -1,3 +1,4 @@
+import shutil
 import sys
 import os
 import json
@@ -47,7 +48,9 @@ GAME_DECL({0});
 cmake_template = '''
 cmake_minimum_required(VERSION 3.22)
 
-project({0} LANGAUGES CXX)
+project({0} LANGUAGES CXX)
+
+set(CMAKE_MODULE_PATH ${{CMAKE_CURRENT_SOURCE_DIR}}/cmake)
 
 set({0}_SRC
     ${{CMAKE_CURRENT_SOURCE_DIR}}/src/main.cpp
@@ -55,7 +58,20 @@ set({0}_SRC
 
 set(COMPONENTS_LIST )
 
+include(Macros)
+set(serialization_files ${{CMAKE_BINARY_DIR}}/_generated/types.cpp)
+
+set(COMPONENTS_LIST_LEMON
+    "{1}/world/components/entity_components.h"
+    "{1}/world/components/transform_components.h"
+    "{1}/rendering/components/rendering_components.h"
+    "{1}/scripting/components/scripting_components.h"
+    "{1}/physics/components/physics_components.h"
+)
+
+add_components("${{COMPONENTS_LIST_LEMON}}")
 add_components("${{COMPONENTS_LIST}}")
+add_executable({0} ${{{0}_SRC}} ${{serialization_files}})
 
 target_compile_definitions(
     {0} PUBLIC
@@ -81,6 +97,8 @@ def main(argv):
     os.mkdir(asset_path + "/scripts")
     os.mkdir(asset_path + "/shaders")
     os.mkdir(asset_path + "/textures")
+    shutil.copytree("tools/cmake", os.path.join(asset_path, "cmake"))
+
     with open(asset_path + "/assets.json", "w+") as f:
         json.dump({
             "textures": [],
@@ -100,7 +118,7 @@ def main(argv):
 
     cmake_file = project_dir + "/CMakeLists.txt"
     with open(cmake_file, "w+") as f:
-        f.write(cmake_template.format(project_name))
+        f.write(cmake_template.format(project_name, os.path.abspath("../../include")))
 
     project_f = {
         "project_name": project_name,

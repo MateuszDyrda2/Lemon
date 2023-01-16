@@ -8,7 +8,7 @@ option(LEMON_BUILD_SANDBOX "Build sandbox" ON)
 # Build tests
 option(LEMON_BUILD_TESTS "Build lemon tests" ON)
 # Build docs
-option(LEMON_BUILD_DOCS "Build docs" OFF)
+option(LEMON_BUILD_DOCS "Build docs" ON)
 # -------------------------------------------
 
 if(LEMON_BUILD_DOCS)

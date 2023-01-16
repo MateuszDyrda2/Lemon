@@ -131,11 +131,9 @@ std::list<u32> bvh_tree::raycast(vec2 position)
 
 void bvh_tree::insert_node(index_t leafIndex)
 {
-    auto& newNode      = nodes[leafIndex];
-    auto& box          = newNode.box;
-    const auto boxSize = box.max - box.min;
-    box.min -= boxSize * fattenBy;
-    box.max += boxSize * fattenBy;
+    auto& newNode = nodes[leafIndex];
+    auto& box     = newNode.box;
+    fatten_box(box);
 
     if (nodeCount == 1)
     {
@@ -147,38 +145,14 @@ void bvh_tree::insert_node(index_t leafIndex)
     auto siblingIndex = find_sibling(box);
 
     // create a new parent
-    auto oldParentIndex       = nodes[siblingIndex].parentIndex;
-    auto newParentIndex       = allocate_node();
-    auto& newParentNode       = nodes[newParentIndex];
-    newParentNode.box         = detail::AABB_union(box, nodes[siblingIndex].box);
-    newParentNode.parentIndex = oldParentIndex;
-    newParentNode.isLeaf      = false;
-    newParentNode.height = nodes[siblingIndex].height + 1;
+    auto oldParentIndex = nodes[siblingIndex].parentIndex;
+    auto newParentIndex = allocate_node();
+    initialize_new_parent(oldParentIndex, newParentIndex, siblingIndex, box);
 
     if (oldParentIndex != nullIndex)
-    {
-        if (nodes[oldParentIndex].childA == siblingIndex)
-        {
-            nodes[oldParentIndex].childA = newParentIndex;
-        }
-        else
-        {
-            nodes[oldParentIndex].childB = newParentIndex;
-        }
-
-        nodes[newParentIndex].childA    = siblingIndex;
-        nodes[newParentIndex].childB    = leafIndex;
-        nodes[siblingIndex].parentIndex = newParentIndex;
-        nodes[leafIndex].parentIndex    = newParentIndex;
-    }
+        create_parent(oldParentIndex, newParentIndex, siblingIndex, leafIndex);
     else
-    {
-        nodes[newParentIndex].childA    = siblingIndex;
-        nodes[newParentIndex].childB    = leafIndex;
-        nodes[siblingIndex].parentIndex = newParentIndex;
-        nodes[leafIndex].parentIndex    = newParentIndex;
-        rootIndex                       = newParentIndex;
-    }
+        create_parent_root(oldParentIndex, newParentIndex, siblingIndex, leafIndex);
 
     // walk back up the tree refitting AABBs
     auto index = nodes[leafIndex].parentIndex;
@@ -197,6 +171,47 @@ void bvh_tree::insert_node(index_t leafIndex)
     }
 }
 
+void bvh_tree::fatten_box(AABB& box)
+{
+    const auto boxSize = box.max - box.min;
+    box.min -= boxSize * fattenBy;
+    box.max += boxSize * fattenBy;
+}
+
+void bvh_tree::initialize_new_parent(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, AABB& box)
+{
+    auto& newParentNode       = nodes[newParentIndex];
+    newParentNode.box         = detail::AABB_union(box, nodes[siblingIndex].box);
+    newParentNode.parentIndex = oldParentIndex;
+    newParentNode.isLeaf      = false;
+    newParentNode.height      = nodes[siblingIndex].height + 1;
+}
+
+void bvh_tree::create_parent(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, index_t leafIndex)
+{
+    if (nodes[oldParentIndex].childA == siblingIndex)
+    {
+        nodes[oldParentIndex].childA = newParentIndex;
+    }
+    else
+    {
+        nodes[oldParentIndex].childB = newParentIndex;
+    }
+
+    nodes[newParentIndex].childA    = siblingIndex;
+    nodes[newParentIndex].childB    = leafIndex;
+    nodes[siblingIndex].parentIndex = newParentIndex;
+    nodes[leafIndex].parentIndex    = newParentIndex;
+}
+void bvh_tree::create_parent_root(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, index_t leafIndex)
+{
+    nodes[newParentIndex].childA    = siblingIndex;
+    nodes[newParentIndex].childB    = leafIndex;
+    nodes[siblingIndex].parentIndex = newParentIndex;
+    nodes[leafIndex].parentIndex    = newParentIndex;
+    rootIndex                       = newParentIndex;
+}
+
 void bvh_tree::remove_node(index_t index)
 {
     if (index == rootIndex)
@@ -208,7 +223,7 @@ void bvh_tree::remove_node(index_t index)
     auto& currentNode     = nodes[index];
     auto parentIndex      = currentNode.parentIndex;
     auto& parentNode      = nodes[parentIndex];
-    auto siblingIndex     = parentNode.childA == index ? parentNode.childA : parentNode.childB;
+    auto siblingIndex     = parentNode.childA == index ? parentNode.childB : parentNode.childA;
     auto& siblingNode     = nodes[siblingIndex];
     auto grandparentIndex = parentNode.parentIndex;
     if (grandparentIndex != nullIndex)
@@ -248,6 +263,123 @@ void bvh_tree::remove_node(index_t index)
     currentNode.parentIndex = nullIndex;
 }
 
+bvh_tree::index_t bvh_tree::rotate_right(index_t index, index_t childAIndex, index_t childBIndex)
+{
+    auto childBchildAIndex = nodes[childBIndex].childA;
+    auto childBchildBIndex = nodes[childBIndex].childB;
+
+    nodes[childBIndex].childA      = index;
+    nodes[childBIndex].parentIndex = nodes[index].parentIndex;
+    nodes[index].parentIndex       = childBIndex;
+
+    if (nodes[childBIndex].parentIndex != nullIndex)
+    {
+        if (nodes[nodes[childBIndex].parentIndex].childA == index)
+        {
+            nodes[nodes[childBIndex].parentIndex].childA = childBIndex;
+        }
+        else
+        {
+            nodes[nodes[childBIndex].parentIndex].childB = childBIndex;
+        }
+    }
+    else
+    {
+        rootIndex = childBIndex;
+    }
+    if (nodes[childBchildAIndex].height > nodes[childBchildBIndex].height)
+    {
+        rotate_right_left(index, childAIndex, childBIndex, childBchildAIndex, childBchildBIndex);
+    }
+    else
+    {
+        rotate_right_right(index, childAIndex, childBIndex, childBchildAIndex, childBchildBIndex);
+    }
+    return childBIndex;
+}
+
+bvh_tree::index_t bvh_tree::rotate_left(index_t index, index_t childAIndex, index_t childBIndex)
+{
+    auto childAchildAIndex = nodes[childAIndex].childA;
+    auto childAchildBIndex = nodes[childAIndex].childB;
+
+    nodes[childAIndex].childA      = index;
+    nodes[childAIndex].parentIndex = nodes[index].parentIndex;
+    nodes[index].parentIndex       = childAIndex;
+
+    if (nodes[childAIndex].parentIndex != nullIndex)
+    {
+        if (nodes[nodes[childAIndex].parentIndex].childA == index)
+        {
+            nodes[nodes[childAIndex].parentIndex].childA = childAIndex;
+        }
+        else
+        {
+            nodes[nodes[childAIndex].parentIndex].childB = childAIndex;
+        }
+    }
+    else
+    {
+        rootIndex = childAIndex;
+    }
+    if (nodes[childAchildAIndex].height > nodes[childAchildBIndex].height)
+    {
+        rotate_left_left(index, childAIndex, childBIndex, childAchildAIndex, childAchildBIndex);
+    }
+    else
+    {
+        rotate_left_right(index, childAIndex, childBIndex, childAchildAIndex, childAchildBIndex);
+    }
+    return childAIndex;
+}
+
+void bvh_tree::rotate_right_left(index_t index, index_t childAIndex, index_t childBIndex, index_t childBchildAIndex, index_t childBchildBIndex)
+{
+    nodes[childBIndex].childB            = childBchildAIndex;
+    nodes[index].childB                  = childBchildBIndex;
+    nodes[childBchildBIndex].parentIndex = index;
+    nodes[index].box                     = detail::AABB_union(nodes[childAIndex].box, nodes[childBchildBIndex].box);
+    nodes[childBIndex].box               = detail::AABB_union(nodes[index].box, nodes[childBchildAIndex].box);
+
+    nodes[index].height       = 1 + std::max(nodes[childAIndex].height, nodes[childBchildBIndex].height);
+    nodes[childBIndex].height = 1 + std::max(nodes[index].height, nodes[childBchildAIndex].height);
+}
+
+void bvh_tree::rotate_right_right(index_t index, index_t childAIndex, index_t childBIndex, index_t childBchildAIndex, index_t childBchildBIndex)
+{
+    nodes[childBIndex].childB            = childBchildBIndex;
+    nodes[index].childB                  = childBchildAIndex;
+    nodes[childBchildAIndex].parentIndex = index;
+    nodes[index].box                     = detail::AABB_union(nodes[childAIndex].box, nodes[childBchildAIndex].box);
+    nodes[childBIndex].box               = detail::AABB_union(nodes[index].box, nodes[childBchildBIndex].box);
+
+    nodes[index].height       = 1 + std::max(nodes[childAIndex].height, nodes[childBchildAIndex].height);
+    nodes[childBIndex].height = 1 + std::max(nodes[index].height, nodes[childBchildBIndex].height);
+}
+
+void bvh_tree::rotate_left_left(index_t index, index_t childAIndex, index_t childBIndex, index_t childAchildAIndex, index_t childAchildBIndex)
+{
+    nodes[childAIndex].childB            = childAchildAIndex;
+    nodes[index].childA                  = childAchildBIndex;
+    nodes[childAchildBIndex].parentIndex = index;
+    nodes[index].box                     = detail::AABB_union(nodes[childBIndex].box, nodes[childAchildBIndex].box);
+    nodes[childAIndex].box               = detail::AABB_union(nodes[index].box, nodes[childAchildAIndex].box);
+
+    nodes[index].height       = 1 + std::max(nodes[childBIndex].height, nodes[childAchildBIndex].height);
+    nodes[childAIndex].height = 1 + std::max(nodes[index].height, nodes[childAchildAIndex].height);
+}
+void bvh_tree::rotate_left_right(index_t index, index_t childAIndex, index_t childBIndex, index_t childAchildAIndex, index_t childAchildBIndex)
+{
+    nodes[childAIndex].childB            = childAchildBIndex;
+    nodes[index].childA                  = childAchildAIndex;
+    nodes[childAchildAIndex].parentIndex = index;
+    nodes[index].box                     = detail::AABB_union(nodes[childBIndex].box, nodes[childAchildAIndex].box);
+    nodes[childAIndex].box               = detail::AABB_union(nodes[index].box, nodes[childAchildBIndex].box);
+
+    nodes[index].height       = 1 + std::max(nodes[childBIndex].height, nodes[childAchildAIndex].height);
+    nodes[childAIndex].height = 1 + std::max(nodes[index].height, nodes[childAchildBIndex].height);
+}
+
 bvh_tree::index_t bvh_tree::rotate(index_t index)
 {
     if (nodes[index].isLeaf || nodes[index].height < 2) return index;
@@ -257,101 +389,9 @@ bvh_tree::index_t bvh_tree::rotate(index_t index)
 
     auto balance = nodes[childBIndex].height - nodes[childAIndex].height;
     if (balance > 1)
-    {
-        auto childBchildAIndex = nodes[childBIndex].childA;
-        auto childBchildBIndex = nodes[childBIndex].childB;
-
-        nodes[childBIndex].childA      = index;
-        nodes[childBIndex].parentIndex = nodes[index].parentIndex;
-        nodes[index].parentIndex       = childBIndex;
-
-        if (nodes[childBIndex].parentIndex != nullIndex)
-        {
-            if (nodes[nodes[childBIndex].parentIndex].childA == index)
-            {
-                nodes[nodes[childBIndex].parentIndex].childA = childBIndex;
-            }
-            else
-            {
-                nodes[nodes[childBIndex].parentIndex].childB = childBIndex;
-            }
-        }
-        else
-        {
-            rootIndex = childBIndex;
-        }
-        if (nodes[childBchildAIndex].height > nodes[childBchildBIndex].height)
-        {
-            nodes[childBIndex].childB            = childBchildAIndex;
-            nodes[index].childB                  = childBchildBIndex;
-            nodes[childBchildBIndex].parentIndex = index;
-            nodes[index].box                     = detail::AABB_union(nodes[childAIndex].box, nodes[childBchildBIndex].box);
-            nodes[childBIndex].box               = detail::AABB_union(nodes[index].box, nodes[childBchildAIndex].box);
-
-            nodes[index].height       = 1 + std::max(nodes[childAIndex].height, nodes[childBchildBIndex].height);
-            nodes[childBIndex].height = 1 + std::max(nodes[index].height, nodes[childBchildAIndex].height);
-        }
-        else
-        {
-            nodes[childBIndex].childB            = childBchildBIndex;
-            nodes[index].childB                  = childBchildAIndex;
-            nodes[childBchildAIndex].parentIndex = index;
-            nodes[index].box                     = detail::AABB_union(nodes[childAIndex].box, nodes[childBchildAIndex].box);
-            nodes[childBIndex].box               = detail::AABB_union(nodes[index].box, nodes[childBchildBIndex].box);
-
-            nodes[index].height       = 1 + std::max(nodes[childAIndex].height, nodes[childBchildAIndex].height);
-            nodes[childBIndex].height = 1 + std::max(nodes[index].height, nodes[childBchildBIndex].height);
-        }
-        return childBIndex;
-    }
+        return rotate_right(index, childAIndex, childBIndex);
     else if (balance < -1)
-    {
-        auto childAchildAIndex = nodes[childAIndex].childA;
-        auto childAchildBIndex = nodes[childAIndex].childB;
-
-        nodes[childAIndex].childA      = index;
-        nodes[childAIndex].parentIndex = nodes[index].parentIndex;
-        nodes[index].parentIndex       = childAIndex;
-
-        if (nodes[childAIndex].parentIndex != nullIndex)
-        {
-            if (nodes[nodes[childAIndex].parentIndex].childA == index)
-            {
-                nodes[nodes[childAIndex].parentIndex].childA = childAIndex;
-            }
-            else
-            {
-                nodes[nodes[childAIndex].parentIndex].childB = childAIndex;
-            }
-        }
-        else
-        {
-            rootIndex = childAIndex;
-        }
-        if (nodes[childAchildAIndex].height > nodes[childAchildBIndex].height)
-        {
-            nodes[childAIndex].childB            = childAchildAIndex;
-            nodes[index].childA                  = childAchildBIndex;
-            nodes[childAchildBIndex].parentIndex = index;
-            nodes[index].box                     = detail::AABB_union(nodes[childBIndex].box, nodes[childAchildBIndex].box);
-            nodes[childAIndex].box               = detail::AABB_union(nodes[index].box, nodes[childAchildAIndex].box);
-
-            nodes[index].height       = 1 + std::max(nodes[childBIndex].height, nodes[childAchildBIndex].height);
-            nodes[childAIndex].height = 1 + std::max(nodes[index].height, nodes[childAchildAIndex].height);
-        }
-        else
-        {
-            nodes[childAIndex].childB            = childAchildBIndex;
-            nodes[index].childA                  = childAchildAIndex;
-            nodes[childAchildAIndex].parentIndex = index;
-            nodes[index].box                     = detail::AABB_union(nodes[childBIndex].box, nodes[childAchildAIndex].box);
-            nodes[childAIndex].box               = detail::AABB_union(nodes[index].box, nodes[childAchildBIndex].box);
-
-            nodes[index].height       = 1 + std::max(nodes[childBIndex].height, nodes[childAchildAIndex].height);
-            nodes[childAIndex].height = 1 + std::max(nodes[index].height, nodes[childAchildBIndex].height);
-        }
-        return childAIndex;
-    }
+        return rotate_left(index, childAIndex, childBIndex);
     return index;
 }
 

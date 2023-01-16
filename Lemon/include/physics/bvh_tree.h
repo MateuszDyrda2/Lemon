@@ -76,5 +76,16 @@ class LEMON_API bvh_tree
     index_t find_sibling(const AABB& box);
     index_t allocate_node();
     void deallocate_node(index_t node);
+
+    void fatten_box(AABB& box);
+    void initialize_new_parent(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, AABB& box);
+    void create_parent(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, index_t leafIndex);
+    void create_parent_root(index_t oldParentIndex, index_t newParentIndex, index_t siblingIndex, index_t leafIndex);
+    index_t rotate_right(index_t index, index_t childAIndex, index_t childBIndex);
+    index_t rotate_left(index_t index, index_t childAIndex, index_t childBIndex);
+    void rotate_right_left(index_t index, index_t childAIndex, index_t childBIndex, index_t childBchildAIndex, index_t childBchildBIndex);
+    void rotate_right_right(index_t index, index_t childAIndex, index_t childBIndex, index_t childBchildAIndex, index_t childBchildBIndex);
+    void rotate_left_left(index_t index, index_t childAIndex, index_t childBIndex, index_t childAchildAIndex, index_t childAchildBIndex);
+    void rotate_left_right(index_t index, index_t childAIndex, index_t childBIndex, index_t childAchildAIndex, index_t childAchildBIndex);
 };
 }

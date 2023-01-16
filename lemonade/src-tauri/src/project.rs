@@ -739,7 +739,10 @@ pub fn save(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
 }
 
 #[tauri::command]
-pub fn recreate_assets(state: tauri::State<ProjectState>) -> Result<(), ProjectErrorCode> {
+pub fn recreate_assets(
+    state: tauri::State<ProjectState>,
+    handle: tauri::AppHandle,
+) -> Result<(), ProjectErrorCode> {
     let state_guard = lock_state!(state);
 
     let Some(project) = &*state_guard else {
@@ -749,11 +752,15 @@ pub fn recreate_assets(state: tauri::State<ProjectState>) -> Result<(), ProjectE
     let path = &project.path;
 
     let asset_path = path.join(assets);
-    let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("tools/recreate_assets.py");
+    let tool_path = handle.path_resolver()
+                .resolve_resource("tools/recreate_assets.py")
+                .expect("failed to create project");
+
+    //let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
+    //    .unwrap()
+    //    .parent()
+    //    .unwrap()
+    //    .join("tools/recreate_assets.py");
 
     let python = if cfg!(windows) { "py.exe" } else { "python3" };
 
@@ -838,18 +845,22 @@ pub fn set_settings(
 #[tauri::command]
 pub fn create_project(
     state: tauri::State<ProjectState>,
+    handle: tauri::AppHandle,
     window: Window,
     path: String,
 ) -> Result<String, &'static str> {
     let mut state_guard = lock_state!(state);
 
     let project_name = Path::new(&path).file_name().unwrap().to_str().unwrap();
+    let tool_path = handle.path_resolver()
+                .resolve_resource("tools/create_project.py")
+                .expect("failed to create project");
 
-    let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("tools/create_project.py");
+    //let tool_path = PathBuf::try_from(env!("CARGO_MANIFEST_DIR"))
+    //    .unwrap()
+    //    .parent()
+    //    .unwrap()
+    //    .join("tools/create_project.py");
 
     let python = if cfg!(windows) { "py.exe" } else { "python3" };
 

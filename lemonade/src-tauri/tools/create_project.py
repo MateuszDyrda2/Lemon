@@ -1,3 +1,5 @@
+import errno
+import shutil
 import sys
 import os
 import json
@@ -47,15 +49,22 @@ GAME_DECL({0});
 cmake_template = '''
 cmake_minimum_required(VERSION 3.22)
 
-project({0} LANGAUGES CXX)
+project({0} LANGUAGES CXX)
 
 set({0}_SRC
     ${{CMAKE_CURRENT_SOURCE_DIR}}/src/main.cpp
 )
 
+add_subdirectory("${{CMAKE_CURRENT_SOURCE_DIR}}/Lemon")
+
 set(COMPONENTS_LIST )
 
+set(serialization_files ${{CMAKE_BINARY_DIR}}/_generated/types.cpp)
+
 add_components("${{COMPONENTS_LIST}}")
+add_executable({0} ${{{0}_SRC}} ${{serialization_files}})
+
+target_link_libraries({0} PUBLIC lemon::lemon)
 
 target_compile_definitions(
     {0} PUBLIC
@@ -65,6 +74,16 @@ target_compile_definitions(
 )
 
 '''
+
+
+def copyDir(src, dst):
+    try:
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+    except OSError as exc:
+        if exc.errno in (errno.ENOTDIR, errno.EINVAL):
+            shutil.copy(src, dst)
+        else:
+            raise
 
 
 def main(argv):
@@ -81,6 +100,10 @@ def main(argv):
     os.mkdir(asset_path + "/scripts")
     os.mkdir(asset_path + "/shaders")
     os.mkdir(asset_path + "/textures")
+    copyDir("tools", os.path.join(project_dir, "tools"))
+    shutil.copy("tools/CMakePresets.json", project_dir)
+    copyDir("../../Lemon", os.path.join(project_dir, "Lemon"))
+
     with open(asset_path + "/assets.json", "w+") as f:
         json.dump({
             "textures": [],
@@ -100,7 +123,8 @@ def main(argv):
 
     cmake_file = project_dir + "/CMakeLists.txt"
     with open(cmake_file, "w+") as f:
-        f.write(cmake_template.format(project_name))
+        f.write(cmake_template.format(project_name,
+                os.path.abspath("../..").replace(os.sep, '/')))
 
     project_f = {
         "project_name": project_name,
