@@ -70,12 +70,13 @@ fn get_dataset(project: &Project) -> Result<&Types, ProjectErrorCode> {
         .ok_or(ProjectErrorCode::NoDatasetLoaded)
 }
 
-fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
+fn generate_assets(assets: &Assets, assets_p: PathBuf) -> Result<AssetLookup, ProjectErrorCode> {
     let mut asset_lookup: HashMap<u32, String> = HashMap::new();
+
     for a in &assets.textures {
         let hashed = hash_string(&a.name);
         if let Some(h) = hashed {
-            asset_lookup.insert(h, a.path.clone());
+            asset_lookup.insert(h, assets_p.join(a.path.clone()).to_str().unwrap().to_string());
         } else {
             println!("Failed to hash and insert asset: {}", &a.name);
         }
@@ -84,7 +85,7 @@ fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
     for a in &assets.sounds {
         let hashed = hash_string(&a.name);
         if let Some(h) = hashed {
-            asset_lookup.insert(h, a.path.clone());
+            asset_lookup.insert(h, assets_p.join(a.path.clone()).to_str().unwrap().to_string());
         } else {
             println!("Failed to hash and insert asset: {}", &a.name);
         }
@@ -93,7 +94,7 @@ fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
     for a in &assets.shaders {
         let hashed = hash_string(&a.name);
         if let Some(h) = hashed {
-            asset_lookup.insert(h, a.path.clone());
+            asset_lookup.insert(h, assets_p.join(a.path.clone()).to_str().unwrap().to_string());
         } else {
             println!("Failed to hash and insert asset: {}", &a.name);
         }
@@ -102,7 +103,7 @@ fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
     for a in &assets.scripts {
         let hashed = hash_string(&a.name);
         if let Some(h) = hashed {
-            asset_lookup.insert(h, a.path.clone());
+            asset_lookup.insert(h, assets_p.join(a.path.clone()).to_str().unwrap().to_string());
         } else {
             println!("Failed to hash and insert asset: {}", &a.name);
         }
@@ -111,7 +112,7 @@ fn generate_assets(assets: &Assets) -> Result<AssetLookup, ProjectErrorCode> {
     for a in &assets.animations {
         let hashed = hash_string(&a.name);
         if let Some(h) = hashed {
-            asset_lookup.insert(h, a.path.clone());
+            asset_lookup.insert(h, assets_p.join(a.path.clone()).to_str().unwrap().to_string());
         } else {
             println!("Failed to hash and insert asset: {}", &a.name);
         }
@@ -169,7 +170,7 @@ fn open_project_impl(
         };
 
         if let Some(a) = &project.assets {
-            project.asset_lookup = generate_assets(a).ok();
+            project.asset_lookup = generate_assets(a, parent.unwrap().join(&project.assets_path)).ok();
         }
 
         _ = window.emit("project-opened", "");

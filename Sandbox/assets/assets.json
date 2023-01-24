@@ -2,74 +2,74 @@
     "textures": [
         {
             "name": "dwarf-m-001",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf-m-001.png"
+            "path": "textures\\dwarf-m-001.png"
         },
         {
             "name": "dwarf-m-002",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf-m-002.png"
+            "path": "textures\\dwarf-m-002.png"
         },
         {
             "name": "dwarf_elder-m-001",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_elder-m-001.png"
+            "path": "textures\\dwarf_elder-m-001.png"
         },
         {
             "name": "dwarf_guardian-m-001",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_guardian-m-001.png"
+            "path": "textures\\dwarf_guardian-m-001.png"
         },
         {
             "name": "dwarf_hero-m-001",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_hero-m-001.png"
+            "path": "textures\\dwarf_hero-m-001.png"
         },
         {
             "name": "dwarf_leader-m-001",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\dwarf_leader-m-001.png"
+            "path": "textures\\dwarf_leader-m-001.png"
         },
         {
             "name": "fire",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\fire.png"
+            "path": "textures\\fire.png"
         },
         {
             "name": "floor",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\floor.png"
+            "path": "textures\\floor.png"
         },
         {
             "name": "player",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\player.png"
+            "path": "textures\\player.png"
         },
         {
             "name": "player_anim",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\player_anim.png"
+            "path": "textures\\player_anim.png"
         },
         {
             "name": "tile",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\textures\\tile.png"
+            "path": "textures\\tile.png"
         }
     ],
     "sounds": [],
     "shaders": [
         {
             "name": "sprite_renderer_shader",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\shaders\\sprite_renderer_shader.glsl"
+            "path": "shaders\\sprite_renderer_shader.glsl"
         }
     ],
     "scripts": [
         {
             "name": "camera_script",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\scripts\\camera_script.lua"
+            "path": "scripts\\camera_script.lua"
         },
         {
             "name": "player_script",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\scripts\\player_script.lua"
+            "path": "scripts\\player_script.lua"
         }
     ],
     "animations": [
         {
             "name": "player2_animation",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\animations\\player2_animation.lua"
+            "path": "animations\\player2_animation.lua"
         },
         {
             "name": "player_animation",
-            "path": "C:\\Users\\JI42GA\\source\\repos\\Lemon\\Sandbox\\assets\\animations\\player_animation.lua"
+            "path": "animations\\player_animation.lua"
         }
     ]
 }

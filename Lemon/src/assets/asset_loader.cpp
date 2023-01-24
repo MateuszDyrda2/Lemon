@@ -42,13 +42,13 @@ asset_loader::asset_loader(const string& path, scripting_engine& _scriptingEngin
     auto&& scripts    = document["scripts"].GetArray();
     auto&& animations = document["animations"].GetArray();
 
-    run_for_each([this](auto& vv) {
+    run_for_each([this, &path](auto& vv) {
         for (auto&& v : vv)
         {
             auto&& t                                   = v.GetObject();
             auto name                                  = t["name"].GetString();
-            auto path                                  = t["path"].GetString();
-            resourcePaths[hashstr::runtime_hash(name)] = path;
+            auto _path                                  = path + "/" + t["path"].GetString();
+            resourcePaths[hashstr::runtime_hash(name)] = _path;
         }
     },
                  textures, sounds, shaders, scripts, animations);
