@@ -1,4 +1,8 @@
-use super::{error_codes::ProjectErrorCode, models::{Scene, Component}, utils::hash_string};
+use super::{
+    error_codes::ProjectErrorCode,
+    models::{Component, Scene},
+    utils::hash_string,
+};
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -12,7 +16,7 @@ pub struct EntityDTO {
 
 pub fn get_all_entities(scene: &Scene) -> Vec<EntityDTO> {
     let names = (&scene.components).iter().find(|x| x.name == "tag");
-    
+
     let Some(entities_m) = names.as_ref() else {
         return Vec::new();
     };
@@ -29,8 +33,8 @@ pub fn get_all_entities(scene: &Scene) -> Vec<EntityDTO> {
 
 pub fn add_new_entity(scene: &mut Scene) {
     let entities = &mut scene.entities;
-    let new_id = entities.count;
-    entities.count += 1;
+    let new_id = entities.count + 1;
+    entities.count = new_id;
     entities.ids.insert(0, new_id);
 
     let components = &mut scene.components;
@@ -45,7 +49,10 @@ pub fn add_new_entity(scene: &mut Scene) {
             name: "tag".to_owned(),
             id: hash_string("tag").unwrap() as u64,
             count: 1,
-            entities: HashMap::from([(new_id, HashMap::from([(String::from("name"), json!("scene_object"))]))])
+            entities: HashMap::from([(
+                new_id,
+                HashMap::from([(String::from("name"), json!("scene_object"))]),
+            )]),
         });
     }
 }

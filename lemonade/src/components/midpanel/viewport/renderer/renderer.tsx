@@ -44,6 +44,7 @@ const renderScene = (
     gl.enableVertexAttribArray(program.attribLocations.vertexPosition);
 
     for (const data of renderingData) {
+        if (!textures[data.textureid]) return;
         const { handle, size } = textures[data.textureid];
         const texCoords = data.tex_coords;
 
